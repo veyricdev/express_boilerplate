@@ -1,38 +1,16 @@
 {
-	// JavaScript/TypeScript
-	"biome_lsp.trace.server": "verbose",
-	"biome.requireConfiguration": true,
-	"biome.lspBin": "../node_modules/@biomejs/biome/bin/biome",
-	"[javascript]": {
-		"editor.defaultFormatter": "biomejs.biome",
-		"editor.codeActionsOnSave": {
-			"quickfix.biome": "explicit",
-			"source.fixAll.eslint": "explicit",
-			"source.organizeImports.biome": "explicit"
-		}
+	"biome.enabled": true,
+	"editor.formatOnSave": true,
+	"[javascript][typescript][json][jsonc]": {
+		"editor.defaultFormatter": "biomejs.biome"
 	},
-	"[typescript]": {
-		"editor.defaultFormatter": "biomejs.biome",
-		"editor.codeActionsOnSave": {
-			"quickfix.biome": "explicit",
-			"source.fixAll.eslint": "explicit",
-			"source.organizeImports.biome": "explicit"
-		}
+	"editor.codeActionsOnSave": {
+		"source.fixAll": "explicit",
+		"source.fixAll.biome": "explicit",
+		"source.organizeImports.biome": "explicit"
 	},
-	"[typescriptreact]": {
-		"editor.defaultFormatter": "biomejs.biome",
-		"editor.codeActionsOnSave": {
-			"quickfix.biome": "explicit",
-			"source.fixAll.eslint": "explicit",
-			"source.organizeImports.biome": "explicit"
-		}
+	"editor.quickSuggestions": {
+		"strings": "on"
 	},
-	// vscode adds this 'merged' entry automatically. Supposedly we could remove all single entries, but right now when I remove this, the biome format on save stops working
-	"[javascript][typescript][typescriptreact]": {
-		"editor.codeActionsOnSave": {
-			"quickfix.biome": "explicit",
-			"source.fixAll.eslint": "explicit",
-			"source.organizeImports.biome": "explicit"
-		}
-	}
+	"i18n-ally.localesPaths": ["src/locales", "src/locales/lang"]
 }

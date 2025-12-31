@@ -1,0 +1,8 @@
+{
+	"recommendations": [
+		"EditorConfig.EditorConfig",
+		"esbenp.prettier-vscode",
+		"biomejs.biome",
+		"Lokalise.i18n-ally"
+	]
+}
