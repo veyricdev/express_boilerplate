@@ -32,7 +32,7 @@ services:
   # Postgres Database
   app_db:
     container_name: express_boilerplate_postgres_db
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     ports:
       - "6677:5432"
     environment:
