@@ -1,0 +1,56 @@
+services:
+  app_api:
+    container_name: express_boilerplate_api
+    build:
+      context: .
+      # dockerfile: Dockerfile.local
+    ports:
+      - "6606:6606"
+    environment:
+      - REDIS_HOST=express_boilerplate_redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    depends_on:
+      - app_db
+      - app_cache
+    networks:
+      - express_boilerplate_network
+
+  # Redis cache
+  app_cache:
+    container_name: express_boilerplate_redis
+    image: redis:8.4.0-alpine
+    ports:
+      - "6679:6379"
+    volumes:
+      - express_boilerplate_redis_data:/data
+    networks:
+      - express_boilerplate_network
+
+  # Postgres Database
+  app_db:
+    container_name: express_boilerplate_postgres_db
+    image: postgres:16-alpine
+    ports:
+      - "6677:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    env_file:
+      - ./.env
+    restart: unless-stopped
+    volumes:
+      - express_boilerplate_db_data:/var/lib/postgresql/data
+    networks:
+      - express_boilerplate_network
+
+volumes:
+  express_boilerplate_redis_data:
+  express_boilerplate_db_data:
+
+networks:
+  express_boilerplate_network:

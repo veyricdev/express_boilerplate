@@ -1,12 +1,12 @@
 import type { CorsOptions } from 'cors'
 import { StatusCodes } from 'http-status-codes'
 
-import { IS_PROD } from '~/constants'
 import ApiError from '~/core/ApiError'
+import { env } from './env'
 
 export const corsOptions: CorsOptions = {
 	origin(origin, callback) {
-		if (!origin || !IS_PROD) return callback(null, true)
+		if (!origin || !env.isProduction) return callback(null, true)
 
 		// check domain is in whitelist domain
 		// if (WHITELIST_DOMAINS.filter(Boolean).includes(origin)) return callback(null, true)

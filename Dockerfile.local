@@ -1,0 +1,20 @@
+FROM node:23.11.1-slim AS develop
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install
+
+# Environment
+ENV NODE_ENV=dev
+ENV PORT=6606
+
+COPY . .
+
+# Expose port 6606
+EXPOSE 6606
+
+# Start the server
+CMD npm run dev
