@@ -48,7 +48,7 @@
   },
   "author": "Veyric",
   "license": "ISC",
-  "packageManager": "pnpm@10.26.1",
+  "packageManager": "pnpm@10.27.0",
   "engines": {
     "node": ">=22.21.1"
   }
