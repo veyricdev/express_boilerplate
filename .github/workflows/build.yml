@@ -8,25 +8,66 @@ on:
 
 jobs:
   build:
-    name: build
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Use the latest stable Bun
-        uses: oven-sh/setup-bun@v2
+      # Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          bun-version: 1.1.34
+          node-version: 22
+          cache: pnpm
 
-      - name: Install Dependencies
-        run: bun install
+      # Setup pnpm
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
 
-      - name: Run Build
-        run: bun run build
+      # Install deps
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
+      # Create .env from GitHub Secrets
+      - name: Create .env file
+        run: |
+          echo "NODE_ENV=prod" >> .env
+          echo "DEBUG_CONSOLE=${{ secrets.DEBUG_CONSOLE }}" >> .env
+          echo "DEBUG_FILE=${{ secrets.DEBUG_FILE }}" >> .env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "TELE_CHAT_ID=${{ secrets.TELE_CHAT_ID }}" >> .env
+          echo "TELE_BOT_TOKEN=${{ secrets.TELE_BOT_TOKEN }}" >> .env
+
+      # (optional) Debug
+      - name: Check .env exists
+        run: ls -la .env
+
+      # Build
+      - name: Run build
+        run: pnpm run build
+
+      # Prisma Generate
+      - name: Run prisma:generate
+        run: pnpm run prisma:generate
+
+      # Cleanup
       - name: Remove folder and file for optimize
-        run: rm -rf types src tsconfig.json Dockerfile .dockerignore .env.example .github .husky .vscode
+        run: |
+          rm -rf \
+            types \
+            src \
+            tsconfig.json \
+            Dockerfile \
+            .dockerignore \
+            .env.example \
+            .github \
+            .husky \
+            .vscode
 
+      # Deploy Vercel
       - name: Deploy to Vercel
         run: |
           npm install -g vercel
