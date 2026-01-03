@@ -1,17 +1,14 @@
 import type { NextFunction, Request, Response } from 'express'
-import { StatusCodes } from 'http-status-codes'
-import ApiError from '~/core/ApiError'
-import { catchAsync } from '~/utils/catchAsync'
+import { Api404Error, BusinessLogicError } from '~/core/api.error'
 
 const ErrorsController = {
-	// pass through error default express v5
-	get404(_req: Request, _res: Response, _next: NextFunction) {
-		throw new ApiError('Page Not Found!', StatusCodes.NOT_FOUND)
-	},
+  get404(_req: Request, _res: Response, _next: NextFunction) {
+    throw new Api404Error('Page Not Found!')
+  },
 
-	get500: catchAsync(async (_req: Request, _res: Response, _next: NextFunction) => {
-		throw 'Server Error!'
-	}),
+  get500: async (_req: Request, _res: Response, _next: NextFunction) => {
+    throw new BusinessLogicError('Server Error!')
+  },
 }
 
 export default ErrorsController

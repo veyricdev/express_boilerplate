@@ -1,42 +1,15 @@
-import path from 'node:path'
 import { StatusCodes } from 'http-status-codes'
-import pino, { type TransportTargetOptions } from 'pino'
 import pinoHttp from 'pino-http'
-import { env } from '~/configs/env'
+import { logger } from '~/configs/logger'
 
-const getLogLevel = (status: number) => {
+export const getLogLevel = (status: number) => {
   if (status >= StatusCodes.INTERNAL_SERVER_ERROR) return 'error'
   if (status >= StatusCodes.BAD_REQUEST) return 'warn'
   return 'info'
 }
 
 const requestLogger = pinoHttp({
-  logger: pino({
-    level: env.isProduction ? 'info' : 'debug',
-    timestamp: pino.stdTimeFunctions.isoTime,
-    transport: env.isProduction
-      ? undefined
-      : {
-          targets: [
-            env.DEBUG_FILE
-              ? {
-                  target: 'pino-roll',
-                  options: {
-                    file: path.join(__dirname, '..', 'logs/date/app'),
-                    frequency: 'daily',
-                    mkdir: true,
-                    dateFormat: 'yyyy-MM-dd',
-                  },
-                }
-              : undefined,
-            env.DEBUG_CONSOLE
-              ? {
-                  target: 'pino-pretty',
-                }
-              : undefined,
-          ].filter(Boolean) as TransportTargetOptions<Record<string, any>>[],
-        },
-  }),
+  logger,
   genReqId: (req, res) => {
     const existingID = req.id ?? req.headers['x-request-id']
     if (existingID) return existingID
