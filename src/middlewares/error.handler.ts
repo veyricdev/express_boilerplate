@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import { env } from '~/configs/env'
 import { logger } from '~/configs/logger'
 import bot from '~/configs/telegraf'
-import ApiError from '~/core/ApiError'
+import ApiError from '~/core/api.error'
 
 export default function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunction) {
   const statusCode = err instanceof ApiError ? err.statusCode : StatusCodes.INTERNAL_SERVER_ERROR
@@ -36,5 +36,6 @@ export default function errorHandler(err: Error, _req: Request, res: Response, _
       })
   }
 
+  logger.error(err)
   res.status(statusCode).json(data)
 }
