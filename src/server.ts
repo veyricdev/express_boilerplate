@@ -8,7 +8,7 @@ import { env } from '~/configs/env'
 import { generateOpenAPIDocument } from '~/docs'
 import errorHandler from '~/middlewares/error.handler'
 import rateLimiter from '~/middlewares/rate.limiter'
-import router from '~/routes'
+import router from '~/modules'
 
 const app = express()
 

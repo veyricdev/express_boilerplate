@@ -1,14 +1,14 @@
 import type { NextFunction, Request, Response } from 'express'
 import { Api404Error, BusinessLogicError } from '~/core/api.error'
 
-const ErrorsController = {
+class ErrorController {
   get404(_req: Request, _res: Response, _next: NextFunction) {
     throw new Api404Error('Page Not Found!')
-  },
+  }
 
-  get500: async (_req: Request, _res: Response, _next: NextFunction) => {
+  async get500(_req: Request, _res: Response, _next: NextFunction) {
     throw new BusinessLogicError('Server Error!')
-  },
+  }
 }
 
-export default ErrorsController
+export const errorController = new ErrorController()
