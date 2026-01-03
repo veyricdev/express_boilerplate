@@ -1,4 +1,3 @@
-import { apiReference } from '@scalar/express-api-reference'
 import compression from 'compression'
 import cors from 'cors'
 import express from 'express'
@@ -50,15 +49,14 @@ router(app)
 app.use(errorHandler)
 
 // API Docs
-app.use(
-  '/docs',
-  apiReference({
-    // Pass your generated OpenAPI document
+app.use('/docs', async (req, res) => {
+  const { apiReference } = await import('@scalar/express-api-reference')
+  return apiReference({
     content: generateOpenAPIDocument(),
     metaData: {
       title: 'Express Boilerplate API',
     },
-  })
-)
+  })(req, res)
+})
 
 export { app }
