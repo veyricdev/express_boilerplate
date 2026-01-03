@@ -45,13 +45,13 @@ jobs:
       - name: Check .env exists
         run: ls -la .env
 
-      # Build
-      - name: Run build
-        run: pnpm run build
-
       # Prisma Generate
       - name: Run prisma:generate
         run: pnpm run prisma:generate
+
+      # Build
+      - name: Run build
+        run: pnpm run build
 
       # Cleanup
       - name: Remove folder and file for optimize
