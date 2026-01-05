@@ -18,6 +18,6 @@
     "strictNullChecks": true,
     "types": ["vitest/globals"]
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*", "types/**/*.d.ts", "types/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

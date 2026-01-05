@@ -12,9 +12,9 @@ class ApiSuccess<T> {
     reasonStatusCode = StatusCodes[StatusCodes.OK],
     data = null,
   }: {
-    message: string
+    message?: string
     code?: number
-    reasonStatusCode: string
+    reasonStatusCode?: string
     data?: T | null
   }) {
     this.message = !message ? reasonStatusCode : message

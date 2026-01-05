@@ -6,7 +6,7 @@ import bot from '~/configs/telegraf'
 import ApiError from '~/core/api.error'
 
 export default function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunction) {
-  const statusCode = err instanceof ApiError ? err.statusCode : StatusCodes.INTERNAL_SERVER_ERROR
+  const statusCode = err instanceof ApiError ? err.code : StatusCodes.INTERNAL_SERVER_ERROR
 
   const data = {
     code: statusCode,

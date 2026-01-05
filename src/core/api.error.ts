@@ -16,6 +16,12 @@ export default class ApiError extends Error {
   }
 }
 
+export class BadRequestError extends ApiError {
+  constructor(message: string = ReasonPhrases.BAD_REQUEST, code = StatusCodes.BAD_REQUEST) {
+    super(message, code)
+  }
+}
+
 export class Api404Error extends ApiError {
   constructor(message: string = ReasonPhrases.NOT_FOUND, code = StatusCodes.NOT_FOUND) {
     super(message, code)
