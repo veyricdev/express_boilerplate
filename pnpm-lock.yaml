@@ -26,6 +26,9 @@ importers:
       '@swc/core':
         specifier: 1.15.8
         version: 1.15.8
+      bcryptjs:
+        specifier: ^3.0.3
+        version: 3.0.3
       compression:
         specifier: 1.8.1
         version: 1.8.1
@@ -984,6 +987,10 @@ packages:
 
   base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
+
+  bcryptjs@3.0.3:
+    resolution: {integrity: sha512-GlF5wPWnSa/X5LKM1o0wz0suXIINz1iHRLvTS+sLyi7XPbe5ycmYI3DlZqVGZZtDgl4DmasFg7gOB3JYbphV5g==}
+    hasBin: true
 
   bin-version-check@5.1.0:
     resolution: {integrity: sha512-bYsvMqJ8yNGILLz1KP9zKLzQ6YpljV3ln1gqhuLkUtyfGi3qXKGuK2p+U4NAvjVFzDFiBBtOpCOSFNuYYEGZ5g==}
@@ -3194,6 +3201,8 @@ snapshots:
   bare-events@2.8.2: {}
 
   base64-js@1.5.1: {}
+
+  bcryptjs@3.0.3: {}
 
   bin-version-check@5.1.0:
     dependencies:

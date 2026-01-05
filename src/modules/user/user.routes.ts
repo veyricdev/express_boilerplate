@@ -5,7 +5,7 @@ import { createApiResponse } from '~/core/api.schema'
 import { requestValidate } from '~/middlewares/request.validate'
 import { paramsWithIdSchema } from '~/utils/schema.helper'
 import { userController } from './user.controller'
-import { createUserSchema, updateUserSchema, userSchema } from './user.schema'
+import { createUserSchema, updateUserSchema, userByIdQuerySchema, userListQuerySchema, userSchema } from './user.schema'
 
 const router = Router()
 
@@ -27,6 +27,9 @@ userRegistry.registerPath({
   path: `${PATH}`,
   summary: 'Get List User',
   tags: ['Users'],
+  request: {
+    query: userListQuerySchema,
+  },
   responses: createApiResponse(z.null(), 'Get List User Successfully!'),
 })
 userRegistry.registerPath({
@@ -46,10 +49,24 @@ userRegistry.registerPath({
   },
   responses: createApiResponse(z.null(), 'Create User Successfully!'),
 })
-router.route('/').get(userController.index).post(requestValidate(createUserSchema), userController.createOrUpdate)
+router
+  .route('/')
+  .get(requestValidate(userListQuerySchema, 'query'), userController.index)
+  .post(requestValidate(createUserSchema), userController.createOrUpdate)
 
 userRegistry.registerPath({
-  method: 'put',
+  method: 'get',
+  path: `${PATH}/{id}`,
+  summary: 'Get User',
+  tags: ['Users'],
+  request: {
+    params: paramsWithIdSchema,
+    query: userByIdQuerySchema,
+  },
+  responses: createApiResponse(z.null(), 'Get User Successfully!'),
+})
+userRegistry.registerPath({
+  method: 'patch',
   path: `${PATH}/{id}`,
   summary: 'Update User',
   tags: ['Users'],
@@ -79,8 +96,33 @@ userRegistry.registerPath({
 router
   .route('/:id')
   .all(requestValidate(paramsWithIdSchema, 'params'))
-  .put(requestValidate(updateUserSchema), userController.createOrUpdate)
-  .delete(userController.destroy)
+  .get(requestValidate(userByIdQuerySchema, 'query'), userController.show)
+  .patch(requestValidate(updateUserSchema), userController.createOrUpdate)
+  .delete(userController.delete)
+
+userRegistry.registerPath({
+  method: 'delete',
+  path: `${PATH}/{id}/destroy`,
+  summary: 'Hard Delete User',
+  tags: ['Users'],
+  request: {
+    params: paramsWithIdSchema,
+  },
+  responses: createApiResponse(z.null(), 'Hard Delete User Successfully!'),
+})
+router.delete('/:id/destroy', requestValidate(paramsWithIdSchema, 'params'), userController.destroy)
+
+userRegistry.registerPath({
+  method: 'post',
+  path: `${PATH}/{id}/restore`,
+  summary: 'Restore User',
+  tags: ['Users'],
+  request: {
+    params: paramsWithIdSchema,
+  },
+  responses: createApiResponse(z.null(), 'Restore User Successfully!'),
+})
+router.post('/:id/restore', requestValidate(paramsWithIdSchema, 'params'), userController.restore)
 
 export default {
   router,

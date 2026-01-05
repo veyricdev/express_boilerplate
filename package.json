@@ -25,6 +25,7 @@
     "@scalar/express-api-reference": "0.8.30",
     "@swc/cli": "0.7.9",
     "@swc/core": "1.15.8",
+    "bcryptjs": "^3.0.3",
     "compression": "1.8.1",
     "cors": "2.8.5",
     "dotenv": "17.2.3",

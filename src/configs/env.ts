@@ -10,6 +10,8 @@ const envSchema = z.object({
 
   HOST: z.string().min(1).default('localhost'),
 
+  DATABASE_URL: z.string().min(1).default('postgresql://user:password@localhost:5432/mydb?schema=public'),
+
   PORT: z.coerce.number().int().positive().default(6606),
 
   CORS_ORIGIN: z.url().default('http://localhost:6606'),

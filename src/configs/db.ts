@@ -1,7 +1,6 @@
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '~/prisma/generated/prisma/client'
-
-const connectionString = `${process.env.DATABASE_URL}`
+import { env } from './env'
 
 class Database {
   private static instance: PrismaClient
@@ -10,7 +9,7 @@ class Database {
 
   public static getInstance(): PrismaClient {
     if (!Database.instance) {
-      const adapter = new PrismaPg({ connectionString })
+      const adapter = new PrismaPg({ connectionString: env.DATABASE_URL })
       const prisma = new PrismaClient({ adapter })
       Database.instance = prisma
     }
