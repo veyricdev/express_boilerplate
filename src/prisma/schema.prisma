@@ -8,17 +8,18 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
-  username  String    @unique @db.VarChar(10)
-  giveName  String    @db.VarChar(50)
-  password  String
-  phone     String?   @db.VarChar(15)
-  bio       String?   @db.VarChar(300)
-  role      Role      @default(CUSTOMER)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  id             Int            @id @default(autoincrement())
+  email          String         @unique
+  username       String         @unique @db.VarChar(10)
+  giveName       String         @db.VarChar(50)
+  password       String
+  phone          String?        @db.VarChar(15)
+  bio            String?        @db.VarChar(300)
+  role           Role           @default(CUSTOMER)
+  loginHistories LoginHistory[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  deletedAt      DateTime?
 
   @@index([email, username])
   @@map("users")
@@ -27,4 +28,17 @@ model User {
 enum Role {
   ADMIN
   CUSTOMER
+}
+
+model LoginHistory {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  ipAddress String
+  userAgent String
+  loggedAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([loggedAt]) // Optimized for deleting old data.
+  @@map("login_history")
 }

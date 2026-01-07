@@ -1,3 +1,4 @@
+import Cache from '~/configs/cache'
 import Database from '~/configs/db'
 import { env } from '~/configs/env'
 import { logger } from '~/configs/logger'
@@ -10,6 +11,9 @@ const startServer = async () => {
   try {
     // Connect to database
     await Database.connect()
+
+    // Connect to redis
+    await Cache.connect()
 
     // Start server
     const server = app.listen(PORT, (error) => {
@@ -27,7 +31,7 @@ const startServer = async () => {
         process.exit(0)
       })
 
-      // Force shutdown after 10s
+      // Force shutdown after 3s
       setTimeout(() => {
         console.error('Forcing shutdown...')
         process.exit(1)

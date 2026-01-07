@@ -22,6 +22,18 @@ export class BadRequestError extends ApiError {
   }
 }
 
+export class ApiUnauthorizedError extends ApiError {
+  constructor(message: string = ReasonPhrases.UNAUTHORIZED, code = StatusCodes.UNAUTHORIZED) {
+    super(message, code)
+  }
+}
+
+export class ApiForbiddenError extends ApiError {
+  constructor(message: string = ReasonPhrases.FORBIDDEN, code = StatusCodes.FORBIDDEN) {
+    super(message, code)
+  }
+}
+
 export class Api404Error extends ApiError {
   constructor(message: string = ReasonPhrases.NOT_FOUND, code = StatusCodes.NOT_FOUND) {
     super(message, code)

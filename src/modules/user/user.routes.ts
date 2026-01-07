@@ -15,7 +15,7 @@ export const userRegistry = new OpenAPIRegistry()
 
 userRegistry.register('User', userSchema)
 
-const useExample = {
+const userExample = {
   email: 'example@gmail.com',
   username: 'example',
   giveName: 'Nguyen Van A',
@@ -42,7 +42,7 @@ userRegistry.registerPath({
       content: {
         'application/json': {
           schema: createUserSchema,
-          example: useExample,
+          example: userExample,
         },
       },
     },
@@ -76,7 +76,7 @@ userRegistry.registerPath({
       content: {
         'application/json': {
           schema: updateUserSchema,
-          example: useExample,
+          example: userExample,
         },
       },
     },

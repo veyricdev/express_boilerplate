@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
+import { JWTExpired } from 'jose/errors'
 import { env } from '~/configs/env'
 import { logger } from '~/configs/logger'
 import bot from '~/configs/telegraf'
@@ -16,6 +17,10 @@ export default function errorHandler(err: Error, _req: Request, res: Response, _
   }
 
   if (err instanceof Prisma.PrismaClientValidationError) message = 'Validation error'
+
+  if (err instanceof JWTExpired) {
+    if (err.code === 'ERR_JWT_EXPIRED') message = 'JWT expired'
+  }
 
   const data = {
     code: statusCode,
