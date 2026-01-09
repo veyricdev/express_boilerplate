@@ -7,8 +7,8 @@ services:
     ports:
       - "6606:6606"
     environment:
-      - REDIS_HOST=express_boilerplate_redis
-      - REDIS_PORT=6379
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@app_db:5432/${POSTGRES_DB}?schema=public
+      - REDIS_URL=redis://app_cache:6379
     volumes:
       - ./:/app
       - /app/node_modules
@@ -24,6 +24,7 @@ services:
     image: redis:8.4.0-alpine
     ports:
       - "6679:6379"
+    restart: unless-stopped
     volumes:
       - express_boilerplate_redis_data:/data
     networks:
