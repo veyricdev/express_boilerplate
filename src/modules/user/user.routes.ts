@@ -1,7 +1,9 @@
 import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi'
 import { Router } from 'express'
 import z from 'zod'
+import { PERMISSIONS } from '~/configs/permission'
 import { createApiResponse } from '~/core/api.schema'
+import { authentication, requireAnyPermission, requirePermission } from '~/middlewares/auth'
 import { requestValidate } from '~/middlewares/request.validate'
 import { paramsWithIdSchema } from '~/utils/schema.helper'
 import { userController } from './user.controller'
@@ -21,6 +23,8 @@ const userExample = {
   giveName: 'Nguyen Van A',
   password: '123123',
 }
+
+router.use(authentication)
 
 userRegistry.registerPath({
   method: 'get',
@@ -51,8 +55,12 @@ userRegistry.registerPath({
 })
 router
   .route('/')
-  .get(requestValidate(userListQuerySchema, 'query'), userController.index)
-  .post(requestValidate(createUserSchema), userController.createOrUpdate)
+  .get(
+    requirePermission(PERMISSIONS.USER.READ, PERMISSIONS.USER.UPDATE),
+    requestValidate(userListQuerySchema, 'query'),
+    userController.index
+  )
+  .post(requirePermission(PERMISSIONS.USER.CREATE), requestValidate(createUserSchema), userController.createOrUpdate)
 
 userRegistry.registerPath({
   method: 'get',
@@ -96,9 +104,13 @@ userRegistry.registerPath({
 router
   .route('/:id')
   .all(requestValidate(paramsWithIdSchema, 'params'))
-  .get(requestValidate(userByIdQuerySchema, 'query'), userController.show)
-  .patch(requestValidate(updateUserSchema), userController.createOrUpdate)
-  .delete(userController.delete)
+  .get(requirePermission(PERMISSIONS.USER.READ), requestValidate(userByIdQuerySchema, 'query'), userController.show)
+  .patch(
+    requirePermission(PERMISSIONS.USER.READ, PERMISSIONS.USER.UPDATE),
+    requestValidate(updateUserSchema),
+    userController.createOrUpdate
+  )
+  .delete(requirePermission(PERMISSIONS.USER.DELETE), userController.delete)
 
 userRegistry.registerPath({
   method: 'delete',
@@ -110,7 +122,12 @@ userRegistry.registerPath({
   },
   responses: createApiResponse(z.null(), 'Hard Delete User Successfully!'),
 })
-router.delete('/:id/destroy', requestValidate(paramsWithIdSchema, 'params'), userController.destroy)
+router.delete(
+  '/:id/destroy',
+  requirePermission(PERMISSIONS.USER.DELETE),
+  requestValidate(paramsWithIdSchema, 'params'),
+  userController.destroy
+)
 
 userRegistry.registerPath({
   method: 'post',
@@ -122,7 +139,12 @@ userRegistry.registerPath({
   },
   responses: createApiResponse(z.null(), 'Restore User Successfully!'),
 })
-router.post('/:id/restore', requestValidate(paramsWithIdSchema, 'params'), userController.restore)
+router.post(
+  '/:id/restore',
+  requirePermission(PERMISSIONS.USER.DELETE),
+  requestValidate(paramsWithIdSchema, 'params'),
+  userController.restore
+)
 
 export default {
   router,

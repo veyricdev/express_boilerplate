@@ -28,7 +28,8 @@
       },
       "complexity": {
         "noForEach": "off",
-        "noBannedTypes": "off"
+        "noBannedTypes": "off",
+        "noStaticOnlyClass": "off"
       },
       "correctness": {
         "recommended": true,
