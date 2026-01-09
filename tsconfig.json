@@ -1,23 +1,23 @@
 {
-	"compilerOptions": {
-		"target": "ES2022",
-		"module": "ESNext",
-		"moduleResolution": "Bundler",
-		"moduleDetection": "force",
-		"baseUrl": ".",
-		"paths": {
-			"~/*": ["./src/*"],
-			"#/*": ["./types/*"]
-		},
-		"importsNotUsedAsValues": "remove",
-		"allowSyntheticDefaultImports": true,
-		"strict": true,
-		"esModuleInterop": true,
-		"skipLibCheck": true,
-		"forceConsistentCasingInFileNames": true,
-		"strictNullChecks": true,
-		"types": ["vitest/globals"]
-	},
-	"include": ["src/**/*"],
-	"exclude": ["node_modules"]
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "moduleDetection": "force",
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./src/*"],
+      "#/*": ["./types/*"]
+    },
+    "importsNotUsedAsValues": "remove",
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "strictNullChecks": true,
+    "types": ["vitest/globals"]
+  },
+  "include": ["src/**/*", "types/**/*.d.ts", "types/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

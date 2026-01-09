@@ -6,9 +6,17 @@ dotenv.config()
 const envSchema = z.object({
   APP_NAME: z.string().min(1).default('Express Boilerplate'),
 
+  APP_URL: z.url().default('http://localhost:6606'),
+
   NODE_ENV: z.enum(['dev', 'prod', 'test']).default('dev'),
 
   HOST: z.string().min(1).default('localhost'),
+
+  DATABASE_URL: z.string().min(1).default('postgresql://user:password@localhost:5432/mydb?schema=public'),
+  REDIS_URL: z.string().min(1).default('localhost:6379'),
+
+  JWT_ACCESS_SECRET: z.string().min(1).default('JWT_ACCESS_SECRET'),
+  JWT_REFRESH_SECRET: z.string().min(1).default('JWT_REFRESH_SECRET'),
 
   PORT: z.coerce.number().int().positive().default(6606),
 
@@ -25,6 +33,13 @@ const envSchema = z.object({
   DEBUG_CONSOLE: z.stringbool().default(true),
 
   DEBUG_FILE: z.stringbool().default(false),
+
+  GOOGLE_CLIENT_ID: z.string().default(''),
+  GOOGLE_CLIENT_SECRET: z.string().default(''),
+  FACEBOOK_APP_ID: z.string().default(''),
+  FACEBOOK_APP_SECRET: z.string().default(''),
+  GITHUB_CLIENT_ID: z.string().default(''),
+  GITHUB_CLIENT_SECRET: z.string().default(''),
 })
 
 const parsedEnv = envSchema.safeParse(process.env)

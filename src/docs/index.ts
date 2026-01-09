@@ -1,12 +1,11 @@
 import { OpenAPIRegistry, OpenApiGeneratorV3 } from '@asteasolutions/zod-to-openapi'
-import { errorsRegisterPath } from '~/routes/errors'
+import { authRegistry } from '~/modules/auth/auth.routes'
+import { baseRegistry } from '~/modules/base/base.routes'
+import { errorRegistry } from '~/modules/error/error.routes'
+import { userRegistry } from '~/modules/user/user.routes'
 
 export function generateOpenAPIDocument() {
-  const registry = new OpenAPIRegistry()
-
-  // Register definitions here
-  errorsRegisterPath(registry)
-
+  const registry = new OpenAPIRegistry([baseRegistry, authRegistry, userRegistry, errorRegistry])
   const generator = new OpenApiGeneratorV3(registry.definitions)
 
   return generator.generateDocument({
