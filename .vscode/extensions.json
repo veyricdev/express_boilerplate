@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "EditorConfig.EditorConfig",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+    "heybourn.headwind",
+    "biomejs.biome",
+    "dsznajder.es7-react-js-snippets",
+    "formulahendry.auto-close-tag",
+    "formulahendry.auto-rename-tag",
+    "Lokalise.i18n-ally"
+  ]
+}
