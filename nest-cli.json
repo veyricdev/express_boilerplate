@@ -10,6 +10,9 @@
       "options": {
         "swcrcPath": ".swcrc"
       }
-    }
+    },
+    "assets": [
+      "views/**/*"
+    ]
   }
 }

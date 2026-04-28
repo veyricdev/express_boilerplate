@@ -23,6 +23,7 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "~/*": ["./src/*"]
-    }
+    },
+    "jsx": "react-jsx"
   }
 }

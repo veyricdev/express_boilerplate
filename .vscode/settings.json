@@ -3,6 +3,12 @@
   "biome.enabled": true,
   "editor.formatOnSave": true,
   "eslint.format.enable": false,
+  "[handlebars]": {
+    "editor.formatOnSave": false
+  },
+  "[html]": {
+    "editor.formatOnSave": false
+  },
   "[javascript]": {
     "editor.defaultFormatter": "biomejs.biome"
   },

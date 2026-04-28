@@ -4,6 +4,7 @@ import configuration from './config/configuration'
 import { validate } from './config/env.validation'
 // Modules
 import { AuthModule } from './modules/auth/auth.module'
+import { CmsModule } from './modules/cms/cms.module'
 import { UsersModule } from './modules/users/users.module'
 import { PrismaModule } from './prisma/prisma.module'
 
@@ -17,6 +18,7 @@ import { PrismaModule } from './prisma/prisma.module'
     PrismaModule,
     AuthModule,
     UsersModule,
+    CmsModule,
   ],
 })
 export class AppModule {}
