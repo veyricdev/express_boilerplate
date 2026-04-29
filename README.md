@@ -9,22 +9,24 @@ Một boilerplate chuyên nghiệp sử dụng **NestJS (Fastify)** làm backend
 - **⚡ Fastify Framework**: Sử dụng Fastify cho tốc độ xử lý nhanh hơn 2-3 lần so với Express truyền thống.
 - **🏗️ Kiến trúc Module hóa**: Phân tách rõ ràng giữa `modules`, `common`, `config`, `prisma`, và `shared`.
 - **🔐 Authentication & Security**:
-  - Xác thực JWT kép (Access Token & Refresh Token).
-  - Phân quyền theo vai trò (Admin/User) và quản lý Permission.
-  - Decorator `@CurrentUser()` tùy chỉnh để lấy thông tin user một cách type-safe.
+  - Xác thực JWT kép (Access Token & Refresh Token) với cơ chế **Rotation**.
+  - **Security Headers**: Tích hợp **Helmet** với cấu hình CSP chặt chẽ.
+  - **CORS Configuration**: Quản lý danh sách domain cho phép qua biến môi trường `CORS_ORIGINS`.
 - **📦 Monorepo Workspace**: Quản lý Backend và Frontend (`/cms`) trong một repository duy nhất bằng **pnpm workspaces**.
 - **🗃️ Prisma ORM**: 
   - Quản lý database MariaDB/MySQL.
-  - **Soft Delete System**: Cơ chế xóa mềm hệ thống cho Post, User, Category, Tag (tự động lọc bản ghi đã xóa).
-  - Hệ thống Seed dữ liệu mẫu mạnh mẽ với **Faker.js** (tự động tạo 100+ bài viết, danh mục, tags).
-- **📝 CMS Content Management**: 
+  - **Soft Delete System**: Tự động lọc bản ghi đã xóa, hỗ trợ `Restore` và `Hard Delete` cho Admin.
+  - Hệ thống Seed dữ liệu mẫu mạnh mẽ với **Faker.js**.
+- **📝 CMS & User Management**: 
   - Quản lý bài viết với trạng thái **Scheduled Publishing** (hẹn giờ đăng bài).
-  - **Pagination Engine**: Hệ thống phân trang đồng nhất (`limit=20`) cho tất cả Admin API.
+  - Quản lý người dùng nâng cao (Tạo mới, phân quyền, trạng thái hoạt động).
+- **🕵️ Audit Logging System**: 
+  - Tự động ghi lại mọi thao tác thay đổi dữ liệu (`POST`, `PATCH`, `DELETE`) của Admin.
+  - Xem lịch sử hoạt động, chi tiết dữ liệu cũ và mới, IP người thực hiện.
 - **📚 API Documentation**: Tích hợp **Scalar API Reference / Swagger** tại `/docs`.
 - **🛠️ Developer Experience**:
-  - **Path Aliases**: Sử dụng `~/` thay cho `../../` cho import code sạch hơn.
   - **Bitwise Permissions**: Hệ thống phân quyền nâng cao sử dụng Bit Flags (BigInt) cho hiệu năng tối ưu.
-- **🎨 UI/UX**: Tích hợp React Vite được serve trực tiếp qua Fastify engine.
+  - **Unified Pagination**: Engine phân trang đồng nhất cho toàn bộ hệ thống Admin.
 
 ---
 
@@ -33,14 +35,12 @@ Một boilerplate chuyên nghiệp sử dụng **NestJS (Fastify)** làm backend
 ```text
 /
 ├── cms/                # Workspace riêng cho React Frontend (Vite)
-│   ├── src/            # Mã nguồn giao diện CMS
-│   └── package.json    # Quản lý dependencies cho Frontend
 ├── src/                # NestJS Backend API
-│   ├── common/         # Decorators, Guards, Filters, Interceptors, Helpers (Pagination)
-│   ├── modules/        # Các tính năng chính (Auth, Users, Posts, Categories, Tags)
+│   ├── common/         # Decorators, Guards, Filters, Interceptors, Helpers
+│   ├── config/         # Cấu hình hệ thống & Validation môi trường
+│   ├── modules/        # Các tính năng chính (Auth, Users, Posts, AuditLogs,...)
 │   ├── prisma/         # Prisma Module, Service, Schema, và Seed logic
-│   ├── shared/         # Logic dùng chung giữa các module
-│   └── views/          # Handlebars templates để load React app
+│   └── shared/         # Logic dùng chung & Vite Integration
 ├── pnpm-workspace.yaml # Cấu hình pnpm workspaces
 └── package.json        # Cấu hình root, dependencies và scripts
 ```
@@ -62,37 +62,22 @@ Một boilerplate chuyên nghiệp sử dụng **NestJS (Fastify)** làm backend
    ```
 
 2. **Cấu hình môi trường (.env)**
-   Sao chép tệp `.env.example` thành `.env` và cập nhật thông tin chuỗi kết nối Database.
+   Sao chép tệp `.env.example` thành `.env` và cập nhật các thông tin:
+   - `DATABASE_URL`: Kết nối DB.
+   - `JWT_SECRET` & `JWT_REFRESH_SECRET`: Khóa bảo mật.
+   - `CORS_ORIGINS`: Danh sách domain (cách nhau bởi dấu phẩy).
 
 3. **Quản lý Cơ sở dữ liệu (Prisma)**
-   Chúng tôi đã chuẩn hóa các lệnh database qua tiền tố `db:`:
    ```bash
    pnpm db:gen      # Sinh mã Prisma Client
-   pnpm db:push     # Đồng bộ schema trực tiếp (khuyên dùng cho PlanetScale/Dev)
    pnpm db:migrate  # Tạo và chạy migration
-   pnpm db:seed     # Đổ dữ liệu mẫu (100 bài viết, 5 danh mục, 10 tags)
-   pnpm db:reset    # Reset toàn bộ dữ liệu và chạy lại seed
-   pnpm db:studio   # Mở giao diện quản lý DB trực quan
+   pnpm db:seed     # Đổ dữ liệu mẫu
+   pnpm db:studio   # Giao diện quản lý DB trực quan
    ```
 
 4. **Chạy dự án ở chế độ phát triển (Development)**
-   Khởi chạy đồng thời NestJS API và Vite Dev Server:
    ```bash
    pnpm dev
-   ```
-
----
-
-## 🏗️ Build & Production
-
-1. **Build toàn bộ dự án** (React CMS + NestJS Backend)
-   ```bash
-   pnpm build
-   ```
-
-2. **Chạy Production**
-   ```bash
-   pnpm start:prod
    ```
 
 ---
@@ -112,4 +97,5 @@ Sau khi server khởi chạy (mặc định ở cổng `3000`):
 - **Backend**: NestJS, Fastify, Passport, JWT.
 - **ORM**: Prisma.
 - **Frontend**: React, Vite.
+- **Security**: Helmet, CORS.
 - **Tooling**: pnpm, Biome, Faker.js, Handlebars.
