@@ -13,13 +13,19 @@ export class AllExceptionsFilter implements ExceptionFilter {
       console.error('Unhandled exception:', exception)
     }
 
-    const message = exception instanceof HttpException ? exception.getResponse() : 'Internal server error'
+    const exceptionResponse = exception instanceof HttpException ? exception.getResponse() : 'Internal server error'
+
+    const message =
+      typeof exceptionResponse === 'object' && exceptionResponse !== null
+        ? (exceptionResponse as any).message || (exceptionResponse as any).error || JSON.stringify(exceptionResponse)
+        : exceptionResponse
 
     response.status(status).send({
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
-      error: message,
+      message,
+      data: null,
     })
   }
 }

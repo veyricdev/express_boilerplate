@@ -1,19 +1,30 @@
 # NestJS & React CMS Boilerplate
 
-Một boilerplate chuyên nghiệp sử dụng **NestJS** làm backend API kết hợp với **React (Vite)** cho phần giao diện CMS. Dự án được thiết kế theo kiến trúc module sạch sẽ (Clean Modular Architecture), phân tách rõ ràng giữa Admin và Client.
+Một boilerplate chuyên nghiệp sử dụng **NestJS (Fastify)** làm backend API kết hợp với **React (Vite)** cho phần giao diện CMS. Dự án được thiết kế theo kiến trúc module sạch sẽ (Clean Modular Architecture), tối ưu hiệu năng và bảo mật.
+
+---
 
 ## ✨ Tính năng nổi bật
 
-- **Kiến trúc Module hóa**: Cấu trúc thư mục rõ ràng với `modules`, `common`, `config`, `prisma`, và `shared`.
-- **Phân tách Admin/Client**: Tách biệt logic và controller cho Client API và Admin API.
-- **Monorepo Workspace**: Sử dụng **pnpm workspaces** để tách biệt dependencies giữa Backend (NestJS) và Frontend (React CMS).
-- **Authentication**: Xác thực người dùng bằng JWT (Access Token & Refresh Token).
-- **Phân quyền (RBAC)**: Quản lý quyền truy cập dựa trên vai trò (`admin`, `user`).
-- **Tích hợp React + Vite**: Serve ứng dụng React thông qua Fastify view engine, cho phép chạy song song API và Frontend trên cùng một cổng.
-- **Prisma ORM**: Quản lý cơ sở dữ liệu mạnh mẽ, an toàn với MariaDB/MySQL.
-- **Tài liệu API**: Tích hợp Scalar API Reference / Swagger (có sẵn tại endpoint `/docs`).
-- **Bảo mật & Validate**: Sử dụng `bcrypt` để mã hóa mật khẩu và `class-validator` cho validation tự động.
-- **Linting & Formatting**: Tích hợp Biome để đảm bảo chất lượng code.
+- **⚡ Fastify Framework**: Sử dụng Fastify cho tốc độ xử lý nhanh hơn 2-3 lần so với Express truyền thống.
+- **🏗️ Kiến trúc Module hóa**: Phân tách rõ ràng giữa `modules`, `common`, `config`, `prisma`, và `shared`.
+- **🔐 Authentication & Security**:
+  - Xác thực JWT kép (Access Token & Refresh Token).
+  - Phân quyền theo vai trò (Admin/User) và quản lý Permission.
+  - Decorator `@CurrentUser()` tùy chỉnh để lấy thông tin user một cách type-safe.
+- **📦 Monorepo Workspace**: Quản lý Backend và Frontend (`/cms`) trong một repository duy nhất bằng **pnpm workspaces**.
+- **🗃️ Prisma ORM**: 
+  - Quản lý database MariaDB/MySQL.
+  - **Soft Delete System**: Cơ chế xóa mềm hệ thống cho Post, User, Category, Tag (tự động lọc bản ghi đã xóa).
+  - Hệ thống Seed dữ liệu mẫu mạnh mẽ với **Faker.js** (tự động tạo 100+ bài viết, danh mục, tags).
+- **📝 CMS Content Management**: 
+  - Quản lý bài viết với trạng thái **Scheduled Publishing** (hẹn giờ đăng bài).
+  - **Pagination Engine**: Hệ thống phân trang đồng nhất (`limit=20`) cho tất cả Admin API.
+- **📚 API Documentation**: Tích hợp **Scalar API Reference / Swagger** tại `/docs`.
+- **🛠️ Developer Experience**:
+  - **Path Aliases**: Sử dụng `~/` thay cho `../../` cho import code sạch hơn.
+  - **Bitwise Permissions**: Hệ thống phân quyền nâng cao sử dụng Bit Flags (BigInt) cho hiệu năng tối ưu.
+- **🎨 UI/UX**: Tích hợp React Vite được serve trực tiếp qua Fastify engine.
 
 ---
 
@@ -25,15 +36,13 @@ Một boilerplate chuyên nghiệp sử dụng **NestJS** làm backend API kết
 │   ├── src/            # Mã nguồn giao diện CMS
 │   └── package.json    # Quản lý dependencies cho Frontend
 ├── src/                # NestJS Backend API
-│   ├── common/         # Global guards, filters, interceptors, decorators
-│   ├── config/         # Cấu hình biến môi trường (.env)
-│   ├── modules/        # Chứa các tính năng chính (Auth, Users, CMS Controller)
-│   ├── prisma/         # Prisma Module và Service
-│   ├── shared/         # Các logic dùng chung (Vite Helper)
+│   ├── common/         # Decorators, Guards, Filters, Interceptors, Helpers (Pagination)
+│   ├── modules/        # Các tính năng chính (Auth, Users, Posts, Categories, Tags)
+│   ├── prisma/         # Prisma Module, Service, Schema, và Seed logic
+│   ├── shared/         # Logic dùng chung giữa các module
 │   └── views/          # Handlebars templates để load React app
-├── prisma/             # Schema database và migrations
 ├── pnpm-workspace.yaml # Cấu hình pnpm workspaces
-└── package.json        # Cấu hình root và dependencies cho Backend
+└── package.json        # Cấu hình root, dependencies và scripts
 ```
 
 ---
@@ -42,7 +51,7 @@ Một boilerplate chuyên nghiệp sử dụng **NestJS** làm backend API kết
 
 ### Yêu cầu hệ thống
 - **Node.js**: Phiên bản >= 20
-- **Trình quản lý package**: `pnpm` (Khuyên dùng) hoặc `npm`/`yarn`
+- **Trình quản lý package**: `pnpm` (Bắt buộc)
 - **Database**: MariaDB hoặc MySQL
 
 ### Các bước khởi chạy
@@ -54,37 +63,29 @@ Một boilerplate chuyên nghiệp sử dụng **NestJS** làm backend API kết
 
 2. **Cấu hình môi trường (.env)**
    Sao chép tệp `.env.example` thành `.env` và cập nhật thông tin chuỗi kết nối Database.
-   ```bash
-   cp .env.example .env
-   ```
 
-3. **Thiết lập Cơ sở dữ liệu (Prisma)**
-   Tạo schema và cập nhật Prisma client:
+3. **Quản lý Cơ sở dữ liệu (Prisma)**
+   Chúng tôi đã chuẩn hóa các lệnh database qua tiền tố `db:`:
    ```bash
-   pnpm prisma:generate      # Sinh mã Prisma Client
-   pnpm prisma:migrate-init  # (Chỉ dùng lần đầu) Khởi tạo database
-   # Hoặc
-   pnpm prisma:migrate       # Cập nhật schema nếu có thay đổi
+   pnpm db:gen      # Sinh mã Prisma Client
+   pnpm db:push     # Đồng bộ schema trực tiếp (khuyên dùng cho PlanetScale/Dev)
+   pnpm db:migrate  # Tạo và chạy migration
+   pnpm db:seed     # Đổ dữ liệu mẫu (100 bài viết, 5 danh mục, 10 tags)
+   pnpm db:reset    # Reset toàn bộ dữ liệu và chạy lại seed
+   pnpm db:studio   # Mở giao diện quản lý DB trực quan
    ```
 
 4. **Chạy dự án ở chế độ phát triển (Development)**
-   Lệnh này sẽ khởi chạy đồng thời **NestJS API** và **Vite Dev Server** (trong workspace `cms`).
+   Khởi chạy đồng thời NestJS API và Vite Dev Server:
    ```bash
    pnpm dev
    ```
-
-5. **Quản lý Dependencies trong Workspace**
-   - Thêm package cho **Backend**: `pnpm add <tên-package>` (chạy ở thư mục gốc).
-- Thêm package cho **Frontend**: `pnpm --filter cms add <tên-package>`.
 
 ---
 
 ## 🏗️ Build & Production
 
-Để build và chạy dự án ở môi trường Production:
-
-1. **Build toàn bộ dự án**
-   Lệnh này sẽ build ứng dụng React (vào thư mục `public/build`) và NestJS (vào thư mục `dist`).
+1. **Build toàn bộ dự án** (React CMS + NestJS Backend)
    ```bash
    pnpm build
    ```
@@ -98,14 +99,17 @@ Một boilerplate chuyên nghiệp sử dụng **NestJS** làm backend API kết
 
 ## 🔗 Các đường dẫn quan trọng (Endpoints)
 
-Sau khi server khởi chạy (mặc định ở cổng `3000`), bạn có thể truy cập:
+Sau khi server khởi chạy (mặc định ở cổng `3000`):
 
-- **API Documentation (Scalar/Swagger)**: [http://localhost:3000/docs](http://localhost:3000/docs)
-- **Giao diện quản trị CMS (React)**: [http://localhost:3000/cms](http://localhost:3000/cms)
+- **API Documentation**: [http://localhost:3000/docs](http://localhost:3000/docs)
+- **Giao diện CMS (Admin)**: [http://localhost:3000/cms](http://localhost:3000/cms)
+- **Database Studio**: `pnpm db:studio`
 
 ---
 
-## 👥 Quản lý Role (Vai trò)
+## 🛠️ Công nghệ sử dụng
 
-- `user`: Role mặc định khi người dùng đăng ký tài khoản qua API client.
-- `admin`: Role quản trị viên. Việc cấp quyền admin hiện tại cần được thực hiện qua Database (Prisma Studio) hoặc thông qua tính năng cấp quyền riêng biệt của Admin API.
+- **Backend**: NestJS, Fastify, Passport, JWT.
+- **ORM**: Prisma.
+- **Frontend**: React, Vite.
+- **Tooling**: pnpm, Biome, Faker.js, Handlebars.

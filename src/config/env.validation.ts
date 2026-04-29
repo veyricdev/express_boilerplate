@@ -17,6 +17,9 @@ export const envSchema = z.object({
   JWT_EXPIRES_IN: z.string().default('3600s'),
   JWT_REFRESH_SECRET: z.string(),
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
+ 
+  // Security
+  CORS_ORIGINS: z.string().optional().default('*'),
 })
 
 export type Env = z.infer<typeof envSchema>

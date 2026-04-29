@@ -57,3 +57,4 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 src/prisma/generated/prisma
 public/build
+cms/node_modules

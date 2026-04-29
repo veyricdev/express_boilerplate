@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { PassportStrategy } from '@nestjs/passport'
-import type { Request } from 'express'
+import type { FastifyRequest } from 'fastify'
 import { ExtractJwt, Strategy } from 'passport-jwt'
 
 @Injectable()
@@ -14,9 +14,9 @@ export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-refres
     })
   }
 
-  validate(req: Request, payload: any) {
-    const authHeader = req.get('Authorization')
+  validate(req: FastifyRequest, payload: any) {
+    const authHeader = req.headers.authorization
     const refreshToken = authHeader ? authHeader.replace('Bearer', '').trim() : ''
-    return { ...payload, refreshToken }
+    return { id: payload.sub, email: payload.email, permissions: payload.permissions, refreshToken }
   }
 }

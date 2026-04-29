@@ -1,5 +1,5 @@
 generator client {
-  provider     = "prisma-client"
+  provider     = "prisma-client-js"
   output       = "./generated/prisma"
   moduleFormat = "cjs"
 }
@@ -8,11 +8,9 @@ datasource db {
   provider = "mysql"
 }
 
-enum Role {
-  SUPER_ADMIN
-  SITE_ADMIN
-  EDITOR
-}
+// =============================================================================
+// USERS & AUTH
+// =============================================================================
 
 model User {
   id           Int       @id @default(autoincrement()) @db.UnsignedInt
@@ -20,23 +18,23 @@ model User {
   passwordHash String    @map("password_hash") @db.VarChar(255)
   fullName     String    @map("full_name") @db.VarChar(150)
   avatarUrl    String?   @map("avatar_url") @db.VarChar(500)
-  role         Role      @default(EDITOR)
+  permissions  BigInt    @default(0) @db.UnsignedBigInt // Bit Flags
   isActive     Boolean   @default(true) @map("is_active")
   lastLoginAt  DateTime? @map("last_login_at")
+  deletedAt    DateTime? @map("deleted_at")
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
 
-  refreshTokens   RefreshToken[]
+  refreshTokens RefreshToken[]
+  posts         Post[]
+  auditLogs     AuditLog[]
 
   @@index([email])
-  @@index([role])
   @@index([isActive])
+  @@index([deletedAt])
   @@map("users")
 }
 
-// =============================================================================
-// REFRESH_TOKENS
-// =============================================================================
 model RefreshToken {
   id        Int      @id @default(autoincrement()) @db.UnsignedInt
   userId    Int      @map("user_id") @db.UnsignedInt
@@ -52,4 +50,109 @@ model RefreshToken {
   @@index([userId])
   @@index([expiresAt])
   @@map("refresh_tokens")
+}
+
+// =============================================================================
+// CMS: POSTS, CATEGORIES, TAGS
+// =============================================================================
+
+model Category {
+  id              Int       @id @default(autoincrement()) @db.UnsignedInt
+  name            String    @db.VarChar(150)
+  slug            String    @unique @db.VarChar(200)
+  description     String?   @db.Text
+  metaTitle       String?   @map("meta_title") @db.VarChar(255)
+  metaDescription String?   @map("meta_description") @db.VarChar(500)
+  deletedAt       DateTime? @map("deleted_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  posts Post[]
+
+  @@index([slug])
+  @@index([deletedAt])
+  @@map("categories")
+}
+
+model Tag {
+  id        Int       @id @default(autoincrement()) @db.UnsignedInt
+  name      String    @unique @db.VarChar(100)
+  slug      String    @unique @db.VarChar(120)
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  postTags PostTag[]
+
+  @@index([slug])
+  @@index([deletedAt])
+  @@map("tags")
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model Post {
+  id              Int        @id @default(autoincrement()) @db.UnsignedInt
+  title           String     @db.VarChar(255)
+  slug            String     @unique @db.VarChar(300)
+  content         String     @db.LongText
+  excerpt         String?    @db.VarChar(500)
+  thumbnail       String?    @db.VarChar(500)
+  status          PostStatus @default(DRAFT)
+  publishedAt     DateTime?  @map("published_at")
+  metaTitle       String?    @map("meta_title") @db.VarChar(255)
+  metaDescription String?    @map("meta_description") @db.VarChar(500)
+  metaThumbnail   String?    @map("meta_thumbnail") @db.VarChar(500)
+  authorId        Int        @map("author_id") @db.UnsignedInt
+  categoryId      Int?       @map("category_id") @db.UnsignedInt
+  deletedAt       DateTime?  @map("deleted_at")
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+
+  author   User      @relation(fields: [authorId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  postTags PostTag[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([categoryId])
+  @@index([publishedAt])
+  @@index([deletedAt])
+  @@map("posts")
+}
+
+model PostTag {
+  postId Int @map("post_id") @db.UnsignedInt
+  tagId  Int @map("tag_id") @db.UnsignedInt
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+  @@map("post_tags")
+}
+
+// =============================================================================
+// AUDIT LOGS
+// =============================================================================
+
+model AuditLog {
+  id        BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  userId    Int?     @map("user_id") @db.UnsignedInt
+  action    String   @db.VarChar(50)  // e.g., "CREATE", "UPDATE", "DELETE", "LOGIN"
+  entity    String   @db.VarChar(50)  // e.g., "POST", "CATEGORY", "USER"
+  entityId  Int?     @map("entity_id") @db.UnsignedInt
+  oldData   Json?    @map("old_data")
+  newData   Json?    @map("new_data")
+  ipAddress String?  @map("ip_address") @db.VarChar(45)
+  userAgent String?  @map("user_agent") @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([entity, entityId])
+  @@map("audit_logs")
 }

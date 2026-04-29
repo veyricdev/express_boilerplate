@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { Role } from '~/prisma/generated/prisma/client'
 
 export class UserResponseDto {
   @ApiProperty()
@@ -11,11 +10,14 @@ export class UserResponseDto {
   @ApiProperty()
   fullName: string
 
-  @ApiProperty({ enum: Role })
-  role: Role
+  @ApiProperty({ type: 'string', example: '127' })
+  permissions: string
 
   @ApiProperty()
   isActive: boolean
+
+  @ApiProperty()
+  lastLoginAt?: Date
 
   @ApiProperty()
   createdAt: Date

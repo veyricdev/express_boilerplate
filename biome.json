@@ -13,7 +13,8 @@
       "**/.vscode/**/*",
       "**/index.html",
       "**/vite.config.ts",
-      "!**/public/**/*"
+      "!**/public/**/*",
+      "!**/src/prisma/generated/prisma/**/*"
     ]
   },
   "formatter": {
