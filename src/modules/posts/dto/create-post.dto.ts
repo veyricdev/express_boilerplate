@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
-import { IsArray, IsEnum, IsInt, IsISO8601, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator'
+import { IsArray, IsDate, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator'
 import { PostStatus } from '~/prisma/generated/prisma'
 
 export class CreatePostDto {
@@ -9,6 +9,12 @@ export class CreatePostDto {
   @IsString()
   @MaxLength(255)
   title: string
+
+  @ApiPropertyOptional({ example: 'huong-dan-nestjs' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  slug?: string
 
   @ApiProperty({ example: '<p>Nội dung bài viết...</p>' })
   @IsNotEmpty()
@@ -37,7 +43,7 @@ export class CreatePostDto {
     description: 'Schedule publish time. If omitted and status=PUBLISHED, defaults to now.',
   })
   @IsOptional()
-  @IsISO8601()
+  @IsDate()
   @Type(() => Date)
   publishedAt?: Date
 
@@ -52,6 +58,12 @@ export class CreatePostDto {
   @IsString()
   @MaxLength(500)
   metaDescription?: string
+
+  @ApiPropertyOptional({ example: 'keyword1, keyword2' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  metaKeywords?: string
 
   @ApiPropertyOptional({ example: 'https://example.com/meta-thumb.jpg' })
   @IsOptional()

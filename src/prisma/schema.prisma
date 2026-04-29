@@ -104,6 +104,7 @@ model Post {
   publishedAt     DateTime?  @map("published_at")
   metaTitle       String?    @map("meta_title") @db.VarChar(255)
   metaDescription String?    @map("meta_description") @db.VarChar(500)
+  metaKeywords    String?    @map("meta_keywords") @db.VarChar(255)
   metaThumbnail   String?    @map("meta_thumbnail") @db.VarChar(500)
   authorId        Int        @map("author_id") @db.UnsignedInt
   categoryId      Int?       @map("category_id") @db.UnsignedInt

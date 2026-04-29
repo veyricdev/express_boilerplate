@@ -48,6 +48,7 @@ export interface Post {
   publishedAt?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
+  metaKeywords?: string | null
   metaThumbnail?: string | null
   authorId: number
   categoryId?: number | null
@@ -57,6 +58,7 @@ export interface Post {
   author?: User
   category?: Category | null
   tags?: Tag[]
+  postTags?: { tagId: number; tag: Tag }[]
 }
 
 export interface AuditLog {

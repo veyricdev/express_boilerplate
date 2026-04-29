@@ -2,7 +2,6 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { PaginationDto } from '~/common/dtos/pagination.dto'
 import { TrashMode } from '~/common/enums/trash-mode.enum'
 import { paginate } from '~/common/helpers/pagination.helper'
-import type { Prisma } from '~/prisma/generated/prisma'
 import { PostStatus } from '~/prisma/generated/prisma'
 import { PrismaService } from '~/prisma/prisma.service'
 import { slugify } from '~/utils/slug.util'
@@ -69,8 +68,8 @@ export class PostsService {
   }
 
   async create(authorId: number, dto: CreatePostDto) {
-    const { tagIds, publishedAt, ...postData } = dto
-    const baseSlug = slugify(dto.title)
+    const { tagIds, publishedAt, slug: customSlug, categoryId, ...postData } = dto
+    const baseSlug = slugify(customSlug || dto.title)
 
     // Slug uniqueness check — only against non-deleted posts
     const existing = await this.prisma.db.post.findFirst({
@@ -88,7 +87,8 @@ export class PostsService {
         ...postData,
         status: postData.status,
         slug,
-        authorId,
+        author: { connect: { id: authorId } },
+        ...(categoryId ? { category: { connect: { id: categoryId } } } : {}),
         publishedAt: resolvedPublishedAt,
         postTags: tagIds?.length ? { create: tagIds.map((tagId) => ({ tagId })) } : undefined,
       },
@@ -102,11 +102,23 @@ export class PostsService {
   async update(id: number, dto: UpdatePostDto) {
     await this.findOneAdmin(id) // throws if not found (includes soft-deleted)
 
-    const { tagIds, status, publishedAt, ...rest } = dto
+    const { tagIds, status, publishedAt, slug: customSlug, categoryId, ...rest } = dto
 
     // Handle tag replacement
     if (tagIds !== undefined) {
       await this.prisma.db.postTag.deleteMany({ where: { postId: id } })
+    }
+
+    // Handle slug
+    let updatedSlug: string | undefined
+    const slugToCheck = customSlug || rest.title
+    if (slugToCheck) {
+      const baseSlug = slugify(slugToCheck)
+      const existing = await this.prisma.db.post.findFirst({
+        where: { slug: baseSlug, id: { not: id } },
+        select: { id: true },
+      })
+      updatedSlug = existing ? `${baseSlug}-${Date.now().toString().slice(-5)}` : baseSlug
     }
 
     // publishedAt logic on update:
@@ -130,12 +142,16 @@ export class PostsService {
       where: { id },
       data: {
         ...rest,
+        ...(categoryId !== undefined && {
+          category: categoryId ? { connect: { id: categoryId } } : { disconnect: true },
+        }),
+        ...(updatedSlug !== undefined && { slug: updatedSlug }),
         ...(status !== undefined && { status }),
         ...(resolvedPublishedAt !== undefined && { publishedAt: resolvedPublishedAt }),
         ...(tagIds !== undefined && {
           postTags: { create: tagIds.map((tagId) => ({ tagId })) },
         }),
-      } as Prisma.PostUpdateInput,
+      },
       include: {
         category: true,
         postTags: { include: { tag: true } },

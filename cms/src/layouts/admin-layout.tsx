@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Link, Outlet, useLocation } from 'react-router'
 import { AppSidebar } from '@/components/app-sidebar'
+import { ModeToggle } from '@/components/mode-toggle'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,8 +12,6 @@ import {
 } from '@/components/ui/breadcrumb'
 import { Separator } from '@/components/ui/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
-
-import { ModeToggle } from '@/components/mode-toggle'
 
 const navigation = [
   { name: 'Dashboard', href: '/' },
@@ -41,7 +40,7 @@ export default function AdminLayout() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className='min-w-0'>
         <header className='flex h-16 shrink-0 items-center gap-2 border-b px-4 transition-all duration-200 ease-in-out'>
           <div className='flex items-center gap-2'>
             <SidebarTrigger className='-ml-1' />
@@ -73,7 +72,7 @@ export default function AdminLayout() {
             <ModeToggle />
           </div>
         </header>
-        <div className='flex flex-1 flex-col gap-4 p-8 pt-6'>
+        <div className='flex flex-1 flex-col gap-4 p-4 pt-0 w-full min-w-0 overflow-x-hidden'>
           <Outlet />
         </div>
       </SidebarInset>
