@@ -1,21 +1,29 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
-import { PaginationDto } from '~/common/dtos/pagination.dto'
+import { TrashMode } from '~/common/enums/trash-mode.enum'
 import { paginate } from '~/common/helpers/pagination.helper'
 import type { Prisma } from '~/prisma/generated/prisma'
 import { PrismaService } from '~/prisma/prisma.service'
+import { FindUsersAdminDto } from './dto/find-users-admin.dto'
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(pagination: PaginationDto) {
+  async findAll(query: FindUsersAdminDto) {
+    const { page, limit, search, trashMode } = query
+
     return paginate(
       this.prisma.db.user,
       {
+        where: {
+          ...(trashMode === TrashMode.TRASH ? { deletedAt: { not: null } } : {}),
+          ...(trashMode === TrashMode.ALL ? { deletedAt: { not: undefined } } : {}),
+          OR: search ? [{ fullName: { contains: search } }, { email: { contains: search } }] : undefined,
+        },
         orderBy: { createdAt: 'desc' },
       },
-      pagination
+      { page, limit }
     )
   }
 

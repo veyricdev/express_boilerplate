@@ -7,6 +7,7 @@ import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fa
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { apiReference } from '@scalar/nestjs-api-reference'
 import { AppModule } from './app.module'
+import { ApiResponseDto } from './common/dtos/api-response.dto'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter({ logger: true }))
@@ -20,6 +21,7 @@ async function bootstrap() {
           "'self'",
           "'unsafe-inline'",
           "'unsafe-eval'",
+          'http://localhost:5173',
           'https://cdn.ckeditor.com',
           'https://cdn.jsdelivr.net',
           'https://static.cloudflareinsights.com',
@@ -27,12 +29,13 @@ async function bootstrap() {
         styleSrc: [
           "'self'",
           "'unsafe-inline'",
+          'http://localhost:5173',
           'https://fonts.googleapis.com',
           'https://cdn.ckeditor.com',
           'https://cdn.jsdelivr.net',
           'https://unpkg.com',
         ],
-        fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+        fontSrc: ["'self'", 'http://localhost:5173', 'https://fonts.gstatic.com', 'data:'],
         imgSrc: ["'self'", 'data:', 'blob:', '*'],
         connectSrc: ["'self'", '*'],
         mediaSrc: ["'self'", '*'],
@@ -70,7 +73,6 @@ async function bootstrap() {
     })
   )
 
-
   // Serve static files (React build output)
   app.useStaticAssets({
     root: join(__dirname, '..', 'public'),
@@ -93,7 +95,9 @@ async function bootstrap() {
     .addBearerAuth()
     .build()
 
-  const document = SwaggerModule.createDocument(app, config)
+  const document = SwaggerModule.createDocument(app, config, {
+    extraModels: [ApiResponseDto],
+  })
 
   app.use(
     '/docs',

@@ -1,0 +1,1685 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/v1/admin/auth/login": {
+      "post": {
+        "operationId": "AdminAuthController_login_v1",
+        "parameters": [
+          {
+            "name": "user-agent",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Admin login → returns access + refresh token",
+        "tags": [
+          "Admin Auth"
+        ]
+      }
+    },
+    "/api/v1/admin/auth/refresh": {
+      "post": {
+        "operationId": "AdminAuthController_refresh_v1",
+        "parameters": [
+          {
+            "name": "user-agent",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Rotate refresh token → returns new token pair",
+        "tags": [
+          "Admin Auth"
+        ]
+      }
+    },
+    "/api/v1/admin/auth/logout": {
+      "post": {
+        "operationId": "AdminAuthController_logout_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Logout → revoke current refresh token",
+        "tags": [
+          "Admin Auth"
+        ]
+      }
+    },
+    "/api/v1/admin/auth/logout-all": {
+      "post": {
+        "operationId": "AdminAuthController_logoutAll_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Logout all → revoke every refresh token for current user",
+        "tags": [
+          "Admin Auth"
+        ]
+      }
+    },
+    "/api/v1/users/me": {
+      "get": {
+        "operationId": "ClientUsersController_getMe_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current user profile",
+        "tags": [
+          "Client Users"
+        ]
+      }
+    },
+    "/api/v1/admin/users": {
+      "get": {
+        "operationId": "AdminUsersController_findAll_v1",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all active users",
+        "tags": [
+          "Admin Users"
+        ]
+      },
+      "post": {
+        "operationId": "AdminUsersController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create new user",
+        "tags": [
+          "Admin Users"
+        ]
+      }
+    },
+    "/api/v1/admin/users/{id}": {
+      "get": {
+        "operationId": "AdminUsersController_findOne_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get user details (includes soft-deleted for restore UI)",
+        "tags": [
+          "Admin Users"
+        ]
+      },
+      "patch": {
+        "operationId": "AdminUsersController_update_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update user info or permissions",
+        "tags": [
+          "Admin Users"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminUsersController_remove_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Soft delete user (revokes tokens, moves to trash)",
+        "tags": [
+          "Admin Users"
+        ]
+      }
+    },
+    "/api/v1/admin/users/{id}/toggle-active": {
+      "patch": {
+        "operationId": "AdminUsersController_toggleActive_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Toggle user active status",
+        "tags": [
+          "Admin Users"
+        ]
+      }
+    },
+    "/api/v1/admin/users/{id}/restore": {
+      "post": {
+        "operationId": "AdminUsersController_restore_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Restore a soft-deleted user",
+        "tags": [
+          "Admin Users"
+        ]
+      }
+    },
+    "/api/v1/admin/users/{id}/permanent": {
+      "delete": {
+        "operationId": "AdminUsersController_hardDelete_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Permanently delete user (irreversible, cascades tokens)",
+        "tags": [
+          "Admin Users"
+        ]
+      }
+    },
+    "/api/v1/admin/posts": {
+      "get": {
+        "operationId": "AdminPostsController_findAll_v1",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DRAFT",
+                "PUBLISHED"
+              ]
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "search query",
+              "type": "string"
+            }
+          },
+          {
+            "name": "trashMode",
+            "required": false,
+            "in": "query",
+            "description": "Filter by deletion status: active (not deleted), trash (deleted only), all (both)",
+            "schema": {
+              "default": "active",
+              "type": "string",
+              "enum": [
+                "active",
+                "trash",
+                "all"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List posts with filtering (active, trash, all)",
+        "tags": [
+          "Admin Posts"
+        ]
+      },
+      "post": {
+        "operationId": "AdminPostsController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePostDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create new post. Set publishedAt to schedule future publication.",
+        "tags": [
+          "Admin Posts"
+        ]
+      }
+    },
+    "/api/v1/admin/posts/{id}": {
+      "get": {
+        "operationId": "AdminPostsController_findOne_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get post detail by ID (includes soft-deleted for restore UI)",
+        "tags": [
+          "Admin Posts"
+        ]
+      },
+      "patch": {
+        "operationId": "AdminPostsController_update_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePostDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update post",
+        "tags": [
+          "Admin Posts"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminPostsController_remove_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Soft delete post (moves to trash, restorable)",
+        "tags": [
+          "Admin Posts"
+        ]
+      }
+    },
+    "/api/v1/admin/posts/{id}/restore": {
+      "post": {
+        "operationId": "AdminPostsController_restore_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Restore a soft-deleted post from trash",
+        "tags": [
+          "Admin Posts"
+        ]
+      }
+    },
+    "/api/v1/admin/posts/{id}/permanent": {
+      "delete": {
+        "operationId": "AdminPostsController_hardDelete_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Permanently delete post (irreversible)",
+        "tags": [
+          "Admin Posts"
+        ]
+      }
+    },
+    "/api/v1/posts": {
+      "get": {
+        "operationId": "ClientPostsController_findAll_v1",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "tagId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "List all published posts",
+        "tags": [
+          "Posts"
+        ]
+      }
+    },
+    "/api/v1/posts/s/{slug}": {
+      "get": {
+        "operationId": "ClientPostsController_findBySlug_v1",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get published post by slug (SEO-friendly)",
+        "tags": [
+          "Posts"
+        ]
+      }
+    },
+    "/api/v1/admin/categories": {
+      "get": {
+        "operationId": "AdminCategoriesController_findAll_v1",
+        "parameters": [
+          {
+            "name": "trashMode",
+            "required": false,
+            "in": "query",
+            "description": "Filter by deletion status: active (not deleted), trash (deleted only), all (both)",
+            "schema": {
+              "default": "active",
+              "type": "string",
+              "enum": [
+                "active",
+                "trash",
+                "all"
+              ]
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by name",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List categories with filtering (active, trash, all)",
+        "tags": [
+          "Admin Categories"
+        ]
+      },
+      "post": {
+        "operationId": "AdminCategoriesController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create category (auto-generate slug)",
+        "tags": [
+          "Admin Categories"
+        ]
+      }
+    },
+    "/api/v1/admin/categories/{id}": {
+      "get": {
+        "operationId": "AdminCategoriesController_findOne_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get category by ID (includes soft-deleted)",
+        "tags": [
+          "Admin Categories"
+        ]
+      },
+      "patch": {
+        "operationId": "AdminCategoriesController_update_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update category",
+        "tags": [
+          "Admin Categories"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminCategoriesController_remove_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Soft delete category (detaches posts, moves to trash)",
+        "tags": [
+          "Admin Categories"
+        ]
+      }
+    },
+    "/api/v1/admin/categories/{id}/restore": {
+      "post": {
+        "operationId": "AdminCategoriesController_restore_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Restore a soft-deleted category",
+        "tags": [
+          "Admin Categories"
+        ]
+      }
+    },
+    "/api/v1/admin/categories/{id}/permanent": {
+      "delete": {
+        "operationId": "AdminCategoriesController_hardDelete_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Permanently delete category (irreversible)",
+        "tags": [
+          "Admin Categories"
+        ]
+      }
+    },
+    "/api/v1/categories": {
+      "get": {
+        "operationId": "ClientCategoriesController_findAll_v1",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "List all categories (public)",
+        "tags": [
+          "Categories"
+        ]
+      }
+    },
+    "/api/v1/categories/s/{slug}": {
+      "get": {
+        "operationId": "ClientCategoriesController_findBySlug_v1",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get category by slug with published posts",
+        "tags": [
+          "Categories"
+        ]
+      }
+    },
+    "/api/v1/admin/tags": {
+      "get": {
+        "operationId": "AdminTagsController_findAll_v1",
+        "parameters": [
+          {
+            "name": "trashMode",
+            "required": false,
+            "in": "query",
+            "description": "Filter by deletion status: active (not deleted), trash (deleted only), all (both)",
+            "schema": {
+              "default": "active",
+              "type": "string",
+              "enum": [
+                "active",
+                "trash",
+                "all"
+              ]
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by name",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List tags with filtering (active, trash, all)",
+        "tags": [
+          "Admin Tags"
+        ]
+      },
+      "post": {
+        "operationId": "AdminTagsController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTagDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create tag (idempotent — returns existing if slug matches)",
+        "tags": [
+          "Admin Tags"
+        ]
+      }
+    },
+    "/api/v1/admin/tags/{id}": {
+      "patch": {
+        "operationId": "AdminTagsController_update_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTagDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update tag",
+        "tags": [
+          "Admin Tags"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminTagsController_remove_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Soft delete tag (moves to trash, restorable)",
+        "tags": [
+          "Admin Tags"
+        ]
+      }
+    },
+    "/api/v1/admin/tags/{id}/restore": {
+      "post": {
+        "operationId": "AdminTagsController_restore_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Restore a soft-deleted tag",
+        "tags": [
+          "Admin Tags"
+        ]
+      }
+    },
+    "/api/v1/admin/tags/{id}/permanent": {
+      "delete": {
+        "operationId": "AdminTagsController_hardDelete_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Permanently delete tag (irreversible)",
+        "tags": [
+          "Admin Tags"
+        ]
+      }
+    },
+    "/api/v1/tags": {
+      "get": {
+        "operationId": "ClientTagsController_findAll_v1",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "List all tags (public)",
+        "tags": [
+          "Tags"
+        ]
+      }
+    },
+    "/cms": {
+      "get": {
+        "operationId": "CmsController_serveAppRoot",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Cms"
+        ]
+      }
+    },
+    "/cms/{path}": {
+      "get": {
+        "operationId": "CmsController_serveApp",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Cms"
+        ]
+      }
+    },
+    "/api/v1/admin/audit-logs": {
+      "get": {
+        "operationId": "AdminAuditLogsController_findAll_v1",
+        "parameters": [
+          {
+            "name": "entity",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "POST",
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "SOFT_DELETE",
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "entityId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all audit logs",
+        "tags": [
+          "Admin: Audit Logs"
+        ]
+      }
+    },
+    "/api/v1/admin/audit-logs/{id}": {
+      "get": {
+        "operationId": "AdminAuditLogsController_findOne_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get audit log details",
+        "tags": [
+          "Admin: Audit Logs"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "NestJS Boilerplate",
+    "description": "NestJS Boilerplate",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "admin@cms.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "Admin@123"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "LoginResponseDto": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "accessToken",
+          "refreshToken"
+        ]
+      },
+      "UserResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "email": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "permissions": {
+            "type": "string",
+            "example": "127"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "lastLoginAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "fullName",
+          "permissions",
+          "isActive",
+          "lastLoginAt",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "fullName": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123",
+            "minLength": 6
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true
+          },
+          "permissions": {
+            "type": "string",
+            "example": "1024",
+            "description": "Permissions as a stringified BigInt"
+          }
+        },
+        "required": [
+          "email",
+          "fullName",
+          "password"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "fullName": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true
+          },
+          "permissions": {
+            "type": "string",
+            "example": "1024",
+            "description": "Permissions as a stringified BigInt"
+          }
+        }
+      },
+      "CreatePostDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Hướng Dẫn NestJS"
+          },
+          "content": {
+            "type": "string",
+            "example": "<p>Nội dung bài viết...</p>"
+          },
+          "excerpt": {
+            "type": "string",
+            "example": "Tóm tắt ngắn gọn về bài viết"
+          },
+          "thumbnail": {
+            "type": "string",
+            "example": "https://example.com/thumb.jpg"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PUBLISHED"
+            ],
+            "default": "DRAFT"
+          },
+          "publishedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-06-01T08:00:00.000Z",
+            "description": "Schedule publish time. If omitted and status=PUBLISHED, defaults to now."
+          },
+          "metaTitle": {
+            "type": "string",
+            "example": "SEO Title"
+          },
+          "metaDescription": {
+            "type": "string",
+            "example": "SEO Description"
+          },
+          "metaThumbnail": {
+            "type": "string",
+            "example": "https://example.com/meta-thumb.jpg"
+          },
+          "categoryId": {
+            "type": "number",
+            "example": 1
+          },
+          "tagIds": {
+            "example": [
+              1,
+              2,
+              3
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "title",
+          "content"
+        ]
+      },
+      "UpdatePostDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Hướng Dẫn NestJS"
+          },
+          "content": {
+            "type": "string",
+            "example": "<p>Nội dung bài viết...</p>"
+          },
+          "excerpt": {
+            "type": "string",
+            "example": "Tóm tắt ngắn gọn về bài viết"
+          },
+          "thumbnail": {
+            "type": "string",
+            "example": "https://example.com/thumb.jpg"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PUBLISHED"
+            ],
+            "default": "DRAFT"
+          },
+          "publishedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-06-01T08:00:00.000Z",
+            "description": "Schedule publish time. If omitted and status=PUBLISHED, defaults to now."
+          },
+          "metaTitle": {
+            "type": "string",
+            "example": "SEO Title"
+          },
+          "metaDescription": {
+            "type": "string",
+            "example": "SEO Description"
+          },
+          "metaThumbnail": {
+            "type": "string",
+            "example": "https://example.com/meta-thumb.jpg"
+          },
+          "categoryId": {
+            "type": "number",
+            "example": 1
+          },
+          "tagIds": {
+            "example": [
+              1,
+              2,
+              3
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CreateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Công Nghệ"
+          },
+          "description": {
+            "type": "string",
+            "example": "Các bài viết về công nghệ"
+          },
+          "metaTitle": {
+            "type": "string",
+            "example": "SEO Title"
+          },
+          "metaDescription": {
+            "type": "string",
+            "example": "SEO Description"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Công Nghệ"
+          },
+          "description": {
+            "type": "string",
+            "example": "Các bài viết về công nghệ"
+          },
+          "metaTitle": {
+            "type": "string",
+            "example": "SEO Title"
+          },
+          "metaDescription": {
+            "type": "string",
+            "example": "SEO Description"
+          }
+        }
+      },
+      "CreateTagDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "nestjs"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateTagDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "nestjs-v10"
+          }
+        }
+      }
+    }
+  }
+}

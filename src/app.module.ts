@@ -6,6 +6,8 @@ import { AuditLogInterceptor } from './common/interceptors/audit-log.interceptor
 // Interceptors
 import { BigIntInterceptor } from './common/interceptors/bigint.interceptor'
 import { TransformInterceptor } from './common/interceptors/transform.interceptor'
+// Modules
+import { LoggerModule } from './common/logger/logger.module'
 import configuration from './config/configuration'
 import { validate } from './config/env.validation'
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module'
@@ -15,8 +17,6 @@ import { CmsModule } from './modules/cms/cms.module'
 import { PostsModule } from './modules/posts/posts.module'
 import { TagsModule } from './modules/tags/tags.module'
 import { UsersModule } from './modules/users/users.module'
-// Modules
-import { LoggerModule } from './common/logger/logger.module'
 import { PrismaModule } from './prisma/prisma.module'
 
 @Module({

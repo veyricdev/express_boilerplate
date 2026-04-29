@@ -1,5 +1,6 @@
 import { Body, Controller, Headers, HttpCode, HttpStatus, Ip, Post, UseGuards } from '@nestjs/common'
-import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiWrappedResponse } from '~/common/decorators/api-response.decorator'
 import { CurrentUser } from '~/common/decorators/current-user.decorator'
 import { JwtAuthGuard } from '~/common/guards/jwt-auth.guard'
 import { JwtRefreshGuard } from '~/common/guards/jwt-refresh.guard'
@@ -17,7 +18,7 @@ export class AdminAuthController {
    */
   @Post('login')
   @ApiOperation({ summary: 'Admin login → returns access + refresh token' })
-  @ApiOkResponse({ type: LoginResponseDto })
+  @ApiWrappedResponse(LoginResponseDto)
   login(@Body() dto: LoginDto, @Ip() ip: string, @Headers('user-agent') ua: string) {
     return this.authService.login(dto, ip, ua)
   }
@@ -31,6 +32,7 @@ export class AdminAuthController {
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Rotate refresh token → returns new token pair' })
+  @ApiWrappedResponse(LoginResponseDto)
   refresh(@CurrentUser('refreshToken') refreshToken: string, @Ip() ip: string, @Headers('user-agent') ua: string) {
     return this.authService.refresh(refreshToken, ip, ua)
   }

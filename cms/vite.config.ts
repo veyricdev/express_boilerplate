@@ -1,11 +1,19 @@
+import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
 
-export default defineConfig({
-  plugins: [react({})],
+export default defineConfig(({ mode }) => ({
+  base: mode === 'production' ? '/build/' : '/',
+  plugins: [react({}), tailwindcss()],
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, './src'),
+    },
+  },
   build: {
     outDir: '../public/build',
+    emptyOutDir: true,
     manifest: true, // Tạo manifest.json như Laravel
     rollupOptions: {
       input: {
@@ -26,5 +34,6 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     cors: true,
+    origin: 'http://localhost:5173',
   },
-})
+}))

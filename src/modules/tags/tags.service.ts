@@ -46,7 +46,7 @@ export class TagsService {
           ...(trashMode === TrashMode.ALL ? { deletedAt: { not: undefined } } : {}),
           name: query?.search ? { contains: query.search, mode: 'insensitive' } : undefined,
         },
-        include: { _count: { select: { posts: true } } },
+        include: { _count: { select: { postTags: true } } },
         orderBy: { name: 'asc' },
       },
       pagination

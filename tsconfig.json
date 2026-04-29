@@ -25,5 +25,7 @@
       "~/*": ["./src/*"]
     },
     "jsx": "react-jsx"
-  }
+  },
+  "include": ["src", "test"],
+  "exclude": ["node_modules", "dist", "cms"]
 }
