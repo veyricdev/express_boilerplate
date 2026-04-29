@@ -13,7 +13,7 @@ async function bootstrap() {
 
   // Global Prefix
   app.setGlobalPrefix('api', {
-    exclude: ['cms', 'cms/(.*)'],
+    exclude: ['cms', 'cms/*path'],
   })
 
   // Versioning

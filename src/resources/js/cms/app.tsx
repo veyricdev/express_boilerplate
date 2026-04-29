@@ -1,7 +1,5 @@
 import { createRoot } from 'react-dom/client'
+import { RouterProvider } from 'react-router'
+import { router } from './routes'
 
-function App() {
-  return <div>hello</div>
-}
-
-createRoot(document.getElementById('cms-root')!).render(<App />)
+createRoot(document.getElementById('cms-root')!).render(<RouterProvider router={router} />)
