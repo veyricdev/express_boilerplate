@@ -7,8 +7,6 @@ import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fa
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { apiReference } from '@scalar/nestjs-api-reference'
 import { AppModule } from './app.module'
-import { AllExceptionsFilter } from './common/filters/http-exception.filter'
-import { TransformInterceptor } from './common/interceptors/transform.interceptor'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter({ logger: true }))
@@ -72,9 +70,6 @@ async function bootstrap() {
     })
   )
 
-  // Global Filters & Interceptors
-  app.useGlobalFilters(new AllExceptionsFilter())
-  app.useGlobalInterceptors(new TransformInterceptor())
 
   // Serve static files (React build output)
   app.useStaticAssets({

@@ -3,8 +3,7 @@ import { faker } from '@faker-js/faker'
 import { PrismaMariaDb } from '@prisma/adapter-mariadb'
 import * as bcrypt from 'bcrypt'
 import { PERM_ADMIN } from '../common/constants/permissions'
-import { PrismaClient } from './generated/prisma'
-import { PostStatus } from './generated/prisma/enums'
+import { PostStatus, PrismaClient } from './generated/prisma'
 
 const adapter = new PrismaMariaDb({
   host: process.env.DATABASE_HOST || 'localhost',

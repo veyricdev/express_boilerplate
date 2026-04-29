@@ -10,6 +10,29 @@ import type { CreateTagDto, UpdateTagDto } from './dto/tag.dto'
 export class TagsService {
   constructor(private prisma: PrismaService) {}
 
+  // ─── Public ───────────────────────────────────────────────────────────────
+
+  async findAll(pagination: PaginationDto) {
+    return paginate(
+      this.prisma.db.tag,
+      {
+        where: {
+          deletedAt: undefined,
+        },
+        orderBy: { name: 'asc' },
+      },
+      pagination
+    )
+  }
+
+  async findOnePublic(id: number) {
+    const tag = await this.prisma.db.tag.findUnique({
+      where: { id, deletedAt: undefined } as any,
+    })
+    if (!tag) throw new NotFoundException('Tag not found')
+    return tag
+  }
+
   // ─── Admin ───────────────────────────────────────────────────────────────
 
   async findAllAdmin(pagination: PaginationDto, query?: { search?: string; trashMode?: TrashMode }) {

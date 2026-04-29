@@ -3,7 +3,7 @@ import { Type } from 'class-transformer'
 import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator'
 import { PaginationDto } from '~/common/dtos/pagination.dto'
 import { TrashMode } from '~/common/enums/trash-mode.enum'
-import { PostStatus } from '~/prisma/generated/prisma/enums'
+import { PostStatus } from '~/prisma/generated/prisma'
 
 export class FindPostsAdminDto extends PaginationDto {
   @ApiPropertyOptional({ example: 1 })

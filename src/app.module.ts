@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
-import { APP_INTERCEPTOR } from '@nestjs/core'
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core'
+import { AllExceptionsFilter } from './common/filters/http-exception.filter'
 import { AuditLogInterceptor } from './common/interceptors/audit-log.interceptor'
 // Interceptors
 import { BigIntInterceptor } from './common/interceptors/bigint.interceptor'
+import { TransformInterceptor } from './common/interceptors/transform.interceptor'
 import configuration from './config/configuration'
 import { validate } from './config/env.validation'
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module'
@@ -14,6 +16,7 @@ import { PostsModule } from './modules/posts/posts.module'
 import { TagsModule } from './modules/tags/tags.module'
 import { UsersModule } from './modules/users/users.module'
 // Modules
+import { LoggerModule } from './common/logger/logger.module'
 import { PrismaModule } from './prisma/prisma.module'
 
 @Module({
@@ -31,10 +34,13 @@ import { PrismaModule } from './prisma/prisma.module'
     TagsModule,
     CmsModule,
     AuditLogsModule,
+    LoggerModule,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: BigIntInterceptor },
     { provide: APP_INTERCEPTOR, useClass: AuditLogInterceptor },
+    { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
+    { provide: APP_FILTER, useClass: AllExceptionsFilter },
   ],
 })
 export class AppModule {}

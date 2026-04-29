@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
 import { IsArray, IsEnum, IsInt, IsISO8601, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator'
-import { PostStatus } from '~/prisma/generated/prisma/enums'
+import { PostStatus } from '~/prisma/generated/prisma'
 
 export class CreatePostDto {
   @ApiProperty({ example: 'Hướng Dẫn NestJS' })
