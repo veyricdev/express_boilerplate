@@ -1,5 +1,26 @@
-import { FileText, FolderTree, History, LayoutDashboard, LogOut, Tag, Users } from 'lucide-react'
+import {
+  BadgeCheck,
+  Bell,
+  ChevronsUpDown,
+  FileText,
+  FolderTree,
+  History,
+  LayoutDashboard,
+  LogOut,
+  Tag,
+  Users,
+} from 'lucide-react'
 import { Link, useLocation, useNavigate } from 'react-router'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Sidebar,
   SidebarContent,
@@ -12,6 +33,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  useSidebar,
 } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/store/auth'
@@ -28,11 +50,19 @@ const navigation = [
 export function AppSidebar() {
   const location = useLocation()
   const navigate = useNavigate()
+  const { isMobile } = useSidebar()
+  const user = useAuth((state) => state.user)
   const logout = useAuth((state) => state.logout)
 
   const handleLogout = () => {
     logout()
     navigate('/login')
+  }
+
+  const userData = {
+    name: user?.fullName || 'Admin',
+    email: user?.email || 'admin@example.com',
+    avatar: '',
   }
 
   return (
@@ -92,20 +122,66 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className='border-t p-2 group-data-[collapsible=icon]:p-0'>
+      <SidebarFooter className='p-2 group-data-[collapsible=icon]:p-2 border-t'>
         <SidebarMenu className='group-data-[collapsible=icon]:items-center'>
           <SidebarMenuItem className='w-full flex justify-center'>
-            <SidebarMenuButton
-              onClick={handleLogout}
-              tooltip='Đăng xuất'
-              className={cn(
-                'text-destructive hover:text-destructive hover:bg-destructive/10 text-base h-11 px-3 rounded-xl w-full',
-                'group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:rounded-lg'
-              )}
-            >
-              <LogOut className='size-5 shrink-0' />
-              <span className='group-data-[collapsible=icon]:hidden'>Đăng xuất</span>
-            </SidebarMenuButton>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size='lg'
+                  className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:w-auto'
+                >
+                  <Avatar className='h-8 w-8 rounded-lg'>
+                    <AvatarImage src={userData.avatar} alt={userData.name} />
+                    <AvatarFallback className='rounded-lg bg-primary/10 text-primary'>
+                      {userData.name.slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className='grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden'>
+                    <span className='truncate font-medium'>{userData.name}</span>
+                    <span className='truncate text-xs text-muted-foreground'>{userData.email}</span>
+                  </div>
+                  <ChevronsUpDown className='ml-auto size-4 group-data-[collapsible=icon]:hidden' />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className='w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg'
+                side={isMobile ? 'bottom' : 'right'}
+                align='end'
+                sideOffset={4}
+              >
+                <DropdownMenuLabel className='p-0 font-normal'>
+                  <div className='flex items-center gap-2 px-1 py-1.5 text-left text-sm'>
+                    <Avatar className='h-8 w-8 rounded-lg'>
+                      <AvatarImage src={userData.avatar} alt={userData.name} />
+                      <AvatarFallback className='rounded-lg bg-primary/10 text-primary'>
+                        {userData.name.slice(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className='grid flex-1 text-left text-sm leading-tight'>
+                      <span className='truncate font-medium'>{userData.name}</span>
+                      <span className='truncate text-xs text-muted-foreground'>{userData.email}</span>
+                    </div>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>
+                    <BadgeCheck className='size-4' />
+                    Tài khoản
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Bell className='size-4' />
+                    Thông báo
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className='text-destructive focus:text-destructive'>
+                  <LogOut className='size-4' />
+                  Đăng xuất
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
