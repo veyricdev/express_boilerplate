@@ -1,5 +1,74 @@
-import { ThemeProvider as NextThemesProvider } from 'next-themes'
+import { createContext, useContext, useLayoutEffect, useState } from 'react'
 
-export function ThemeProvider({ children, ...props }: React.ComponentProps<typeof NextThemesProvider>) {
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>
+type Theme = 'dark' | 'light' | 'system'
+
+type ThemeProviderProps = {
+  children: React.ReactNode
+  defaultTheme?: Theme
+  storageKey?: string
+}
+
+type ThemeProviderState = {
+  theme: Theme
+  setTheme: (theme: Theme) => void
+}
+
+const initialState: ThemeProviderState = {
+  theme: 'system',
+  setTheme: () => null,
+}
+
+const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
+
+export function ThemeProvider({
+  children,
+  defaultTheme = 'system',
+  storageKey = 'cms-ui-theme',
+  ...props
+}: ThemeProviderProps) {
+  const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem(storageKey) as Theme) || defaultTheme)
+
+  useLayoutEffect(() => {
+    const root = window.document.documentElement
+
+    // Disable transitions during theme change to prevent "flicker"
+    const style = document.createElement('style')
+    style.appendChild(document.createTextNode('* { transition: none !important; }'))
+    document.head.appendChild(style)
+
+    root.classList.remove('light', 'dark')
+
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      root.classList.add(systemTheme)
+    } else {
+      root.classList.add(theme)
+    }
+
+    // Force a repaint to ensure class change is processed without transitions
+    window.getComputedStyle(style).opacity
+    document.head.removeChild(style)
+  }, [theme])
+
+  const value = {
+    theme,
+    setTheme: (theme: Theme) => {
+      localStorage.setItem(storageKey, theme)
+      setTheme(theme)
+    },
+  }
+
+  return (
+    <ThemeProviderContext.Provider {...props} value={value}>
+      {children}
+    </ThemeProviderContext.Provider>
+  )
+}
+
+export const useTheme = () => {
+  const context = useContext(ThemeProviderContext)
+
+  if (context === undefined) throw new Error('useTheme must be used within a ThemeProvider')
+
+  return context
 }
