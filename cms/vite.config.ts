@@ -5,11 +5,11 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [react({})],
   build: {
-    outDir: 'public/build',
+    outDir: '../public/build',
     manifest: true, // Tạo manifest.json như Laravel
     rollupOptions: {
       input: {
-        cms: resolve(__dirname, 'src/resources/js/cms/app.tsx'),
+        cms: resolve(__dirname, 'src/app.tsx'),
         // Thêm entry khác nếu cần
         // admin: resolve(__dirname, 'src/resources/js/admin/app.tsx'),
       },

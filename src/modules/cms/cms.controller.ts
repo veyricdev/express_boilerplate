@@ -21,7 +21,7 @@ export class CmsController {
   @Get('*')
   async serveApp(@Res() res: FastifyReply) {
     try {
-      const assets = viteAssets(this.viteService, 'src/resources/js/cms/app.tsx')
+      const assets = viteAssets(this.viteService, 'src/app.tsx')
 
       return await res.view('cms/app', {
         title: 'Quản trị',
