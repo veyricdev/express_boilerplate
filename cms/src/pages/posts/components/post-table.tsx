@@ -1,10 +1,15 @@
+import React from 'react'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
-import { User as AuthorIcon, Calendar, Clock, Edit, Eye, Trash2 } from 'lucide-react'
+import { User as AuthorIcon, Calendar, Clock, Edit, Eye, Trash2, RotateCcw, XCircle } from 'lucide-react'
 import { useNavigate } from 'react-router'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import { postService } from '@/services/post.service'
 import { Post } from '@/types'
 import { cn } from '@/utils/cn'
 import { PostStatusBadge } from './post-status-badge'
@@ -16,14 +21,71 @@ interface PostTableProps {
 
 export function PostTable({ posts, isLoading }: PostTableProps) {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => postService.remove(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] })
+      toast.success('Xóa bài viết thành công')
+    },
+    onError: () => {
+      toast.error('Có lỗi xảy ra khi xóa bài viết')
+    },
+  })
+
+  const restoreMutation = useMutation({
+    mutationFn: (id: number) => postService.restore(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] })
+      toast.success('Khôi phục bài viết thành công')
+    },
+    onError: () => {
+      toast.error('Có lỗi xảy ra khi khôi phục bài viết')
+    },
+  })
+
+  const permanentDeleteMutation = useMutation({
+    mutationFn: (id: number) => postService.permanentRemove(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] })
+      toast.success('Xóa vĩnh viễn bài viết thành công')
+    },
+    onError: () => {
+      toast.error('Có lỗi xảy ra khi xóa vĩnh viễn bài viết')
+    },
+  })
+
+  const handleDelete = (id: number) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa bài viết này?')) {
+      deleteMutation.mutate(id)
+    }
+  }
+
+  const handleRestore = (id: number) => {
+    if (window.confirm('Bạn có muốn khôi phục bài viết này không?')) {
+      restoreMutation.mutate(id)
+    }
+  }
+
+  const handlePermanentDelete = (id: number) => {
+    if (window.confirm('CẢNH BÁO: Bài viết này sẽ bị xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn?')) {
+      permanentDeleteMutation.mutate(id)
+    }
+  }
+
+  const handleViewDetails = () => {
+    alert('Tính năng xem chi tiết bài viết đang được phát triển!')
+  }
 
   return (
     <div className='overflow-x-auto'>
       <Table>
         <TableHeader className='bg-muted/50'>
           <TableRow className='hover:bg-transparent border-b'>
-            <TableHead className='w-[40%] px-6 py-4 font-semibold text-foreground'>Tiêu đề</TableHead>
+            <TableHead className='w-[30%] px-6 py-4 font-semibold text-foreground'>Tiêu đề</TableHead>
             <TableHead className='px-6 py-4 font-semibold text-foreground'>Danh mục</TableHead>
+            <TableHead className='px-6 py-4 font-semibold text-foreground'>Tags</TableHead>
             <TableHead className='px-6 py-4 font-semibold text-foreground'>Trạng thái</TableHead>
             <TableHead className='px-6 py-4 font-semibold text-foreground'>Tác giả</TableHead>
             <TableHead className='px-6 py-4 font-semibold text-foreground text-right'>Ngày đăng</TableHead>
@@ -33,7 +95,7 @@ export function PostTable({ posts, isLoading }: PostTableProps) {
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={6} className='h-32 text-center'>
+              <TableCell colSpan={7} className='h-32 text-center'>
                 <div className='flex flex-col items-center gap-2 text-muted-foreground'>
                   <div className='animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent' />
                   <span>Đang tải dữ liệu...</span>
@@ -42,7 +104,7 @@ export function PostTable({ posts, isLoading }: PostTableProps) {
             </TableRow>
           ) : posts.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className='h-32 text-center text-muted-foreground'>
+              <TableCell colSpan={7} className='h-32 text-center text-muted-foreground'>
                 Không có bài viết nào phù hợp.
               </TableCell>
             </TableRow>
@@ -73,6 +135,30 @@ export function PostTable({ posts, isLoading }: PostTableProps) {
                   <span className='inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted/50 border border-muted-foreground/10'>
                     {post.category?.name || 'Không có'}
                   </span>
+                </TableCell>
+                <TableCell className='px-6 py-4'>
+                  <div className='flex flex-wrap gap-1.5'>
+                    {post.postTags?.length ? (
+                      post.postTags.map((pt) => (
+                        <Badge
+                          key={pt.tagId}
+                          variant='secondary'
+                          className='cursor-pointer text-[10px] font-semibold px-2 py-0 rounded-full bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-foreground border border-primary/20 dark:border-primary/30 hover:bg-primary hover:text-primary-foreground transition-all duration-200'
+                          onClick={(e: React.MouseEvent) => {
+                            e.stopPropagation()
+                            const newParams = new URLSearchParams(window.location.search)
+                            newParams.set('tagIds', pt.tagId.toString())
+                            newParams.set('page', '1')
+                            navigate(`?${newParams.toString()}`, { replace: true })
+                          }}
+                        >
+                          #{pt.tag?.name}
+                        </Badge>
+                      ))
+                    ) : (
+                      <span className='text-xs text-muted-foreground/50 italic'>-</span>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell className='px-6 py-4'>
                   <PostStatusBadge status={post.status} deletedAt={post.deletedAt} />
@@ -123,6 +209,7 @@ export function PostTable({ posts, isLoading }: PostTableProps) {
                           variant='ghost'
                           size='icon'
                           className='h-9 w-9 rounded-full hover:bg-primary/10 hover:text-primary'
+                          onClick={handleViewDetails}
                         >
                           <Eye className='h-4 w-4' />
                         </Button>
@@ -130,18 +217,54 @@ export function PostTable({ posts, isLoading }: PostTableProps) {
                       <TooltipContent>Xem bài viết</TooltipContent>
                     </Tooltip>
 
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant='ghost'
-                          size='icon'
-                          className='h-9 w-9 rounded-full hover:bg-destructive/10 hover:text-destructive'
-                        >
-                          <Trash2 className='h-4 w-4' />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Xóa bài viết</TooltipContent>
-                    </Tooltip>
+                    {post.deletedAt ? (
+                      <>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant='ghost'
+                              size='icon'
+                              className='h-9 w-9 rounded-full hover:bg-primary/10 hover:text-primary'
+                              onClick={() => handleRestore(post.id)}
+                              disabled={restoreMutation.isPending}
+                            >
+                              <RotateCcw className='h-4 w-4' />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Khôi phục</TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant='ghost'
+                              size='icon'
+                              className='h-9 w-9 rounded-full hover:bg-destructive/10 hover:text-destructive'
+                              onClick={() => handlePermanentDelete(post.id)}
+                              disabled={permanentDeleteMutation.isPending}
+                            >
+                              <XCircle className='h-4 w-4' />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Xóa vĩnh viễn</TooltipContent>
+                        </Tooltip>
+                      </>
+                    ) : (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant='ghost'
+                            size='icon'
+                            className='h-9 w-9 rounded-full hover:bg-destructive/10 hover:text-destructive'
+                            onClick={() => handleDelete(post.id)}
+                            disabled={deleteMutation.isPending}
+                          >
+                            <Trash2 className='h-4 w-4' />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Xóa bài viết</TooltipContent>
+                      </Tooltip>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>

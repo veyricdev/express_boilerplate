@@ -41,12 +41,14 @@ export function PublishAccordion() {
           </div>
         </div>
 
-        <div className='space-y-2'>
-          <Label htmlFor='publishedAt' className='text-xs font-semibold text-muted-foreground'>
-            Ngày xuất bản
-          </Label>
-          <Input id='publishedAt' type='datetime-local' className='h-10 rounded-xl' {...register('publishedAt')} />
-        </div>
+        {status !== PostStatus.DRAFT && (
+          <div className='space-y-2'>
+            <Label htmlFor='publishedAt' className='text-xs font-semibold text-muted-foreground'>
+              Ngày xuất bản
+            </Label>
+            <Input id='publishedAt' type='datetime-local' className='h-10 rounded-xl' {...register('publishedAt')} />
+          </div>
+        )}
       </AccordionContent>
     </AccordionItem>
   )

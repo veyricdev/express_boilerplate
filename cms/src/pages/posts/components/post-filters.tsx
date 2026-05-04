@@ -10,20 +10,24 @@ interface PostFiltersProps {
   trashMode: TrashMode
   searchTerm: string
   categories: any[]
+  tags: any[]
   author: string
   fromDate: string
   toDate: string
   statusFilter: string | null
+  tagIds: number[]
 }
 
 export function PostFilters({
   trashMode,
   searchTerm,
   categories,
+  tags,
   author,
   fromDate,
   toDate,
   statusFilter,
+  tagIds,
 }: PostFiltersProps) {
   const [searchParams, setSearchParams] = useSearchParams()
   const [localSearch, setLocalSearch] = useState(searchTerm)
@@ -109,10 +113,12 @@ export function PostFilters({
 
         <AdvancedFilterPopover
           categories={categories}
+          tags={tags}
           author={author}
           fromDate={fromDate}
           toDate={toDate}
           statusFilter={statusFilter}
+          tagIds={tagIds}
         />
       </div>
     </div>

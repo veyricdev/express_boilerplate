@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
-import { Type } from 'class-transformer'
+import { Transform, Type } from 'class-transformer'
 import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator'
 import { PaginationDto } from '~/common/dtos/pagination.dto'
 import { TrashMode } from '~/common/enums/trash-mode.enum'
@@ -31,6 +31,16 @@ export class FindPostsAdminDto extends PaginationDto {
   @IsOptional()
   @IsString()
   author?: string
+
+  @ApiPropertyOptional({ example: [1, 2], isArray: true, type: Number })
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') return value.split(',').map(Number)
+    if (Array.isArray(value)) return value.map(Number)
+    return value
+  })
+  @IsInt({ each: true })
+  tagIds?: number[]
 
   @ApiPropertyOptional({ example: '2024-01-01' })
   @IsOptional()

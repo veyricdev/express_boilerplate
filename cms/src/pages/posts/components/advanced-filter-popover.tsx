@@ -1,26 +1,33 @@
-import { User as AuthorIcon, Calendar, Filter } from 'lucide-react'
+import { Check, ChevronsUpDown, User as AuthorIcon, Calendar, Filter, X } from 'lucide-react'
 import { useSearchParams } from 'react-router'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { PostStatus } from '@/types'
+import { cn } from '@/lib/utils'
+import { PostStatus, Tag } from '@/types'
 
 interface AdvancedFilterPopoverProps {
   categories: any[]
+  tags: Tag[]
   author: string
   fromDate: string
   toDate: string
   statusFilter: string | null
+  tagIds: number[]
 }
 
 export function AdvancedFilterPopover({
   categories,
+  tags,
   author,
   fromDate,
   toDate,
   statusFilter,
+  tagIds,
 }: AdvancedFilterPopoverProps) {
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -28,6 +35,26 @@ export function AdvancedFilterPopover({
     const newParams = new URLSearchParams(searchParams)
     if (value) newParams.set(key, value)
     else newParams.delete(key)
+    newParams.set('page', '1')
+    setSearchParams(newParams, { replace: true })
+  }
+
+  const toggleTag = (tagId: number) => {
+    const newParams = new URLSearchParams(searchParams)
+    let currentTagIds = searchParams.get('tagIds')?.split(',').map(Number).filter(Boolean) || []
+
+    if (currentTagIds.includes(tagId)) {
+      currentTagIds = currentTagIds.filter((id) => id !== tagId)
+    } else {
+      currentTagIds = [...currentTagIds, tagId]
+    }
+
+    if (currentTagIds.length > 0) {
+      newParams.set('tagIds', currentTagIds.join(','))
+    } else {
+      newParams.delete('tagIds')
+    }
+
     newParams.set('page', '1')
     setSearchParams(newParams, { replace: true })
   }
@@ -47,6 +74,11 @@ export function AdvancedFilterPopover({
         >
           <Filter className='h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors' />
           <span className='hidden sm:inline font-medium text-sm'>Lọc nâng cao</span>
+          {tagIds.length > 0 && (
+            <Badge variant='secondary' className='h-5 px-1.5 rounded-md bg-primary/10 text-primary border-none text-[10px]'>
+              {tagIds.length}
+            </Badge>
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent
@@ -67,7 +99,7 @@ export function AdvancedFilterPopover({
             Đặt lại tất cả
           </Button>
         </div>
-        <div className='p-5 space-y-5'>
+        <div className='p-5 space-y-5 max-h-[70vh] overflow-y-auto custom-scrollbar'>
           {/* Category Filter */}
           <div className='space-y-2'>
             <Label className='text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70'>Danh mục</Label>
@@ -87,6 +119,72 @@ export function AdvancedFilterPopover({
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Tags Filter */}
+          <div className='space-y-2'>
+            <Label className='text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70'>Thẻ (Tags)</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant='outline'
+                  role='combobox'
+                  className={cn(
+                    'w-full justify-between rounded-xl h-auto min-h-10 px-3 py-2 bg-muted/20 border-muted-foreground/10 hover:bg-muted/30 transition-colors',
+                    tagIds.length === 0 && 'text-muted-foreground'
+                  )}
+                >
+                  <div className='flex flex-wrap gap-1.5 items-center'>
+                    {tagIds.length > 0 ? (
+                      tagIds.map((id) => {
+                        const tag = tags.find((t) => t.id === id)
+                        return tag ? (
+                          <Badge
+                            variant='secondary'
+                            key={id}
+                            className='bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-foreground border border-primary/20 dark:border-primary/30 rounded-full py-1 px-3 gap-1.5 font-medium text-[10px] transition-all'
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              toggleTag(id)
+                            }}
+                          >
+                            {tag.name}
+                            <X className='size-3 cursor-pointer opacity-70 hover:opacity-100 transition-opacity' />
+                          </Badge>
+                        ) : null
+                      })
+                    ) : (
+                      <span className='font-normal text-sm'>Chọn thẻ...</span>
+                    )}
+                  </div>
+                  <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className='w-[300px] p-0 rounded-xl shadow-2xl border-muted-foreground/10' align='start'>
+                <Command>
+                  <CommandInput placeholder='Tìm kiếm thẻ...' className='h-9' />
+                  <CommandList className='max-h-60'>
+                    <CommandEmpty>Không tìm thấy thẻ nào.</CommandEmpty>
+                    <CommandGroup>
+                      {tags.map((tag) => {
+                        const isSelected = tagIds.includes(tag.id)
+                        return (
+                          <CommandItem
+                            key={tag.id}
+                            value={tag.name}
+                            onSelect={() => toggleTag(tag.id)}
+                            className='rounded-lg mx-1 my-0.5'
+                          >
+                            <Check className={cn('mr-2 h-4 w-4 text-primary', isSelected ? 'opacity-100' : 'opacity-0')} />
+                            {tag.name}
+                          </CommandItem>
+                        )
+                      })}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
 
           {/* Author Filter */}

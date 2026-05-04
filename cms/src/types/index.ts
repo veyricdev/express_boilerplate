@@ -93,6 +93,7 @@ export interface PaginationParams {
   status?: string
   trashMode?: TrashMode
   categoryId?: number
+  tagIds?: number[]
   author?: string
   fromDate?: string
   toDate?: string

@@ -111,11 +111,21 @@ export default function PostEditorPage() {
 
   const mutation = useMutation({
     mutationFn: (data: PostFormValues) => {
-      // transform publishedAt to full ISO if present
-      if (data.publishedAt) {
-        data.publishedAt = new Date(data.publishedAt).toISOString()
+      const payload = { ...data }
+
+      // transform publishedAt to full ISO if present, otherwise null
+      if (payload.publishedAt) {
+        payload.publishedAt = new Date(payload.publishedAt).toISOString()
+      } else {
+        payload.publishedAt = null
       }
-      return isEdit ? postService.update(Number(id), data) : postService.create(data)
+
+      // Handle categoryId
+      if (!payload.categoryId) {
+        payload.categoryId = null
+      }
+
+      return isEdit ? postService.update(Number(id), payload) : postService.create(payload)
     },
     onSuccess: () => {
       toast.success(isEdit ? 'Cập nhật bài viết thành công' : 'Tạo bài viết mới thành công')

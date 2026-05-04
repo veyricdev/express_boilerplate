@@ -25,4 +25,8 @@ export const postService = {
   restore: async (id: number): Promise<void> => {
     await api.post(`/admin/posts/${id}/restore`)
   },
+
+  permanentRemove: async (id: number): Promise<void> => {
+    await api.delete(`/admin/posts/${id}/permanent`)
+  },
 }

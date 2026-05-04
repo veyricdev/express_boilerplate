@@ -7,6 +7,9 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
   withCredentials: true,
+  paramsSerializer: {
+    indexes: null,
+  },
 })
 
 // Request interceptor: Attach token

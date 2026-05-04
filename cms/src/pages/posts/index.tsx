@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router'
 import { SharedPagination } from '@/components/shared/shared-pagination'
 import { categoryService } from '@/services/category.service'
 import { postService } from '@/services/post.service'
+import { tagService } from '@/services/tag.service'
 import { PostStatus, TrashMode } from '@/types'
 import { PostFilters } from './components/post-filters'
 import { PostHeader } from './components/post-header'
@@ -20,9 +21,10 @@ export default function PostsPage() {
   const author = searchParams.get('author') || ''
   const fromDate = searchParams.get('fromDate') || ''
   const toDate = searchParams.get('toDate') || ''
+  const tagIds = searchParams.get('tagIds')?.split(',').map(Number).filter(Boolean) || []
 
   const { data: response, isLoading } = useQuery({
-    queryKey: ['posts', searchTerm, page, limit, statusFilter, trashMode, categoryId, author, fromDate, toDate],
+    queryKey: ['posts', searchTerm, page, limit, statusFilter, trashMode, categoryId, author, fromDate, toDate, tagIds],
     queryFn: () =>
       postService.findAll({
         search: searchTerm,
@@ -34,6 +36,7 @@ export default function PostsPage() {
         author,
         fromDate,
         toDate,
+        tagIds,
       }),
   })
 
@@ -42,9 +45,15 @@ export default function PostsPage() {
     queryFn: () => categoryService.findAll({ limit: 100 }),
   })
 
+  const { data: tagsResponse } = useQuery({
+    queryKey: ['tags-all'],
+    queryFn: () => tagService.findAll({ limit: 100 }),
+  })
+
   const posts = response?.data || []
   const meta = response?.meta
   const categories = categoriesResponse?.data || []
+  const tags = tagsResponse?.data || []
 
   return (
     <div className='p-8 space-y-8 max-w-(--breakpoint-2xl) w-full mx-auto animate-in fade-in duration-500'>
@@ -55,10 +64,12 @@ export default function PostsPage() {
           trashMode={trashMode}
           searchTerm={searchTerm}
           categories={categories}
+          tags={tags}
           author={author}
           fromDate={fromDate}
           toDate={toDate}
           statusFilter={statusFilter}
+          tagIds={tagIds}
         />
 
         <PostTable posts={posts} isLoading={isLoading} />

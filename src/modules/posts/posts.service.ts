@@ -19,6 +19,7 @@ export class PostsService {
     query?: {
       categoryId?: number
       tagId?: number
+      tagIds?: number[]
       status?: PostStatus
       search?: string
       trashMode?: TrashMode
@@ -37,7 +38,11 @@ export class PostsService {
           ...(trashMode === TrashMode.ALL ? { deletedAt: { not: undefined } } : {}),
           categoryId: query?.categoryId,
           status: query?.status,
-          postTags: query?.tagId ? { some: { tagId: query.tagId } } : undefined,
+          postTags: query?.tagIds?.length
+            ? { some: { tagId: { in: query.tagIds } } }
+            : query?.tagId
+              ? { some: { tagId: query.tagId } }
+              : undefined,
           author: query?.author
             ? {
                 OR: [{ fullName: { contains: query.author } }, { email: { contains: query.author } }],
