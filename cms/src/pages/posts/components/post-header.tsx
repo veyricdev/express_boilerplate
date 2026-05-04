@@ -1,9 +1,12 @@
 import { Plus } from 'lucide-react'
 import { useNavigate } from 'react-router'
 import { Button } from '@/components/ui/button'
+import { usePermission } from '@/hooks/use-permission'
+import { PERM_POSTS_WRITE } from '@/lib/permissions'
 
 export function PostHeader() {
   const navigate = useNavigate()
+  const permission = usePermission()
 
   return (
     <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
@@ -13,9 +16,11 @@ export function PostHeader() {
         </h1>
         <p className='text-muted-foreground'>Quản lý nội dung bài viết và xuất bản.</p>
       </div>
-      <Button className='shadow-lg shadow-primary/20 rounded-xl px-5' onClick={() => navigate('/posts/create')}>
-        <Plus className='mr-2 h-4 w-4' /> Viết bài mới
-      </Button>
+      {permission.has(PERM_POSTS_WRITE) && (
+        <Button className='shadow-lg shadow-primary/20 rounded-xl px-5' onClick={() => navigate('/posts/create')}>
+          <Plus className='mr-2 h-4 w-4' /> Viết bài mới
+        </Button>
+      )}
     </div>
   )
 }

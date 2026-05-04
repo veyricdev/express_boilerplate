@@ -1,4 +1,7 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ShieldCheck } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -9,31 +12,67 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Label } from '@/components/ui/label'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { userService } from '@/services/user.service'
 import { User } from '@/types'
 import { cn } from '@/utils/cn'
 
-// Bitwise Permissions (Mapping from src/common/constants/permissions.ts)
-const PERMISSIONS = [
-  { bit: 0, label: 'POSTS_READ', description: 'Xem bài viết' },
-  { bit: 1, label: 'POSTS_WRITE', description: 'Tạo bài viết' },
-  { bit: 2, label: 'POSTS_UPDATE', description: 'Sửa bài viết' },
-  { bit: 3, label: 'POSTS_DELETE', description: 'Xóa bài viết' },
-  { bit: 4, label: 'CATS_READ', description: 'Xem danh mục' },
-  { bit: 5, label: 'CATS_WRITE', description: 'Tạo danh mục' },
-  { bit: 6, label: 'CATS_UPDATE', description: 'Sửa danh mục' },
-  { bit: 7, label: 'CATS_DELETE', description: 'Xóa danh mục' },
-  { bit: 8, label: 'TAGS_READ', description: 'Xem thẻ' },
-  { bit: 9, label: 'TAGS_WRITE', description: 'Tạo thẻ' },
-  { bit: 10, label: 'TAGS_UPDATE', description: 'Sửa thẻ' },
-  { bit: 11, label: 'TAGS_DELETE', description: 'Xóa thẻ' },
-  { bit: 12, label: 'USERS_READ', description: 'Xem người dùng' },
-  { bit: 13, label: 'USERS_WRITE', description: 'Tạo người dùng' },
-  { bit: 14, label: 'USERS_UPDATE', description: 'Sửa người dùng' },
-  { bit: 15, label: 'USERS_DELETE', description: 'Xóa người dùng' },
-  { bit: 16, label: 'AUDIT_READ', description: 'Xem nhật ký hệ thống' },
-  { bit: 17, label: 'SETTINGS_READ', description: 'Xem cài đặt' },
-  { bit: 18, label: 'SETTINGS_WRITE', description: 'Cập nhật cài đặt' },
+// Permission structure mapping
+const PERMISSION_GROUPS = [
+  {
+    entity: 'Bài viết',
+    actions: [
+      { bit: 0, type: 'READ', label: 'Xem' },
+      { bit: 1, type: 'CREATE', label: 'Thêm' },
+      { bit: 2, type: 'UPDATE', label: 'Sửa' },
+      { bit: 3, type: 'DELETE', label: 'Xóa' },
+    ],
+  },
+  {
+    entity: 'Danh mục',
+    actions: [
+      { bit: 4, type: 'READ', label: 'Xem' },
+      { bit: 5, type: 'CREATE', label: 'Thêm' },
+      { bit: 6, type: 'UPDATE', label: 'Sửa' },
+      { bit: 7, type: 'DELETE', label: 'Xóa' },
+    ],
+  },
+  {
+    entity: 'Thẻ (Tags)',
+    actions: [
+      { bit: 8, type: 'READ', label: 'Xem' },
+      { bit: 9, type: 'CREATE', label: 'Thêm' },
+      { bit: 10, type: 'UPDATE', label: 'Sửa' },
+      { bit: 11, type: 'DELETE', label: 'Xóa' },
+    ],
+  },
+  {
+    entity: 'Người dùng',
+    actions: [
+      { bit: 12, type: 'READ', label: 'Xem' },
+      { bit: 13, type: 'CREATE', label: 'Thêm' },
+      { bit: 14, type: 'UPDATE', label: 'Sửa' },
+      { bit: 15, type: 'DELETE', label: 'Xóa' },
+    ],
+  },
+  {
+    entity: 'Cài đặt',
+    actions: [
+      { bit: 17, type: 'READ', label: 'Xem' },
+      { bit: 18, type: 'UPDATE', label: 'Sửa' },
+    ],
+  },
+  {
+    entity: 'Nhật ký',
+    actions: [{ bit: 16, type: 'READ', label: 'Xem' }],
+  },
+]
+
+const ACTION_TYPES = [
+  { type: 'READ', label: 'XEM', color: 'text-blue-600' },
+  { type: 'CREATE', label: 'THÊM', color: 'text-emerald-600' },
+  { type: 'UPDATE', label: 'SỬA', color: 'text-amber-600' },
+  { type: 'DELETE', label: 'XÓA', color: 'text-rose-600' },
 ]
 
 interface EditPermissionsDialogProps {
@@ -43,7 +82,31 @@ interface EditPermissionsDialogProps {
 }
 
 export function EditPermissionsDialog({ user, isOpen, onClose }: EditPermissionsDialogProps) {
-  const hasPermission = (permissions: string | undefined | null, bit: number) => {
+  const [localPermissions, setLocalPermissions] = useState<string>('0')
+  const queryClient = useQueryClient()
+
+  useEffect(() => {
+    if (user && isOpen) {
+      setLocalPermissions(user.permissions || '0')
+    }
+  }, [user, isOpen])
+
+  const mutation = useMutation({
+    mutationFn: (permissions: string) => {
+      if (!user) throw new Error('No user selected')
+      return userService.update(user.id, { permissions })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+      toast.success('Cập nhật quyền hạn thành công')
+      onClose()
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || 'Có lỗi xảy ra khi cập nhật quyền hạn')
+    },
+  })
+
+  const hasPermission = (permissions: string, bit: number) => {
     if (!permissions) return false
     try {
       const p = BigInt(permissions)
@@ -53,8 +116,23 @@ export function EditPermissionsDialog({ user, isOpen, onClose }: EditPermissions
     }
   }
 
+  const togglePermission = (bit: number) => {
+    try {
+      const p = BigInt(localPermissions)
+      const bitVal = 1n << BigInt(bit)
+      const newP = (p & bitVal) !== 0n ? p ^ bitVal : p | bitVal
+      setLocalPermissions(newP.toString())
+    } catch {
+      // Ignore invalid bigint strings
+    }
+  }
+
+  const handleSave = () => {
+    mutation.mutate(localPermissions)
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className='sm:max-w-2xl rounded-3xl border-white/10 shadow-2xl overflow-hidden p-0 animate-in zoom-in-95 duration-200'>
         <div className='absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none' />
         <div className='p-8 space-y-6 relative'>
@@ -73,36 +151,64 @@ export function EditPermissionsDialog({ user, isOpen, onClose }: EditPermissions
             </DialogDescription>
           </DialogHeader>
 
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-3 py-2 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar'>
-            {PERMISSIONS.map((perm) => (
-              <div
-                key={perm.bit}
-                className={cn(
-                  'flex flex-row items-start space-x-3 space-y-0 rounded-2xl border p-4 transition-all cursor-pointer group hover:shadow-sm',
-                  hasPermission(user?.permissions, perm.bit)
-                    ? 'bg-primary/5 border-primary/20 shadow-xs'
-                    : 'bg-card border-muted/50 hover:bg-muted/30'
-                )}
-                onClick={() => {
-                  // TODO: Toggle permission logic
-                }}
-              >
-                <Checkbox
-                  id={`perm-${perm.bit}`}
-                  checked={user ? hasPermission(user.permissions, perm.bit) : false}
-                  className='mt-0.5 rounded-md border-primary/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary'
-                />
-                <div className='space-y-1.5 leading-none'>
-                  <Label
-                    htmlFor={`perm-${perm.bit}`}
-                    className='text-sm font-bold text-foreground/80 group-hover:text-primary transition-colors cursor-pointer'
+          <div className='rounded-2xl border border-muted/50 overflow-hidden bg-card/50'>
+            <Table>
+              <TableHeader className='bg-muted/30'>
+                <TableRow className='hover:bg-transparent border-b border-muted/50'>
+                  <TableHead className='px-6 py-4 font-bold text-foreground uppercase text-[11px] tracking-wider w-[200px]'>
+                    Chức năng
+                  </TableHead>
+                  {ACTION_TYPES.map((action) => (
+                    <TableHead
+                      key={action.type}
+                      className={cn(
+                        'px-4 py-4 font-bold uppercase text-[11px] tracking-wider text-center',
+                        action.color
+                      )}
+                    >
+                      {action.label}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {PERMISSION_GROUPS.map((group) => (
+                  <TableRow
+                    key={group.entity}
+                    className='hover:bg-primary/5 transition-colors border-b border-muted/50 last:border-0'
                   >
-                    {perm.label}
-                  </Label>
-                  <p className='text-[11px] text-muted-foreground font-medium leading-tight'>{perm.description}</p>
-                </div>
-              </div>
-            ))}
+                    <TableCell className='px-6 py-4 font-bold text-foreground/80 text-sm'>{group.entity}</TableCell>
+                    {ACTION_TYPES.map((actionType) => {
+                      const permission = group.actions.find((a) => a.type === actionType.type)
+                      if (!permission) {
+                        return (
+                          <TableCell key={actionType.type} className='px-4 py-4 text-center'>
+                            <div className='flex justify-center'>
+                              <div className='h-1 w-4 rounded-full bg-muted/30' />
+                            </div>
+                          </TableCell>
+                        )
+                      }
+                      return (
+                        <TableCell
+                          key={actionType.type}
+                          className='px-4 py-4 text-center'
+                          onClick={() => togglePermission(permission.bit)}
+                        >
+                          <div className='flex justify-center'>
+                            <Checkbox
+                              checked={hasPermission(localPermissions, permission.bit)}
+                              onCheckedChange={() => togglePermission(permission.bit)}
+                              className='rounded-md border-primary/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-all duration-200 hover:scale-110'
+                            />
+                          </div>
+                        </TableCell>
+                      )
+                    })}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
 
           <DialogFooter className='gap-2 pt-4'>
@@ -113,8 +219,12 @@ export function EditPermissionsDialog({ user, isOpen, onClose }: EditPermissions
             >
               Đóng
             </Button>
-            <Button className='rounded-xl px-8 shadow-lg shadow-primary/20 font-bold bg-primary hover:scale-[1.02] transition-transform active:scale-95'>
-              Lưu thay đổi
+            <Button
+              onClick={handleSave}
+              disabled={mutation.isPending}
+              className='rounded-xl px-8 shadow-lg shadow-primary/20 font-bold bg-primary hover:scale-[1.02] transition-transform active:scale-95'
+            >
+              {mutation.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
             </Button>
           </DialogFooter>
         </div>

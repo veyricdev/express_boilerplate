@@ -13,6 +13,17 @@ export const tagService = {
     }
   },
 
+  findAllPublic: async (params?: PaginationParams): Promise<PaginatedResponse<Tag>> => {
+    const response = (await api.get('/tags', { params })) as unknown as PaginatedResponse<any>
+    return {
+      ...response,
+      data: response.data.map((item) => ({
+        ...item,
+        postCount: item._count?.postTags || 0,
+      })),
+    }
+  },
+
   create: async (data: Partial<Tag>): Promise<Tag> => {
     return api.post('/admin/tags', data)
   },
@@ -23,5 +34,13 @@ export const tagService = {
 
   remove: async (id: number): Promise<void> => {
     await api.delete(`/admin/tags/${id}`)
+  },
+
+  restore: async (id: number): Promise<void> => {
+    await api.post(`/admin/tags/${id}/restore`)
+  },
+
+  permanentRemove: async (id: number): Promise<void> => {
+    await api.delete(`/admin/tags/${id}/permanent`)
   },
 }

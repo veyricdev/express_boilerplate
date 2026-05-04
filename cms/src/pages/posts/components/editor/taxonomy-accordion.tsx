@@ -1,5 +1,7 @@
-import { Check, ChevronsUpDown, X } from 'lucide-react'
+import { Check, ChevronsUpDown, Loader2, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
+import { useInView } from 'react-intersection-observer'
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -7,17 +9,72 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useDebounce } from '@/hooks/use-debounce'
+import { useInfiniteCategories, useInfiniteTags } from '@/hooks/use-infinite-taxonomies'
 import { cn } from '@/lib/utils'
 
-interface TaxonomyAccordionProps {
-  categories: any[]
-  tags: any[]
-}
-
-export function TaxonomyAccordion({ categories, tags }: TaxonomyAccordionProps) {
+export function TaxonomyAccordion() {
   const { watch, setValue } = useFormContext()
   const tagIds = watch('tagIds') || []
   const categoryId = watch('categoryId')
+
+  // -- Categories Infinite Scroll --
+  const {
+    data: catData,
+    fetchNextPage: fetchNextCatPage,
+    hasNextPage: hasNextCatPage,
+    isFetchingNextPage: isFetchingNextCatPage,
+  } = useInfiniteCategories()
+
+  const categories = catData?.pages.flatMap((page) => page.data) || []
+  const { ref: catRef, inView: catInView } = useInView()
+
+  useEffect(() => {
+    if (catInView && hasNextCatPage && !isFetchingNextCatPage) {
+      fetchNextCatPage()
+    }
+  }, [catInView, hasNextCatPage, isFetchingNextCatPage, fetchNextCatPage])
+
+  // -- Tags Infinite Scroll & Search --
+  const [searchTerm, setSearchTerm] = useState('')
+  const debouncedSearch = useDebounce(searchTerm, 500)
+
+  const {
+    data: tagData,
+    fetchNextPage: fetchNextTagPage,
+    hasNextPage: hasNextTagPage,
+    isFetchingNextPage: isFetchingNextTagPage,
+  } = useInfiniteTags(debouncedSearch)
+
+  const tags = tagData?.pages.flatMap((page) => page.data) || []
+  const { ref: tagRef, inView: tagInView } = useInView()
+
+  useEffect(() => {
+    if (tagInView && hasNextTagPage && !isFetchingNextTagPage) {
+      fetchNextTagPage()
+    }
+  }, [tagInView, hasNextTagPage, isFetchingNextTagPage, fetchNextTagPage])
+
+  // Local state to keep track of selected tag names (so they display properly even if not in current infinite list)
+  const [selectedTagsMap, setSelectedTagsMap] = useState<Record<number, string>>({})
+
+  // Update selectedTagsMap when tags are fetched or tagIds changes
+  useEffect(() => {
+    const newMap = { ...selectedTagsMap }
+    let changed = false
+    tagIds.forEach((id: number) => {
+      if (!newMap[id]) {
+        const found = tags.find((t: any) => t.id === id)
+        if (found) {
+          newMap[id] = found.name
+          changed = true
+        }
+      }
+    })
+    if (changed) {
+      setSelectedTagsMap(newMap)
+    }
+  }, [tags, tagIds, selectedTagsMap])
 
   return (
     <AccordionItem value='taxonomy' className='border rounded-2xl bg-card px-4 shadow-sm'>
@@ -38,6 +95,12 @@ export function TaxonomyAccordion({ categories, tags }: TaxonomyAccordionProps) 
                   {cat.name}
                 </SelectItem>
               ))}
+              {/* Intersection target for loading more categories */}
+              {hasNextCatPage && (
+                <div ref={catRef} className='py-2 flex justify-center items-center'>
+                  <Loader2 className='h-4 w-4 animate-spin text-muted-foreground' />
+                </div>
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -57,8 +120,8 @@ export function TaxonomyAccordion({ categories, tags }: TaxonomyAccordionProps) 
                 <div className='flex flex-wrap gap-1.5 items-center'>
                   {tagIds.length > 0 ? (
                     tagIds.map((id: number) => {
-                      const tag = tags.find((t: any) => t.id === id)
-                      return tag ? (
+                      const tagName = selectedTagsMap[id] || `Thẻ #${id}`
+                      return (
                         <Badge
                           variant='secondary'
                           key={id}
@@ -71,10 +134,10 @@ export function TaxonomyAccordion({ categories, tags }: TaxonomyAccordionProps) 
                             )
                           }}
                         >
-                          {tag.name}
+                          {tagName}
                           <X className='size-3.5 cursor-pointer opacity-70 group-hover:opacity-100 transition-opacity' />
                         </Badge>
-                      ) : null
+                      )
                     })
                   ) : (
                     <span className='font-normal text-sm'>Chọn thẻ...</span>
@@ -84,8 +147,8 @@ export function TaxonomyAccordion({ categories, tags }: TaxonomyAccordionProps) 
               </Button>
             </PopoverTrigger>
             <PopoverContent className='w-[300px] p-0' align='start'>
-              <Command>
-                <CommandInput placeholder='Tìm kiếm thẻ...' />
+              <Command shouldFilter={false}>
+                <CommandInput placeholder='Tìm kiếm thẻ...' value={searchTerm} onValueChange={setSearchTerm} />
                 <CommandList>
                   <CommandEmpty>Không tìm thấy thẻ nào.</CommandEmpty>
                   <CommandGroup>
@@ -94,7 +157,7 @@ export function TaxonomyAccordion({ categories, tags }: TaxonomyAccordionProps) 
                       return (
                         <CommandItem
                           key={tag.id}
-                          value={tag.name}
+                          value={tag.id.toString()}
                           onSelect={() => {
                             if (isSelected) {
                               setValue(
@@ -103,6 +166,7 @@ export function TaxonomyAccordion({ categories, tags }: TaxonomyAccordionProps) 
                               )
                             } else {
                               setValue('tagIds', [...tagIds, tag.id])
+                              setSelectedTagsMap((prev) => ({ ...prev, [tag.id]: tag.name }))
                             }
                           }}
                         >
@@ -112,6 +176,12 @@ export function TaxonomyAccordion({ categories, tags }: TaxonomyAccordionProps) 
                       )
                     })}
                   </CommandGroup>
+                  {/* Intersection target for loading more tags */}
+                  {hasNextTagPage && (
+                    <div ref={tagRef} className='py-2 flex justify-center items-center'>
+                      <Loader2 className='h-4 w-4 animate-spin text-muted-foreground' />
+                    </div>
+                  )}
                 </CommandList>
               </Command>
             </PopoverContent>

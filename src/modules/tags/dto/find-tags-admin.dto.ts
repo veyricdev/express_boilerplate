@@ -13,11 +13,6 @@ export class FindTagsAdminDto extends PaginationDto {
   @IsEnum(TrashMode)
   trashMode?: TrashMode = TrashMode.ACTIVE
 
-  @ApiPropertyOptional({ description: 'Search by name' })
-  @IsOptional()
-  @IsString()
-  search?: string
-
   @ApiPropertyOptional({ description: 'Filter by start date' })
   @IsOptional()
   @IsString()

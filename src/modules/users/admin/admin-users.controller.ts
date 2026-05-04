@@ -1,12 +1,10 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common'
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { PERM_USERS_DELETE, PERM_USERS_READ, PERM_USERS_UPDATE } from '~/common/constants/permissions'
 import { ApiWrappedResponse } from '~/common/decorators/api-response.decorator'
 import { RequirePermissions } from '~/common/decorators/require-permissions.decorator'
-import { PaginationDto } from '~/common/dtos/pagination.dto'
 import { JwtAuthGuard } from '~/common/guards/jwt-auth.guard'
 import { PermissionsGuard } from '~/common/guards/permissions.guard'
-import type { Prisma } from '~/prisma/generated/prisma'
 import { CreateUserDto } from '../dto/create-user.dto'
 import { FindUsersAdminDto } from '../dto/find-users-admin.dto'
 import { UpdateUserDto } from '../dto/update-user.dto'
@@ -49,12 +47,7 @@ export class AdminUsersController {
   @ApiOperation({ summary: 'Update user info or permissions' })
   @ApiWrappedResponse(UserResponseDto)
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserDto) {
-    const { permissions, ...rest } = dto
-    const data: Prisma.UserUpdateInput = { ...rest }
-    if (permissions) {
-      data.permissions = BigInt(permissions)
-    }
-    return this.usersService.update(id, data)
+    return this.usersService.update(id, dto)
   }
 
   @Patch(':id/toggle-active')

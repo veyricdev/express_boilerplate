@@ -7,9 +7,7 @@ import slugify from 'slugify'
 import { toast } from 'sonner'
 import * as z from 'zod'
 import { Accordion } from '@/components/ui/accordion'
-import { categoryService } from '@/services/category.service'
 import { postService } from '@/services/post.service'
-import { tagService } from '@/services/tag.service'
 import { PostStatus } from '@/types'
 import { EditorHeader } from './components/editor/editor-header'
 import { EditorMainContent } from './components/editor/editor-main-content'
@@ -71,16 +69,6 @@ export default function PostEditorPage() {
     queryKey: ['post', id],
     queryFn: () => postService.findOne(Number(id)),
     enabled: isEdit,
-  })
-
-  // Fetch categories & tags
-  const { data: catResponse } = useQuery({
-    queryKey: ['categories'],
-    queryFn: () => categoryService.findAll({ limit: 100 }),
-  })
-  const { data: tagResponse } = useQuery({
-    queryKey: ['tags'],
-    queryFn: () => tagService.findAll({ limit: 100 }),
   })
 
   useEffect(() => {
@@ -161,7 +149,7 @@ export default function PostEditorPage() {
               className='w-full space-y-4'
             >
               <PublishAccordion />
-              <TaxonomyAccordion categories={catResponse?.data || []} tags={tagResponse?.data || []} />
+              <TaxonomyAccordion />
               <MediaAccordion />
               <SEOAccordion />
             </Accordion>

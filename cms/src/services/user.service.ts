@@ -21,4 +21,16 @@ export const userService = {
   remove: async (id: number): Promise<void> => {
     await api.delete(`/admin/users/${id}`)
   },
+
+  restore: async (id: number): Promise<void> => {
+    await api.post(`/admin/users/${id}/restore`)
+  },
+
+  permanentRemove: async (id: number): Promise<void> => {
+    await api.delete(`/admin/users/${id}/permanent`)
+  },
+
+  setStatus: async (id: number, isActive: boolean): Promise<User> => {
+    return api.patch(`/admin/users/${id}/toggle-active`, { isActive })
+  },
 }

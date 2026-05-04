@@ -18,8 +18,9 @@ export class TagsService {
       {
         where: {
           deletedAt: undefined,
+          name: pagination.search ? { contains: pagination.search } : undefined,
         },
-        orderBy: { name: 'asc' },
+        orderBy: { createdAt: 'desc' },
       },
       pagination
     )
@@ -57,7 +58,7 @@ export class TagsService {
               : undefined,
         },
         include: { _count: { select: { postTags: true } } },
-        orderBy: { name: 'asc' },
+        orderBy: { createdAt: 'desc' },
       },
       pagination
     )
@@ -72,7 +73,7 @@ export class TagsService {
   }
 
   async create(dto: CreateTagDto) {
-    const slug = slugify(dto.name)
+    const slug = dto.slug || slugify(dto.name)
     // Idempotent: return non-deleted tag if exists
     const existing = await this.prisma.db.tag.findFirst({ where: { slug } })
     if (existing) return existing
@@ -84,11 +85,16 @@ export class TagsService {
     await this.findOneAdmin(id)
 
     let slug: string | undefined
-    if (dto.name) {
+    if (dto.slug) {
+      slug = dto.slug
+    } else if (dto.name) {
       slug = slugify(dto.name)
+    }
+
+    if (slug) {
       const existing = await this.prisma.db.tag.findFirst({ where: { slug } })
       if (existing && existing.id !== id) {
-        throw new ConflictException('Tag with this name already exists')
+        throw new ConflictException('Tag with this name or slug already exists')
       }
     }
 

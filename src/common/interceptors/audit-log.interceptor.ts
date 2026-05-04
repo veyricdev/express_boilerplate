@@ -15,15 +15,15 @@ export class AuditLogInterceptor implements NestInterceptor {
     const isAdminRoute = url.includes('/admin/')
     const isWriteOperation = ['POST', 'PATCH', 'DELETE'].includes(method)
 
-    // Skip login actions from generic audit (handle specially in AuthService if needed)
-    const isLogin = url.includes('/auth/login')
+    // Skip generic refresh token logs as they are too noisy
+    const isRefresh = url.includes('/auth/refresh')
 
-    if (!isAdminRoute || !isWriteOperation || isLogin) {
+    if (!isAdminRoute || !isWriteOperation || isRefresh) {
       return next.handle()
     }
 
     const entity = this.extractEntity(url)
-    const action = this.mapAction(method)
+    const action = this.mapAction(method, url)
     const urlEntityId = this.extractEntityId(url)
 
     return next.handle().pipe(
@@ -40,13 +40,25 @@ export class AuditLogInterceptor implements NestInterceptor {
           const numericEntityId =
             resolvedEntityId && !Number.isNaN(Number(resolvedEntityId)) ? Number(resolvedEntityId) : null
 
-          await this.prisma.unfiltered.auditLog.create({
+          let sanitizedBody = null
+          if (body) {
+            sanitizedBody = JSON.parse(JSON.stringify(body))
+            // Remove sensitive fields
+            const sensitiveFields = ['password', 'passwordConfirm', 'currentPassword', 'newPassword']
+            for (const field of sensitiveFields) {
+              if (field in sanitizedBody) {
+                sanitizedBody[field] = '***REDACTED***'
+              }
+            }
+          }
+
+          await this.prisma.db.auditLog.create({
             data: {
               userId: user?.id,
               action,
               entity,
               entityId: numericEntityId,
-              newData: body ? JSON.parse(JSON.stringify(body)) : null, // Clone to avoid ref issues
+              newData: sanitizedBody,
               ipAddress: typeof ip === 'string' ? ip : JSON.stringify(ip),
               userAgent: userAgent || null,
             },
@@ -77,7 +89,10 @@ export class AuditLogInterceptor implements NestInterceptor {
     return undefined
   }
 
-  private mapAction(method: string): string {
+  private mapAction(method: string, url: string): string {
+    if (url.includes('/auth/login')) return 'LOGIN'
+    if (url.includes('/auth/logout')) return 'LOGOUT'
+    
     switch (method) {
       case 'POST':
         return 'CREATE'

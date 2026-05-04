@@ -1,5 +1,5 @@
 import { Plus } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -17,6 +17,8 @@ import { Switch } from '@/components/ui/switch'
 import type { SettingGroup, SettingType } from '@/services/setting.service'
 
 interface AddSettingDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
   onSave: (setting: {
     key: string
     label: string
@@ -29,8 +31,7 @@ interface AddSettingDialogProps {
   tabs: { key: SettingGroup; label: string }[]
 }
 
-export function AddSettingDialog({ onSave, isPending, tabs }: AddSettingDialogProps) {
-  const [open, setOpen] = useState(false)
+export function AddSettingDialog({ open, onOpenChange, onSave, isPending, tabs }: AddSettingDialogProps) {
   const [form, setForm] = useState({
     key: '',
     label: '',
@@ -43,11 +44,24 @@ export function AddSettingDialog({ onSave, isPending, tabs }: AddSettingDialogPr
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSave(form)
-    // Reset and close is handled by parent on success, but we can reset local state
   }
 
+  // Reset form when dialog opens
+  useEffect(() => {
+    if (open) {
+      setForm({
+        key: '',
+        label: '',
+        type: 'TEXT' as SettingType,
+        group: 'GENERAL' as SettingGroup,
+        description: '',
+        value: '',
+      })
+    }
+  }, [open])
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button className='h-10 shadow-lg shadow-primary/20 rounded-xl px-5 gap-2'>
           <Plus className='size-4' />
@@ -144,7 +158,7 @@ export function AddSettingDialog({ onSave, isPending, tabs }: AddSettingDialogPr
             )}
           </div>
           <DialogFooter className='pt-4'>
-            <Button type='button' variant='outline' className='rounded-xl h-10' onClick={() => setOpen(false)}>
+            <Button type='button' variant='outline' className='rounded-xl h-10' onClick={() => onOpenChange(false)}>
               Hủy
             </Button>
             <Button type='submit' className='rounded-xl h-10 px-6' disabled={isPending}>

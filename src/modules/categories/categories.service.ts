@@ -35,7 +35,7 @@ export class CategoriesService {
               : undefined,
         },
         include: { _count: { select: { posts: true } } },
-        orderBy: { name: 'asc' },
+        orderBy: { createdAt: 'desc' },
       },
       pagination
     )
@@ -51,10 +51,10 @@ export class CategoriesService {
   }
 
   async create(dto: CreateCategoryDto) {
-    const slug = slugify(dto.name)
+    const slug = dto.slug || slugify(dto.name)
     // Check conflict only against non-deleted categories
     const existing = await this.prisma.db.category.findFirst({ where: { slug } })
-    if (existing) throw new ConflictException('Category with this name already exists')
+    if (existing) throw new ConflictException('Category with this name or slug already exists')
 
     return this.prisma.db.category.create({ data: { ...dto, slug } })
   }
@@ -63,11 +63,16 @@ export class CategoriesService {
     await this.findOneAdmin(id)
 
     let slug: string | undefined
-    if (dto.name) {
+    if (dto.slug) {
+      slug = dto.slug
+    } else if (dto.name) {
       slug = slugify(dto.name)
+    }
+
+    if (slug) {
       const existing = await this.prisma.db.category.findFirst({ where: { slug } })
       if (existing && existing.id !== id) {
-        throw new ConflictException('Category with this name already exists')
+        throw new ConflictException('Category with this name or slug already exists')
       }
     }
 

@@ -17,11 +17,6 @@ export class FindPostsAdminDto extends PaginationDto {
   @IsEnum(PostStatus)
   status?: PostStatus
 
-  @ApiPropertyOptional({ example: 'search query' })
-  @IsOptional()
-  @IsString()
-  search?: string
-
   @ApiPropertyOptional({ enum: TrashMode, default: TrashMode.ACTIVE })
   @IsOptional()
   @IsEnum(TrashMode)

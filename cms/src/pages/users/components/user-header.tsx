@@ -1,7 +1,15 @@
 import { Plus, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { usePermission } from '@/hooks/use-permission'
+import { PERM_USERS_WRITE } from '@/lib/permissions'
 
-export function UserHeader() {
+interface UserHeaderProps {
+  onAdd: () => void
+}
+
+export function UserHeader({ onAdd }: UserHeaderProps) {
+  const permission = usePermission()
+
   return (
     <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
       <div>
@@ -12,9 +20,14 @@ export function UserHeader() {
           Users • Quản lý tài khoản và phân quyền hệ thống.
         </p>
       </div>
-      <Button className='shadow-lg shadow-primary/20 h-10 rounded-xl px-5 font-bold transition-all hover:scale-[1.02] active:scale-95'>
-        <Plus className='mr-2 h-4 w-4' /> Thêm người dùng
-      </Button>
+      {permission.has(PERM_USERS_WRITE) && (
+        <Button
+          onClick={onAdd}
+          className='shadow-lg shadow-primary/20 h-10 rounded-xl px-5 font-bold transition-all hover:scale-[1.02] active:scale-95'
+        >
+          <Plus className='mr-2 h-4 w-4' /> Thêm người dùng
+        </Button>
+      )}
     </div>
   )
 }

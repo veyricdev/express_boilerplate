@@ -63,7 +63,9 @@ export function AdvancedFilterPopover() {
         <div className='p-5 space-y-5'>
           {/* Entity Filter */}
           <div className='space-y-2'>
-            <Label className='text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70'>Tài nguyên</Label>
+            <Label className='text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70'>
+              Tài nguyên
+            </Label>
             <Select value={entity} onValueChange={(val) => updateParam('entity', val)}>
               <SelectTrigger className='w-full h-10! rounded-xl bg-muted/20 border-muted-foreground/10'>
                 <SelectValue placeholder='Chọn tài nguyên' />
@@ -81,7 +83,9 @@ export function AdvancedFilterPopover() {
 
           {/* Action Filter */}
           <div className='space-y-2'>
-            <Label className='text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70'>Hành động</Label>
+            <Label className='text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70'>
+              Hành động
+            </Label>
             <Select value={action} onValueChange={(val) => updateParam('action', val)}>
               <SelectTrigger className='w-full h-10! rounded-xl bg-muted/20 border-muted-foreground/10'>
                 <SelectValue placeholder='Chọn hành động' />

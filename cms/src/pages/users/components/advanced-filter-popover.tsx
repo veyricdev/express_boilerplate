@@ -61,10 +61,7 @@ export function AdvancedFilterPopover() {
             <Label className='text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70'>
               Trạng thái tài khoản
             </Label>
-            <Select
-              value={isActive}
-              onValueChange={(val) => updateParam('isActive', val)}
-            >
+            <Select value={isActive} onValueChange={(val) => updateParam('isActive', val)}>
               <SelectTrigger className='w-full h-10! rounded-xl bg-muted/20 border-muted-foreground/10'>
                 <SelectValue placeholder='Chọn trạng thái' />
               </SelectTrigger>

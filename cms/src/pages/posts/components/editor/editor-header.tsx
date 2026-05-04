@@ -1,6 +1,8 @@
 import { ArrowLeft, Save, Send } from 'lucide-react'
 import { useNavigate } from 'react-router'
 import { Button } from '@/components/ui/button'
+import { usePermission } from '@/hooks/use-permission'
+import { PERM_POSTS_UPDATE, PERM_POSTS_WRITE } from '@/lib/permissions'
 
 interface EditorHeaderProps {
   isEdit: boolean
@@ -11,16 +13,14 @@ interface EditorHeaderProps {
 
 export function EditorHeader({ isEdit, isPending, onSubmitDraft, onSubmitPublish }: EditorHeaderProps) {
   const navigate = useNavigate()
+  const permission = usePermission()
+
+  const canSubmit = isEdit ? permission.has(PERM_POSTS_UPDATE) : permission.has(PERM_POSTS_WRITE)
 
   return (
     <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
       <div className='flex items-center gap-3'>
-        <Button
-          variant='ghost'
-          size='icon'
-          onClick={() => navigate('/posts')}
-          className='md:hidden shrink-0'
-        >
+        <Button variant='ghost' size='icon' onClick={() => navigate('/posts')} className='md:hidden shrink-0'>
           <ArrowLeft className='h-5 w-5' />
         </Button>
         <div className='space-y-0.5 md:space-y-1'>
@@ -36,15 +36,19 @@ export function EditorHeader({ isEdit, isPending, onSubmitDraft, onSubmitPublish
         <Button variant='outline' onClick={() => navigate('/posts')} className='shrink-0'>
           Hủy
         </Button>
-        <Button onClick={onSubmitDraft} disabled={isPending} className='shrink-0'>
-          <Save className='mr-2 h-4 w-4' />
-          <span className='hidden sm:inline'>Lưu bản nháp</span>
-          <span className='sm:hidden'>Lưu</span>
-        </Button>
-        <Button onClick={onSubmitPublish} disabled={isPending} className='shrink-0'>
-          <Send className='mr-2 h-4 w-4' />
-          Xuất bản
-        </Button>
+        {canSubmit && (
+          <>
+            <Button onClick={onSubmitDraft} disabled={isPending} className='shrink-0'>
+              <Save className='mr-2 h-4 w-4' />
+              <span className='hidden sm:inline'>Lưu bản nháp</span>
+              <span className='sm:hidden'>Lưu</span>
+            </Button>
+            <Button onClick={onSubmitPublish} disabled={isPending} className='shrink-0'>
+              <Send className='mr-2 h-4 w-4' />
+              Xuất bản
+            </Button>
+          </>
+        )}
       </div>
     </div>
   )

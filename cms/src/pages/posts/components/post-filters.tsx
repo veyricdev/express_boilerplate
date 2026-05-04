@@ -9,8 +9,6 @@ import { AdvancedFilterPopover } from './advanced-filter-popover'
 interface PostFiltersProps {
   trashMode: TrashMode
   searchTerm: string
-  categories: any[]
-  tags: any[]
   author: string
   fromDate: string
   toDate: string
@@ -21,8 +19,6 @@ interface PostFiltersProps {
 export function PostFilters({
   trashMode,
   searchTerm,
-  categories,
-  tags,
   author,
   fromDate,
   toDate,
@@ -112,8 +108,6 @@ export function PostFilters({
         </div>
 
         <AdvancedFilterPopover
-          categories={categories}
-          tags={tags}
           author={author}
           fromDate={fromDate}
           toDate={toDate}

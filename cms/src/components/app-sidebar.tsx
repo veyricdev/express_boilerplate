@@ -11,7 +11,7 @@ import {
   Tag,
   Users,
 } from 'lucide-react'
-import { Link, useLocation, useNavigate } from 'react-router'
+import { Link, useLocation } from 'react-router'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -36,29 +36,37 @@ import {
   SidebarRail,
   useSidebar,
 } from '@/components/ui/sidebar'
+import { usePermission } from '@/hooks/use-permission'
+import {
+  PERM_AUDIT_READ,
+  PERM_CATS_READ,
+  PERM_POSTS_READ,
+  PERM_SETTINGS_READ,
+  PERM_TAGS_READ,
+  PERM_USERS_READ,
+} from '@/lib/permissions'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/store/auth'
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Bài viết', href: '/posts', icon: FileText },
-  { name: 'Danh mục', href: '/categories', icon: FolderTree },
-  { name: 'Tags', href: '/tags', icon: Tag },
-  { name: 'Audit Logs', href: '/audit-logs', icon: History },
-  { name: 'Người dùng', href: '/users', icon: Users },
-  { name: 'Cấu hình', href: '/settings', icon: Settings },
+  { name: 'Dashboard', href: '/', icon: LayoutDashboard }, // No specific permission
+  { name: 'Bài viết', href: '/posts', icon: FileText, perm: PERM_POSTS_READ },
+  { name: 'Danh mục', href: '/categories', icon: FolderTree, perm: PERM_CATS_READ },
+  { name: 'Tags', href: '/tags', icon: Tag, perm: PERM_TAGS_READ },
+  { name: 'Audit Logs', href: '/audit-logs', icon: History, perm: PERM_AUDIT_READ },
+  { name: 'Người dùng', href: '/users', icon: Users, perm: PERM_USERS_READ },
+  { name: 'Cấu hình', href: '/settings', icon: Settings, perm: PERM_SETTINGS_READ },
 ]
 
 export function AppSidebar() {
   const location = useLocation()
-  const navigate = useNavigate()
   const { isMobile } = useSidebar()
   const user = useAuth((state) => state.user)
   const logout = useAuth((state) => state.logout)
+  const permission = usePermission()
 
   const handleLogout = () => {
     logout()
-    navigate('/login')
   }
 
   const userData = {
@@ -85,6 +93,9 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu className='gap-1 px-2 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:items-center transition-all duration-200'>
               {navigation.map((item) => {
+                if (item.perm && !permission.has(item.perm)) {
+                  return null
+                }
                 const isActive =
                   location.pathname === item.href || (item.href !== '/' && location.pathname.startsWith(item.href))
                 return (

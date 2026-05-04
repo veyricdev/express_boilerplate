@@ -9,11 +9,6 @@ export class FindAuditLogsDto extends PaginationDto {
   @IsString()
   entity?: string
 
-  @ApiPropertyOptional({ example: 'keyword' })
-  @IsOptional()
-  @IsString()
-  search?: string
-
   @ApiPropertyOptional({ example: 'SOFT_DELETE' })
   @IsOptional()
   @IsString()

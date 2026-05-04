@@ -1,4 +1,6 @@
-import { Check, ChevronsUpDown, User as AuthorIcon, Calendar, Filter, X } from 'lucide-react'
+import { User as AuthorIcon, Calendar, Check, ChevronsUpDown, Filter, Loader2, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useInView } from 'react-intersection-observer'
 import { useSearchParams } from 'react-router'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -7,12 +9,12 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useDebounce } from '@/hooks/use-debounce'
+import { useInfiniteCategories, useInfiniteTags } from '@/hooks/use-infinite-taxonomies'
 import { cn } from '@/lib/utils'
-import { PostStatus, Tag } from '@/types'
+import { PostStatus } from '@/types'
 
 interface AdvancedFilterPopoverProps {
-  categories: any[]
-  tags: Tag[]
   author: string
   fromDate: string
   toDate: string
@@ -20,16 +22,65 @@ interface AdvancedFilterPopoverProps {
   tagIds: number[]
 }
 
-export function AdvancedFilterPopover({
-  categories,
-  tags,
-  author,
-  fromDate,
-  toDate,
-  statusFilter,
-  tagIds,
-}: AdvancedFilterPopoverProps) {
+export function AdvancedFilterPopover({ author, fromDate, toDate, statusFilter, tagIds }: AdvancedFilterPopoverProps) {
   const [searchParams, setSearchParams] = useSearchParams()
+
+  // -- Categories Infinite Scroll --
+  const {
+    data: catData,
+    fetchNextPage: fetchNextCatPage,
+    hasNextPage: hasNextCatPage,
+    isFetchingNextPage: isFetchingNextCatPage,
+  } = useInfiniteCategories()
+
+  const categories = catData?.pages.flatMap((page) => page.data) || []
+  const { ref: catRef, inView: catInView } = useInView()
+
+  useEffect(() => {
+    if (catInView && hasNextCatPage && !isFetchingNextCatPage) {
+      fetchNextCatPage()
+    }
+  }, [catInView, hasNextCatPage, isFetchingNextCatPage, fetchNextCatPage])
+
+  // -- Tags Infinite Scroll & Search --
+  const [searchTerm, setSearchTerm] = useState('')
+  const debouncedSearch = useDebounce(searchTerm, 500)
+
+  const {
+    data: tagData,
+    fetchNextPage: fetchNextTagPage,
+    hasNextPage: hasNextTagPage,
+    isFetchingNextPage: isFetchingNextTagPage,
+  } = useInfiniteTags(debouncedSearch)
+
+  const tags = tagData?.pages.flatMap((page) => page.data) || []
+  const { ref: tagRef, inView: tagInView } = useInView()
+
+  useEffect(() => {
+    if (tagInView && hasNextTagPage && !isFetchingNextTagPage) {
+      fetchNextTagPage()
+    }
+  }, [tagInView, hasNextTagPage, isFetchingNextTagPage, fetchNextTagPage])
+
+  // Local state for selected tag names
+  const [selectedTagsMap, setSelectedTagsMap] = useState<Record<number, string>>({})
+
+  useEffect(() => {
+    const newMap = { ...selectedTagsMap }
+    let changed = false
+    tagIds.forEach((id: number) => {
+      if (!newMap[id]) {
+        const found = tags.find((t: any) => t.id === id)
+        if (found) {
+          newMap[id] = found.name
+          changed = true
+        }
+      }
+    })
+    if (changed) {
+      setSelectedTagsMap(newMap)
+    }
+  }, [tags, tagIds, selectedTagsMap])
 
   const updateParam = (key: string, value: string | null) => {
     const newParams = new URLSearchParams(searchParams)
@@ -39,7 +90,7 @@ export function AdvancedFilterPopover({
     setSearchParams(newParams, { replace: true })
   }
 
-  const toggleTag = (tagId: number) => {
+  const toggleTag = (tagId: number, tagName?: string) => {
     const newParams = new URLSearchParams(searchParams)
     let currentTagIds = searchParams.get('tagIds')?.split(',').map(Number).filter(Boolean) || []
 
@@ -47,6 +98,9 @@ export function AdvancedFilterPopover({
       currentTagIds = currentTagIds.filter((id) => id !== tagId)
     } else {
       currentTagIds = [...currentTagIds, tagId]
+      if (tagName) {
+        setSelectedTagsMap((prev) => ({ ...prev, [tagId]: tagName }))
+      }
     }
 
     if (currentTagIds.length > 0) {
@@ -75,7 +129,10 @@ export function AdvancedFilterPopover({
           <Filter className='h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors' />
           <span className='hidden sm:inline font-medium text-sm'>Lọc nâng cao</span>
           {tagIds.length > 0 && (
-            <Badge variant='secondary' className='h-5 px-1.5 rounded-md bg-primary/10 text-primary border-none text-[10px]'>
+            <Badge
+              variant='secondary'
+              className='h-5 px-1.5 rounded-md bg-primary/10 text-primary border-none text-[10px]'
+            >
               {tagIds.length}
             </Badge>
           )}
@@ -117,13 +174,20 @@ export function AdvancedFilterPopover({
                     {cat.name}
                   </SelectItem>
                 ))}
+                {hasNextCatPage && (
+                  <div ref={catRef} className='py-2 flex justify-center items-center'>
+                    <Loader2 className='h-4 w-4 animate-spin text-muted-foreground' />
+                  </div>
+                )}
               </SelectContent>
             </Select>
           </div>
 
           {/* Tags Filter */}
           <div className='space-y-2'>
-            <Label className='text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70'>Thẻ (Tags)</Label>
+            <Label className='text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70'>
+              Thẻ (Tags)
+            </Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -137,8 +201,8 @@ export function AdvancedFilterPopover({
                   <div className='flex flex-wrap gap-1.5 items-center'>
                     {tagIds.length > 0 ? (
                       tagIds.map((id) => {
-                        const tag = tags.find((t) => t.id === id)
-                        return tag ? (
+                        const tagName = selectedTagsMap[id] || `Thẻ #${id}`
+                        return (
                           <Badge
                             variant='secondary'
                             key={id}
@@ -148,10 +212,10 @@ export function AdvancedFilterPopover({
                               toggleTag(id)
                             }}
                           >
-                            {tag.name}
+                            {tagName}
                             <X className='size-3 cursor-pointer opacity-70 hover:opacity-100 transition-opacity' />
                           </Badge>
-                        ) : null
+                        )
                       })
                     ) : (
                       <span className='font-normal text-sm'>Chọn thẻ...</span>
@@ -161,26 +225,38 @@ export function AdvancedFilterPopover({
                 </Button>
               </PopoverTrigger>
               <PopoverContent className='w-[300px] p-0 rounded-xl shadow-2xl border-muted-foreground/10' align='start'>
-                <Command>
-                  <CommandInput placeholder='Tìm kiếm thẻ...' className='h-9' />
+                <Command shouldFilter={false}>
+                  <CommandInput
+                    placeholder='Tìm kiếm thẻ...'
+                    className='h-9'
+                    value={searchTerm}
+                    onValueChange={setSearchTerm}
+                  />
                   <CommandList className='max-h-60'>
                     <CommandEmpty>Không tìm thấy thẻ nào.</CommandEmpty>
                     <CommandGroup>
-                      {tags.map((tag) => {
+                      {tags.map((tag: any) => {
                         const isSelected = tagIds.includes(tag.id)
                         return (
                           <CommandItem
                             key={tag.id}
-                            value={tag.name}
-                            onSelect={() => toggleTag(tag.id)}
+                            value={tag.id.toString()}
+                            onSelect={() => toggleTag(tag.id, tag.name)}
                             className='rounded-lg mx-1 my-0.5'
                           >
-                            <Check className={cn('mr-2 h-4 w-4 text-primary', isSelected ? 'opacity-100' : 'opacity-0')} />
+                            <Check
+                              className={cn('mr-2 h-4 w-4 text-primary', isSelected ? 'opacity-100' : 'opacity-0')}
+                            />
                             {tag.name}
                           </CommandItem>
                         )
                       })}
                     </CommandGroup>
+                    {hasNextTagPage && (
+                      <div ref={tagRef} className='py-2 flex justify-center items-center'>
+                        <Loader2 className='h-4 w-4 animate-spin text-muted-foreground' />
+                      </div>
+                    )}
                   </CommandList>
                 </Command>
               </PopoverContent>

@@ -1,6 +1,8 @@
 import { Save } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { usePermission } from '@/hooks/use-permission'
+import { PERM_SETTINGS_WRITE } from '@/lib/permissions'
 import type { Setting, SettingGroup } from '@/services/setting.service'
 import { SettingControl } from './setting-control'
 
@@ -34,6 +36,7 @@ interface SettingsTabPanelProps {
 }
 
 export function SettingsTabPanel({ settings, group, onSave, onDelete, isPending }: SettingsTabPanelProps) {
+  const permission = usePermission()
   const { grouped, values, setValue } = useSettingsForm(settings, group)
 
   const handleSave = () => {
@@ -62,14 +65,16 @@ export function SettingsTabPanel({ settings, group, onSave, onDelete, isPending 
           </div>
         ))}
       </div>
-      <Button
-        onClick={handleSave}
-        disabled={isPending}
-        className='h-10 rounded-xl px-6 shadow-lg shadow-primary/20 gap-2 font-semibold'
-      >
-        <Save className='size-4' />
-        {isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
-      </Button>
+      {permission.has(PERM_SETTINGS_WRITE) && (
+        <Button
+          onClick={handleSave}
+          disabled={isPending}
+          className='h-10 rounded-xl px-6 shadow-lg shadow-primary/20 gap-2 font-semibold'
+        >
+          <Save className='size-4' />
+          {isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
+        </Button>
+      )}
     </div>
   )
 }

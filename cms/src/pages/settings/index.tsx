@@ -15,6 +15,8 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { usePermission } from '@/hooks/use-permission'
+import { PERM_SETTINGS_WRITE } from '@/lib/permissions'
 import type { SettingGroup } from '@/services/setting.service'
 import { bulkUpdateSettings, createSetting, deleteSetting } from '@/services/setting.service'
 import { useSettings } from '@/store/settings'
@@ -25,7 +27,7 @@ import { SettingsTabPanel } from './components/settings-tab-panel'
 
 const TABS = [
   { key: 'GENERAL' as SettingGroup, label: 'Chung', icon: Globe, description: 'Thông tin cơ bản của website' },
-  { key: 'SEO' as SettingGroup, label: 'SEO', icon: Search, description: 'Cấu hình tối ưu tìm kiếm' },
+  { key: 'SEO' as SettingGroup, label: 'SEO', description: 'Cấu hình tối ưu tìm kiếm', icon: Search },
   { key: 'SOCIAL' as SettingGroup, label: 'Mạng xã hội', icon: Share2, description: 'Liên kết đến các mạng xã hội' },
   { key: 'MAIL' as SettingGroup, label: 'Email', icon: Mail, description: 'Cấu hình gửi nhận email' },
   {
@@ -39,6 +41,8 @@ const TABS = [
 
 export default function SettingsPage() {
   const [deleteKey, setDeleteKey] = useState<string | null>(null)
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const permission = usePermission()
 
   const settings = useSettings((s) => s.settings)
   const isStoreLoading = useSettings((s) => s.isLoading)
@@ -60,6 +64,7 @@ export default function SettingsPage() {
     onSuccess: async () => {
       toast.success('Đã thêm cấu hình thành công')
       await useSettings.getState().forceReload()
+      setIsAddDialogOpen(false)
     },
     onError: (err: any) => {
       toast.error(err?.response?.data?.message || 'Thêm cấu hình thất bại')
@@ -101,7 +106,15 @@ export default function SettingsPage() {
           <p className='text-muted-foreground mt-1'>Quản lý các thông số chung của website</p>
         </div>
 
-        <AddSettingDialog onSave={handleCreate} isPending={isCreating} tabs={TABS} />
+        {permission.has(PERM_SETTINGS_WRITE) && (
+          <AddSettingDialog
+            open={isAddDialogOpen}
+            onOpenChange={setIsAddDialogOpen}
+            onSave={handleCreate}
+            isPending={isCreating}
+            tabs={TABS}
+          />
+        )}
       </div>
 
       {isLoading ? (

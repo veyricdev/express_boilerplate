@@ -9,7 +9,7 @@ export function UserFilters() {
   const [searchParams, setSearchParams] = useSearchParams()
   const trashMode = searchParams.get('trashMode') || 'active'
   const searchTerm = searchParams.get('search') || ''
-  
+
   const [localSearch, setLocalSearch] = useState(searchTerm)
 
   // Sync local search with URL param
@@ -46,13 +46,22 @@ export function UserFilters() {
     <div className='px-6 py-4 border-b bg-muted/10 flex flex-col lg:flex-row lg:items-center justify-between gap-4'>
       <Tabs value={trashMode} onValueChange={handleTrashModeChange} className='w-full lg:w-auto'>
         <TabsList className='bg-muted/50 border h-10! p-1 gap-1 rounded-xl shrink-0'>
-          <TabsTrigger value='all' className='px-4 rounded-lg transition-all data-[state=active]:shadow-sm gap-2 h-full'>
+          <TabsTrigger
+            value='all'
+            className='px-4 rounded-lg transition-all data-[state=active]:shadow-sm gap-2 h-full'
+          >
             Tất cả
           </TabsTrigger>
-          <TabsTrigger value='active' className='px-4 rounded-lg transition-all data-[state=active]:shadow-sm gap-2 h-full'>
+          <TabsTrigger
+            value='active'
+            className='px-4 rounded-lg transition-all data-[state=active]:shadow-sm gap-2 h-full'
+          >
             Hoạt động
           </TabsTrigger>
-          <TabsTrigger value='trash' className='px-4 rounded-lg transition-all data-[state=active]:shadow-sm gap-2 h-full'>
+          <TabsTrigger
+            value='trash'
+            className='px-4 rounded-lg transition-all data-[state=active]:shadow-sm gap-2 h-full'
+          >
             Thùng rác
           </TabsTrigger>
         </TabsList>

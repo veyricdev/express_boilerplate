@@ -5,6 +5,8 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { usePermission } from '@/hooks/use-permission'
+import { PERM_SETTINGS_WRITE } from '@/lib/permissions'
 import type { Setting } from '@/services/setting.service'
 
 interface SettingControlProps {
@@ -15,6 +17,8 @@ interface SettingControlProps {
 }
 
 export function SettingControl({ setting, value, onChange, onDelete }: SettingControlProps) {
+  const permission = usePermission()
+
   const LabelSection = () => (
     <div className='flex items-center justify-between mb-2'>
       <div className='flex items-center gap-2'>
@@ -34,7 +38,7 @@ export function SettingControl({ setting, value, onChange, onDelete }: SettingCo
           </TooltipProvider>
         )}
       </div>
-      {!setting.isSystem && (
+      {!setting.isSystem && permission.has(PERM_SETTINGS_WRITE) && (
         <Button
           variant='ghost'
           size='icon'
@@ -56,6 +60,7 @@ export function SettingControl({ setting, value, onChange, onDelete }: SettingCo
             id={setting.key}
             checked={value === 'true'}
             onCheckedChange={(v: boolean) => onChange(v ? 'true' : 'false')}
+            disabled={!permission.has(PERM_SETTINGS_WRITE)}
           />
           <span className='ml-3 text-sm text-muted-foreground'>{value === 'true' ? 'Bật' : 'Tắt'}</span>
         </div>
@@ -73,6 +78,7 @@ export function SettingControl({ setting, value, onChange, onDelete }: SettingCo
           onChange={(e) => onChange(e.target.value)}
           placeholder='https://example.com/image.png'
           className='font-mono text-xs h-10! rounded-xl bg-muted/20 border-muted-foreground/10 focus:bg-background transition-all'
+          disabled={!permission.has(PERM_SETTINGS_WRITE)}
         />
         {value && (
           <img
@@ -96,6 +102,7 @@ export function SettingControl({ setting, value, onChange, onDelete }: SettingCo
           onChange={(e) => onChange(e.target.value)}
           rows={4}
           className='font-mono text-xs rounded-xl bg-muted/20 border-muted-foreground/10 focus:bg-background transition-all'
+          disabled={!permission.has(PERM_SETTINGS_WRITE)}
         />
       </div>
     )
@@ -110,6 +117,7 @@ export function SettingControl({ setting, value, onChange, onDelete }: SettingCo
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className='h-10! rounded-xl bg-muted/20 border-muted-foreground/10 focus:bg-background transition-all'
+        disabled={!permission.has(PERM_SETTINGS_WRITE)}
       />
     </div>
   )

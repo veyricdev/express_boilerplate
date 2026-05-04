@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { Eye, EyeOff, Loader2, Lock, Mail } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router'
+import { useNavigate, useSearchParams } from 'react-router'
 import * as z from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -27,6 +27,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
 
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { setAuth, updateToken } = useAuth()
 
   const {
@@ -59,7 +60,8 @@ export default function LoginPage() {
       // 4. Finalize auth state
       setAuth(user as any, accessToken, refreshToken)
 
-      navigate('/')
+      const redirect = searchParams.get('redirect')
+      navigate(redirect || '/')
     } catch (err: any) {
       setError(err.response?.data?.message || 'Đăng nhập thất bại. Vui lòng thử lại.')
     } finally {

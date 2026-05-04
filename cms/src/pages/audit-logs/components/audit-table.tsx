@@ -107,6 +107,9 @@ export function AuditTable({ logs, isLoading }: AuditTableProps) {
       <Table>
         <TableHeader className='bg-muted/50'>
           <TableRow className='hover:bg-transparent border-b'>
+            <TableHead className='px-6 py-4 font-bold text-foreground h-12 uppercase text-[11px] tracking-wider w-[80px]'>
+              #ID
+            </TableHead>
             <TableHead className='px-6 py-4 font-bold text-foreground h-12 uppercase text-[11px] tracking-wider w-[150px]'>
               Hành động
             </TableHead>
@@ -130,7 +133,7 @@ export function AuditTable({ logs, isLoading }: AuditTableProps) {
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={6} className='h-48 text-center'>
+              <TableCell colSpan={7} className='h-48 text-center'>
                 <div className='flex flex-col items-center justify-center gap-3 text-muted-foreground'>
                   <div className='h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent shadow-sm' />
                   <span className='text-sm font-bold animate-pulse uppercase tracking-widest'>Đang tải...</span>
@@ -139,13 +142,14 @@ export function AuditTable({ logs, isLoading }: AuditTableProps) {
             </TableRow>
           ) : logs.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className='h-48 text-center text-muted-foreground/60 font-medium italic'>
+              <TableCell colSpan={7} className='h-48 text-center text-muted-foreground/60 font-medium italic'>
                 Không có nhật ký hoạt động nào được tìm thấy.
               </TableCell>
             </TableRow>
           ) : (
             logs.map((log) => (
               <TableRow key={log.id} className='hover:bg-muted/30 transition-all border-b last:border-0 group'>
+                <TableCell className='px-6 py-5 font-mono text-[11px] text-muted-foreground'>#{log.id}</TableCell>
                 <TableCell className='px-6 py-5'>{getActionBadge(log.action)}</TableCell>
                 <TableCell className='px-6 py-5'>
                   <div className='flex items-center gap-3'>

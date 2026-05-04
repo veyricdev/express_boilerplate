@@ -24,49 +24,63 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 )
 
+let globalRetryCount = 0
+
 // Response interceptor: Handle 401 and refresh token
 api.interceptors.response.use(
-  (response) => response.data.data,
+  (response) => {
+    globalRetryCount = 0
+    return response.data.data
+  },
   async (error) => {
     const originalRequest = error.config
 
-    // If 401 and not already retrying
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true
+    if (error.response?.status === 401) {
+      if (globalRetryCount < 5) {
+        globalRetryCount += 1
 
-      const { refreshToken, updateToken, logout } = useAuth.getState()
+        const { refreshToken, updateToken, logout } = useAuth.getState()
 
-      if (refreshToken) {
-        try {
-          // Attempt to refresh
-          const response = await axios.post(
-            '/api/v1/admin/auth/refresh',
-            {},
-            {
-              headers: { Authorization: `Bearer ${refreshToken}` },
-            }
-          )
+        if (refreshToken) {
+          try {
+            // Attempt to refresh
+            const response = await axios.post(
+              '/api/v1/admin/auth/refresh',
+              {},
+              {
+                headers: { Authorization: `Bearer ${refreshToken}` },
+              }
+            )
 
-          const { accessToken, refreshToken: newRefreshToken } = response.data.data
-          updateToken(accessToken, newRefreshToken)
+            const { accessToken, refreshToken: newRefreshToken } = response.data.data
+            updateToken(accessToken, newRefreshToken)
 
-          // Update original request header and retry
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`
-          return api(originalRequest)
-        } catch (refreshError) {
-          // Refresh failed, logout
-          logout()
-          if (window.location.pathname !== '/cms/login') {
-            window.location.href = '/cms/login'
+            // Update original request header and retry
+            originalRequest.headers.Authorization = `Bearer ${accessToken}`
+            return api(originalRequest)
+          } catch (refreshError) {
+            // Refresh failed, logout
+            logout()
+            // Navigation is handled by ProtectedRoute
+            return Promise.reject(refreshError)
           }
-          return Promise.reject(refreshError)
+        } else {
+          // No refresh token, logout
+          logout()
+          // Navigation is handled by ProtectedRoute
         }
       } else {
-        // No refresh token, logout
+        // Reached retry limit
+        const { logout } = useAuth.getState()
         logout()
-        if (window.location.pathname !== '/cms/login') {
-          window.location.href = '/cms/login'
-        }
+        globalRetryCount = 0 // Reset for future interactions after re-login
+      }
+    }
+
+    // Handle 403 Forbidden
+    if (error.response?.status === 403) {
+      if (window.location.pathname !== '/cms/403') {
+        window.location.href = '/cms/403'
       }
     }
 

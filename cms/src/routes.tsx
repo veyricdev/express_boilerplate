@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { createBrowserRouter, Navigate, Outlet } from 'react-router'
+import { createBrowserRouter, Navigate, Outlet, useLocation } from 'react-router'
 
 import AdminLayout from '@/layouts/admin-layout'
 import AuthLayout from '@/layouts/auth-layout'
@@ -15,10 +15,18 @@ const TagsPage = lazy(() => import('@/pages/tags'))
 const UsersPage = lazy(() => import('@/pages/users'))
 const AuditLogsPage = lazy(() => import('@/pages/audit-logs'))
 const SettingsPage = lazy(() => import('@/pages/settings'))
+const ForbiddenPage = lazy(() => import('@/pages/errors/403'))
 
 const ProtectedRoute = () => {
   const isAuthenticated = useAuth((state) => state.isAuthenticated)
-  return isAuthenticated ? <Outlet /> : <Navigate to='/login' replace />
+  const location = useLocation()
+
+  if (!isAuthenticated) {
+    const redirectUrl = encodeURIComponent(location.pathname + location.search)
+    return <Navigate to={`/login?redirect=${redirectUrl}`} replace />
+  }
+
+  return <Outlet />
 }
 
 export const router = createBrowserRouter(
@@ -104,6 +112,14 @@ export const router = createBrowserRouter(
               element: (
                 <Suspense fallback={null}>
                   <SettingsPage />
+                </Suspense>
+              ),
+            },
+            {
+              path: '403',
+              element: (
+                <Suspense fallback={null}>
+                  <ForbiddenPage />
                 </Suspense>
               ),
             },

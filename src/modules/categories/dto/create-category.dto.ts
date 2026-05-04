@@ -8,6 +8,12 @@ export class CreateCategoryDto {
   @MaxLength(150)
   name: string
 
+  @ApiPropertyOptional({ example: 'cong-nghe' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(150)
+  slug?: string
+
   @ApiPropertyOptional({ example: 'Các bài viết về công nghệ' })
   @IsOptional()
   @IsString()

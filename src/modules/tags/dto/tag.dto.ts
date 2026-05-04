@@ -7,6 +7,12 @@ export class CreateTagDto {
   @IsString()
   @MaxLength(100)
   name: string
+
+  @ApiPropertyOptional({ example: 'nestjs' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  slug?: string
 }
 
 export class UpdateTagDto {
@@ -15,4 +21,10 @@ export class UpdateTagDto {
   @IsString()
   @MaxLength(100)
   name?: string
+
+  @ApiPropertyOptional({ example: 'nestjs-v10' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  slug?: string
 }

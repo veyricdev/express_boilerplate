@@ -13,11 +13,6 @@ export class FindUsersAdminDto extends PaginationDto {
   @IsEnum(TrashMode)
   trashMode?: TrashMode = TrashMode.ACTIVE
 
-  @ApiPropertyOptional({ description: 'Search by full name or email' })
-  @IsOptional()
-  @IsString()
-  search?: string
-
   @ApiPropertyOptional({ description: 'Filter by active status' })
   @IsOptional()
   isActive?: boolean

@@ -1,14 +1,16 @@
-import React from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
-import { User as AuthorIcon, Calendar, Clock, Edit, Eye, Trash2, RotateCcw, XCircle } from 'lucide-react'
+import { User as AuthorIcon, Calendar, Clock, Edit, Eye, RotateCcw, Trash2, XCircle } from 'lucide-react'
+import React from 'react'
 import { useNavigate } from 'react-router'
+import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
+import { usePermission } from '@/hooks/use-permission'
+import { PERM_POSTS_DELETE, PERM_POSTS_UPDATE } from '@/lib/permissions'
 import { postService } from '@/services/post.service'
 import { Post } from '@/types'
 import { cn } from '@/utils/cn'
@@ -22,6 +24,7 @@ interface PostTableProps {
 export function PostTable({ posts, isLoading }: PostTableProps) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const permission = usePermission()
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => postService.remove(id),
@@ -83,6 +86,7 @@ export function PostTable({ posts, isLoading }: PostTableProps) {
       <Table>
         <TableHeader className='bg-muted/50'>
           <TableRow className='hover:bg-transparent border-b'>
+            <TableHead className='px-6 py-4 font-semibold text-foreground w-[80px]'>#ID</TableHead>
             <TableHead className='w-[30%] px-6 py-4 font-semibold text-foreground'>Tiêu đề</TableHead>
             <TableHead className='px-6 py-4 font-semibold text-foreground'>Danh mục</TableHead>
             <TableHead className='px-6 py-4 font-semibold text-foreground'>Tags</TableHead>
@@ -95,7 +99,7 @@ export function PostTable({ posts, isLoading }: PostTableProps) {
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={7} className='h-32 text-center'>
+              <TableCell colSpan={8} className='h-32 text-center'>
                 <div className='flex flex-col items-center gap-2 text-muted-foreground'>
                   <div className='animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent' />
                   <span>Đang tải dữ liệu...</span>
@@ -104,7 +108,7 @@ export function PostTable({ posts, isLoading }: PostTableProps) {
             </TableRow>
           ) : posts.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className='h-32 text-center text-muted-foreground'>
+              <TableCell colSpan={8} className='h-32 text-center text-muted-foreground'>
                 Không có bài viết nào phù hợp.
               </TableCell>
             </TableRow>
@@ -117,11 +121,15 @@ export function PostTable({ posts, isLoading }: PostTableProps) {
                   post.deletedAt && 'bg-destructive/5 opacity-80'
                 )}
               >
+                <TableCell className='px-6 py-4 font-mono text-[11px] text-muted-foreground'>#{post.id}</TableCell>
                 <TableCell className='px-6 py-4'>
                   <div className='flex flex-col gap-0.5'>
                     <span
-                      className='font-semibold text-foreground leading-tight hover:text-primary cursor-pointer transition-colors'
-                      onClick={() => navigate(`/posts/${post.id}/edit`)}
+                      className={cn(
+                        'font-semibold text-foreground leading-tight transition-colors',
+                        permission.has(PERM_POSTS_UPDATE) && 'hover:text-primary cursor-pointer'
+                      )}
+                      onClick={() => permission.has(PERM_POSTS_UPDATE) && navigate(`/posts/${post.id}/edit`)}
                     >
                       {post.title}
                     </span>
@@ -189,19 +197,21 @@ export function PostTable({ posts, isLoading }: PostTableProps) {
                 </TableCell>
                 <TableCell className='px-6 py-4 text-right'>
                   <div className='flex justify-end gap-1'>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant='ghost'
-                          size='icon'
-                          className='h-9 w-9 rounded-full hover:bg-primary/10 hover:text-primary'
-                          onClick={() => navigate(`/posts/${post.id}/edit`)}
-                        >
-                          <Edit className='h-4 w-4' />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Chỉnh sửa</TooltipContent>
-                    </Tooltip>
+                    {permission.has(PERM_POSTS_UPDATE) && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant='ghost'
+                            size='icon'
+                            className='h-9 w-9 rounded-full hover:bg-primary/10 hover:text-primary'
+                            onClick={() => navigate(`/posts/${post.id}/edit`)}
+                          >
+                            <Edit className='h-4 w-4' />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Chỉnh sửa</TooltipContent>
+                      </Tooltip>
+                    )}
 
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -219,51 +229,59 @@ export function PostTable({ posts, isLoading }: PostTableProps) {
 
                     {post.deletedAt ? (
                       <>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant='ghost'
-                              size='icon'
-                              className='h-9 w-9 rounded-full hover:bg-primary/10 hover:text-primary'
-                              onClick={() => handleRestore(post.id)}
-                              disabled={restoreMutation.isPending}
-                            >
-                              <RotateCcw className='h-4 w-4' />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Khôi phục</TooltipContent>
-                        </Tooltip>
+                        {permission.has(PERM_POSTS_DELETE) && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant='ghost'
+                                size='icon'
+                                className='h-9 w-9 rounded-full hover:bg-primary/10 hover:text-primary'
+                                onClick={() => handleRestore(post.id)}
+                                disabled={restoreMutation.isPending}
+                              >
+                                <RotateCcw className='h-4 w-4' />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Khôi phục</TooltipContent>
+                          </Tooltip>
+                        )}
 
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant='ghost'
-                              size='icon'
-                              className='h-9 w-9 rounded-full hover:bg-destructive/10 hover:text-destructive'
-                              onClick={() => handlePermanentDelete(post.id)}
-                              disabled={permanentDeleteMutation.isPending}
-                            >
-                              <XCircle className='h-4 w-4' />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Xóa vĩnh viễn</TooltipContent>
-                        </Tooltip>
+                        {permission.has(PERM_POSTS_DELETE) && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant='ghost'
+                                size='icon'
+                                className='h-9 w-9 rounded-full hover:bg-destructive/10 hover:text-destructive'
+                                onClick={() => handlePermanentDelete(post.id)}
+                                disabled={permanentDeleteMutation.isPending}
+                              >
+                                <XCircle className='h-4 w-4' />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Xóa vĩnh viễn</TooltipContent>
+                          </Tooltip>
+                        )}
                       </>
                     ) : (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant='ghost'
-                            size='icon'
-                            className='h-9 w-9 rounded-full hover:bg-destructive/10 hover:text-destructive'
-                            onClick={() => handleDelete(post.id)}
-                            disabled={deleteMutation.isPending}
-                          >
-                            <Trash2 className='h-4 w-4' />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Xóa bài viết</TooltipContent>
-                      </Tooltip>
+                      <>
+                        {permission.has(PERM_POSTS_DELETE) && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant='ghost'
+                                size='icon'
+                                className='h-9 w-9 rounded-full hover:bg-destructive/10 hover:text-destructive'
+                                onClick={() => handleDelete(post.id)}
+                                disabled={deleteMutation.isPending}
+                              >
+                                <Trash2 className='h-4 w-4' />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Xóa bài viết</TooltipContent>
+                          </Tooltip>
+                        )}
+                      </>
                     )}
                   </div>
                 </TableCell>
