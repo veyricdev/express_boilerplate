@@ -11,7 +11,7 @@
     "start": "nest start",
     "dev": "concurrently \"nest start --watch\" \"pnpm --filter cms dev\"",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "cross-env NODE_ENV=production node dist/main",
+    "start:prod": "cross-env NODE_ENV=production HOST=0.0.0.0 node dist/main",
     "lint": "biome check --fix",
     "db:gen": "prisma generate",
     "db:migrate": "prisma migrate dev",

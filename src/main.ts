@@ -14,8 +14,10 @@ async function bootstrap() {
 
   // Security
   await app.register(helmet, {
+    hsts: false,
     contentSecurityPolicy: {
       directives: {
+        upgradeInsecureRequests: null,
         defaultSrc: ["'self'", 'unpkg.com'],
         scriptSrc: [
           "'self'",
@@ -108,6 +110,6 @@ async function bootstrap() {
     })
   )
 
-  await app.listen(process.env.PORT || 3000)
+  await app.listen(process.env.PORT || 3000, process.env.HOST || '0.0.0.0')
 }
 bootstrap()

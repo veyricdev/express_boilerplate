@@ -82,6 +82,27 @@ Một boilerplate chuyên nghiệp sử dụng **NestJS (Fastify)** làm backend
    ```
 
 ---
+## 🐳 Triển khai với Docker (Production)
+
+Dự án đã được tối ưu hóa Multi-stage Build cho Docker, giúp dung lượng image siêu nhẹ và loại bỏ hoàn toàn các package thừa của frontend ở runtime.
+
+### 1. Build Docker Image
+```bash
+docker build -t nest-react-app .
+```
+
+### 2. Cấu hình biến môi trường
+Tạo file `.env` (nếu chưa có). **Lưu ý quan trọng khi dùng Docker:**
+- **Không dùng dấu ngoặc kép** `""` để bọc giá trị các biến (ví dụ: `REDIS_URL=rediss://...` thay vì `REDIS_URL="rediss://..."`). Docker `--env-file` không tự loại bỏ dấu ngoặc kép, sẽ gây lỗi Invalid URL.
+- Nếu Database/Redis nằm ở máy Host (máy thật của bạn) chứ không phải trong container, bạn **không thể dùng `localhost` hay `127.0.0.1`**. Hãy đổi thành IP của máy thật (thường là `172.17.0.1` trên Linux) hoặc dùng `host.docker.internal` (trên Windows/Mac).
+  Ví dụ: `DATABASE_URL=mysql://root:@172.17.0.1:3306/nest_boilerplate`
+
+### 3. Chạy Container
+```bash
+docker run -d -p 3000:3000 --env-file .env --name nest-react-app nest-react-app
+```
+
+---
 
 ## 🔗 Các đường dẫn quan trọng (Endpoints)
 
