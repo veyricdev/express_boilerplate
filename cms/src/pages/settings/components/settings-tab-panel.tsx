@@ -1,8 +1,8 @@
+import { PERM_SETTINGS_WRITE } from '@shared/constants/permissions'
 import { Save } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { usePermission } from '@/hooks/use-permission'
-import { PERM_SETTINGS_WRITE } from '@shared/constants/permissions'
 import type { Setting, SettingGroup } from '@/services/setting.service'
 import { SettingControl } from './setting-control'
 

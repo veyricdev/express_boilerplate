@@ -92,7 +92,7 @@ export class AuditLogInterceptor implements NestInterceptor {
   private mapAction(method: string, url: string): string {
     if (url.includes('/auth/login')) return 'LOGIN'
     if (url.includes('/auth/logout')) return 'LOGOUT'
-    
+
     switch (method) {
       case 'POST':
         return 'CREATE'

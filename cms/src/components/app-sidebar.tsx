@@ -1,4 +1,12 @@
 import {
+  PERM_AUDIT_READ,
+  PERM_CATS_READ,
+  PERM_POSTS_READ,
+  PERM_SETTINGS_READ,
+  PERM_TAGS_READ,
+  PERM_USERS_READ,
+} from '@shared/constants/permissions'
+import {
   BadgeCheck,
   Bell,
   ChevronsUpDown,
@@ -37,14 +45,6 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar'
 import { usePermission } from '@/hooks/use-permission'
-import {
-  PERM_AUDIT_READ,
-  PERM_CATS_READ,
-  PERM_POSTS_READ,
-  PERM_SETTINGS_READ,
-  PERM_TAGS_READ,
-  PERM_USERS_READ,
-} from '@shared/constants/permissions'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/store/auth'
 

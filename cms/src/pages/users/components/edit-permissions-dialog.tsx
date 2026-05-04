@@ -1,3 +1,25 @@
+import {
+  hasPermission as checkPerm,
+  PERM_AUDIT_READ,
+  PERM_CATS_DELETE,
+  PERM_CATS_READ,
+  PERM_CATS_UPDATE,
+  PERM_CATS_WRITE,
+  PERM_POSTS_DELETE,
+  PERM_POSTS_READ,
+  PERM_POSTS_UPDATE,
+  PERM_POSTS_WRITE,
+  PERM_SETTINGS_READ,
+  PERM_SETTINGS_WRITE,
+  PERM_TAGS_DELETE,
+  PERM_TAGS_READ,
+  PERM_TAGS_UPDATE,
+  PERM_TAGS_WRITE,
+  PERM_USERS_DELETE,
+  PERM_USERS_READ,
+  PERM_USERS_UPDATE,
+  PERM_USERS_WRITE,
+} from '@shared/constants/permissions'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ShieldCheck } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -16,28 +38,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { userService } from '@/services/user.service'
 import { User } from '@/types'
 import { cn } from '@/utils/cn'
-import {
-  PERM_POSTS_READ,
-  PERM_POSTS_WRITE,
-  PERM_POSTS_UPDATE,
-  PERM_POSTS_DELETE,
-  PERM_CATS_READ,
-  PERM_CATS_WRITE,
-  PERM_CATS_UPDATE,
-  PERM_CATS_DELETE,
-  PERM_TAGS_READ,
-  PERM_TAGS_WRITE,
-  PERM_TAGS_UPDATE,
-  PERM_TAGS_DELETE,
-  PERM_USERS_READ,
-  PERM_USERS_WRITE,
-  PERM_USERS_UPDATE,
-  PERM_USERS_DELETE,
-  PERM_SETTINGS_READ,
-  PERM_SETTINGS_WRITE,
-  PERM_AUDIT_READ,
-  hasPermission as checkPerm,
-} from '@shared/constants/permissions'
 
 // Permission structure mapping
 const PERMISSION_GROUPS = [

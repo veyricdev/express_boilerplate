@@ -1,3 +1,4 @@
+import { PERM_SETTINGS_WRITE } from '@shared/constants/permissions'
 import { Info, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -6,7 +7,6 @@ import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { usePermission } from '@/hooks/use-permission'
-import { PERM_SETTINGS_WRITE } from '@shared/constants/permissions'
 import type { Setting } from '@/services/setting.service'
 
 interface SettingControlProps {

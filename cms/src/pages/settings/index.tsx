@@ -1,3 +1,4 @@
+import { PERM_SETTINGS_WRITE } from '@shared/constants/permissions'
 import { useMutation } from '@tanstack/react-query'
 import { BarChart, Globe, Mail, Palette, Search, Share2 } from 'lucide-react'
 import { useState } from 'react'
@@ -16,7 +17,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { usePermission } from '@/hooks/use-permission'
-import { PERM_SETTINGS_WRITE } from '@shared/constants/permissions'
 import type { SettingGroup } from '@/services/setting.service'
 import { bulkUpdateSettings, createSetting, deleteSetting } from '@/services/setting.service'
 import { useSettings } from '@/store/settings'
