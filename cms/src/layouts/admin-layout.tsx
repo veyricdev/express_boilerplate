@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import { Link, Outlet, useLocation } from 'react-router'
 import { AppSidebar } from '@/components/app-sidebar'
 import { ModeToggle } from '@/components/mode-toggle'
-import { useSettings } from '@/store/settings'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,6 +12,7 @@ import {
 } from '@/components/ui/breadcrumb'
 import { Separator } from '@/components/ui/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { useSettings } from '@/store/settings'
 
 const navigation = [
   { name: 'Dashboard', href: '/' },

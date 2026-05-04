@@ -161,13 +161,13 @@ export class PostsService {
 
   /** Soft delete — marks deletedAt, record remains in DB */
   async remove(id: number) {
-    await this.findOneAdmin(id)
+    const oldPost = await this.findOneAdmin(id)
     const deleted = await this.prisma.db.post.update({
       where: { id, deletedAt: undefined } as any,
       data: { deletedAt: new Date() },
     })
 
-    await this.prisma.logAudit('SOFT_DELETE', 'POST', id)
+    await this.prisma.logAudit('SOFT_DELETE', 'POST', id, oldPost, deleted)
     return deleted
   }
 
@@ -181,15 +181,15 @@ export class PostsService {
       data: { deletedAt: null },
     })
 
-    await this.prisma.logAudit('RESTORE', 'POST', id)
+    await this.prisma.logAudit('RESTORE', 'POST', id, post, restored)
     return restored
   }
 
   /** Hard delete — permanently removes record from DB */
   async hardDelete(id: number) {
-    await this.findOneAdmin(id)
+    const oldPost = await this.findOneAdmin(id)
 
-    await this.prisma.logAudit('HARD_DELETE', 'POST', id)
+    await this.prisma.logAudit('HARD_DELETE', 'POST', id, oldPost)
     return this.prisma.db.post.delete({
       where: { id, deletedAt: undefined } as any,
     })

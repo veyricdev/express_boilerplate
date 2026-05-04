@@ -1,21 +1,38 @@
-import { useEffect, useRef, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
+import { BarChart, Globe, Info, Mail, Palette, Plus, Save, Search, Share2, Trash2 } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Save, Globe, Search, Share2, Mail, BarChart, Palette, Plus, Trash2, Info } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { bulkUpdateSettings, createSetting, deleteSetting } from '@/services/setting.service'
 import type { Setting, SettingGroup, SettingType } from '@/services/setting.service'
+import { bulkUpdateSettings, createSetting, deleteSetting } from '@/services/setting.service'
 import { useSettings } from '@/store/settings'
 
 // ─── Form Value Helpers ──────────────────────────────────────────────────────
@@ -72,7 +89,12 @@ function SettingControl({
         )}
       </div>
       {!setting.isSystem && (
-        <Button variant='ghost' size='icon' className='size-6 text-destructive hover:text-destructive hover:bg-destructive/10' onClick={() => onDelete(setting.key)}>
+        <Button
+          variant='ghost'
+          size='icon'
+          className='size-6 text-destructive hover:text-destructive hover:bg-destructive/10'
+          onClick={() => onDelete(setting.key)}
+        >
           <Trash2 className='size-4' />
         </Button>
       )}
@@ -84,7 +106,11 @@ function SettingControl({
       <div className='space-y-2'>
         <LabelSection />
         <div className='flex items-center'>
-          <Switch id={setting.key} checked={value === 'true'} onCheckedChange={(v: boolean) => onChange(v ? 'true' : 'false')} />
+          <Switch
+            id={setting.key}
+            checked={value === 'true'}
+            onCheckedChange={(v: boolean) => onChange(v ? 'true' : 'false')}
+          />
           <span className='ml-3 text-sm text-muted-foreground'>{value === 'true' ? 'Bật' : 'Tắt'}</span>
         </div>
       </div>
@@ -118,7 +144,13 @@ function SettingControl({
     return (
       <div className='space-y-2'>
         <LabelSection />
-        <Textarea id={setting.key} value={value} onChange={(e) => onChange(e.target.value)} rows={4} className='font-mono text-xs' />
+        <Textarea
+          id={setting.key}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          rows={4}
+          className='font-mono text-xs'
+        />
       </div>
     )
   }
@@ -158,11 +190,7 @@ function SettingsTabPanel({
   }
 
   if (!grouped.length) {
-    return (
-      <div className='text-center py-8 text-muted-foreground'>
-        Chưa có cấu hình nào trong nhóm này.
-      </div>
-    )
+    return <div className='text-center py-8 text-muted-foreground'>Chưa có cấu hình nào trong nhóm này.</div>
   }
 
   return (
@@ -194,14 +222,19 @@ const TABS = [
   { key: 'SEO' as SettingGroup, label: 'SEO', icon: Search, description: 'Cấu hình tối ưu tìm kiếm' },
   { key: 'SOCIAL' as SettingGroup, label: 'Mạng xã hội', icon: Share2, description: 'Liên kết đến các mạng xã hội' },
   { key: 'MAIL' as SettingGroup, label: 'Email', icon: Mail, description: 'Cấu hình gửi nhận email' },
-  { key: 'ANALYTICS' as SettingGroup, label: 'Phân tích', icon: BarChart, description: 'Cấu hình tracking & analytics' },
+  {
+    key: 'ANALYTICS' as SettingGroup,
+    label: 'Phân tích',
+    icon: BarChart,
+    description: 'Cấu hình tracking & analytics',
+  },
   { key: 'THEME' as SettingGroup, label: 'Giao diện', icon: Palette, description: 'Tùy chỉnh màu sắc & UI' },
 ]
 
 export default function SettingsPage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [deleteKey, setDeleteKey] = useState<string | null>(null)
-  
+
   const [newSetting, setNewSetting] = useState({
     key: '',
     label: '',
@@ -214,7 +247,7 @@ export default function SettingsPage() {
   const settings = useSettings((s) => s.settings)
   const isStoreLoading = useSettings((s) => s.isLoading)
   const isLoaded = useSettings((s) => s.isLoaded)
-  
+
   const isLoading = isStoreLoading || (!isLoaded && settings.length === 0)
 
   const { mutate: saveSettings, isPending: isSaving } = useMutation({
@@ -276,7 +309,7 @@ export default function SettingsPage() {
           <h1 className='text-2xl font-bold tracking-tight'>Cấu hình hệ thống</h1>
           <p className='text-muted-foreground text-sm mt-1'>Quản lý các thông số chung của website</p>
         </div>
-        
+
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
             <Button className='gap-2'>
@@ -287,35 +320,38 @@ export default function SettingsPage() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Thêm cấu hình mới</DialogTitle>
-              <DialogDescription>
-                Tạo một cấu hình tùy chỉnh mới cho hệ thống.
-              </DialogDescription>
+              <DialogDescription>Tạo một cấu hình tùy chỉnh mới cho hệ thống.</DialogDescription>
             </DialogHeader>
             <form onSubmit={handleCreate} className='space-y-4 py-4'>
               <div className='space-y-2'>
                 <Label htmlFor='key'>Key (Unique)</Label>
-                <Input 
-                  id='key' 
-                  placeholder='ví dụ: site_announcement' 
+                <Input
+                  id='key'
+                  placeholder='ví dụ: site_announcement'
                   value={newSetting.key}
-                  onChange={(e) => setNewSetting({...newSetting, key: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '_')})}
+                  onChange={(e) =>
+                    setNewSetting({ ...newSetting, key: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '_') })
+                  }
                   required
                 />
               </div>
               <div className='space-y-2'>
                 <Label htmlFor='label'>Nhãn hiển thị</Label>
-                <Input 
-                  id='label' 
-                  placeholder='ví dụ: Thông báo hệ thống' 
+                <Input
+                  id='label'
+                  placeholder='ví dụ: Thông báo hệ thống'
                   value={newSetting.label}
-                  onChange={(e) => setNewSetting({...newSetting, label: e.target.value})}
+                  onChange={(e) => setNewSetting({ ...newSetting, label: e.target.value })}
                   required
                 />
               </div>
               <div className='grid grid-cols-2 gap-4'>
                 <div className='space-y-2'>
                   <Label>Loại dữ liệu</Label>
-                  <Select value={newSetting.type} onValueChange={(val: SettingType) => setNewSetting({...newSetting, type: val})}>
+                  <Select
+                    value={newSetting.type}
+                    onValueChange={(val: SettingType) => setNewSetting({ ...newSetting, type: val })}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -329,13 +365,18 @@ export default function SettingsPage() {
                 </div>
                 <div className='space-y-2'>
                   <Label>Nhóm cấu hình</Label>
-                  <Select value={newSetting.group} onValueChange={(val: SettingGroup) => setNewSetting({...newSetting, group: val})}>
+                  <Select
+                    value={newSetting.group}
+                    onValueChange={(val: SettingGroup) => setNewSetting({ ...newSetting, group: val })}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {TABS.map(t => (
-                        <SelectItem key={t.key} value={t.key}>{t.label}</SelectItem>
+                      {TABS.map((t) => (
+                        <SelectItem key={t.key} value={t.key}>
+                          {t.label}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -343,31 +384,29 @@ export default function SettingsPage() {
               </div>
               <div className='space-y-2'>
                 <Label htmlFor='description'>Mô tả (Không bắt buộc)</Label>
-                <Input 
-                  id='description' 
-                  placeholder='Giải thích ý nghĩa của cấu hình này' 
+                <Input
+                  id='description'
+                  placeholder='Giải thích ý nghĩa của cấu hình này'
                   value={newSetting.description}
-                  onChange={(e) => setNewSetting({...newSetting, description: e.target.value})}
+                  onChange={(e) => setNewSetting({ ...newSetting, description: e.target.value })}
                 />
               </div>
               <div className='space-y-2'>
                 <Label htmlFor='value'>Giá trị mặc định</Label>
                 {newSetting.type === 'BOOLEAN' ? (
                   <div className='flex items-center gap-2 pt-2'>
-                    <Switch 
-                      checked={newSetting.value === 'true'} 
-                      onCheckedChange={(c) => setNewSetting({...newSetting, value: c ? 'true' : 'false'})}
+                    <Switch
+                      checked={newSetting.value === 'true'}
+                      onCheckedChange={(c) => setNewSetting({ ...newSetting, value: c ? 'true' : 'false' })}
                     />
-                    <span className='text-sm text-muted-foreground'>
-                      {newSetting.value === 'true' ? 'Bật' : 'Tắt'}
-                    </span>
+                    <span className='text-sm text-muted-foreground'>{newSetting.value === 'true' ? 'Bật' : 'Tắt'}</span>
                   </div>
                 ) : (
-                  <Input 
-                    id='value' 
-                    placeholder={newSetting.type === 'IMAGE' ? 'https://...' : 'Nhập giá trị'} 
+                  <Input
+                    id='value'
+                    placeholder={newSetting.type === 'IMAGE' ? 'https://...' : 'Nhập giá trị'}
                     value={newSetting.value}
-                    onChange={(e) => setNewSetting({...newSetting, value: e.target.value})}
+                    onChange={(e) => setNewSetting({ ...newSetting, value: e.target.value })}
                   />
                 )}
               </div>
@@ -440,13 +479,13 @@ export default function SettingsPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>Hủy</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={(e) => {
-                e.preventDefault();
-                if (deleteKey) deleteCustomSetting(deleteKey);
+                e.preventDefault()
+                if (deleteKey) deleteCustomSetting(deleteKey)
               }}
               disabled={isDeleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
             >
               {isDeleting ? 'Đang xóa...' : 'Xóa cấu hình'}
             </AlertDialogAction>

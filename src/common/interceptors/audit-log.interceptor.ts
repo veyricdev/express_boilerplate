@@ -6,7 +6,7 @@ import { PrismaService } from '../../prisma/prisma.service'
 export class AuditLogInterceptor implements NestInterceptor {
   constructor(private readonly prisma: PrismaService) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
     const request = context.switchToHttp().getRequest()
     const { method, url, body, user, ip } = request
     const userAgent = request.headers['user-agent']
@@ -22,22 +22,23 @@ export class AuditLogInterceptor implements NestInterceptor {
       return next.handle()
     }
 
+    const entity = this.extractEntity(url)
+    const action = this.mapAction(method)
+    const urlEntityId = this.extractEntityId(url)
+    
     return next.handle().pipe(
       tap(async (data) => {
         try {
-          const entity = this.extractEntity(url)
-          const action = this.mapAction(method)
-
-          // For BigInt serialization in Json field, we might need to be careful
-          // but Prisma Json field handles standard objects.
-          // Body might contain BigInt if we're not careful, but usually it's just JSON.
-
+          const resolvedEntityId = data?.id || data?.key || body?.id || body?.key || urlEntityId || (typeof data === 'number' ? data : undefined)
+          // entityId in Prisma is Int?, so we must ensure it's a number. If it's a string key like 'site_name', it becomes null.
+          const numericEntityId = (resolvedEntityId && !Number.isNaN(Number(resolvedEntityId))) ? Number(resolvedEntityId) : null
+          
           await this.prisma.unfiltered.auditLog.create({
             data: {
               userId: user?.id,
               action,
               entity,
-              entityId: data?.id || body?.id || (typeof data === 'number' ? data : undefined),
+              entityId: numericEntityId,
               newData: body ? JSON.parse(JSON.stringify(body)) : null, // Clone to avoid ref issues
               ipAddress: typeof ip === 'string' ? ip : JSON.stringify(ip),
               userAgent: userAgent || null,
@@ -58,6 +59,18 @@ export class AuditLogInterceptor implements NestInterceptor {
     }
     return 'SYSTEM'
   }
+
+  private extractEntityId(url: string): string | undefined {
+    const parts = url.split('?')[0].split('/')
+    const adminIndex = parts.indexOf('admin')
+    // /admin/users/123 -> parts[adminIndex + 2] is '123'
+    if (adminIndex !== -1 && parts[adminIndex + 2] && parts[adminIndex + 2] !== 'bulk') {
+      return parts[adminIndex + 2]
+    }
+    return undefined
+  }
+
+
 
   private mapAction(method: string): string {
     switch (method) {

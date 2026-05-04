@@ -1,26 +1,40 @@
 import { useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
-import { Activity, Calendar, History, Search, Shield } from 'lucide-react'
-import { useState } from 'react'
+import { Activity, Calendar, Eye, History, Search, Shield } from 'lucide-react'
+import { useSearchParams } from 'react-router'
+import { SharedPagination } from '@/components/shared/shared-pagination'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import api from '@/services/api'
 import { AuditLog, PaginatedResponse } from '@/types'
 
 export default function AuditLogsPage() {
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const searchTerm = searchParams.get('search') || ''
+  const page = parseInt(searchParams.get('page') || '1', 10)
+  const limit = parseInt(searchParams.get('limit') || '10', 10)
 
   const { data: response, isLoading } = useQuery({
-    queryKey: ['audit-logs', searchTerm],
+    queryKey: ['audit-logs', searchTerm, page, limit],
     queryFn: () =>
       api.get<PaginatedResponse<AuditLog>>('/admin/audit-logs', {
-        params: { search: searchTerm },
+        params: { search: searchTerm, page, limit },
       }) as unknown as PaginatedResponse<AuditLog>,
   })
 
   const logs = response?.data || []
+  const meta = response?.meta
 
   const getActionBadge = (action: string) => {
     const actionUpper = action.toUpperCase()
@@ -75,7 +89,16 @@ export default function AuditLogsPage() {
               placeholder='Tìm kiếm hành động, người dùng, tài nguyên...'
               className='pl-10 bg-background/50 border-muted-foreground/20 focus-visible:ring-primary/20 h-10 w-full'
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                const newParams = new URLSearchParams(searchParams)
+                if (e.target.value) {
+                  newParams.set('search', e.target.value)
+                } else {
+                  newParams.delete('search')
+                }
+                newParams.set('page', '1')
+                setSearchParams(newParams, { replace: true })
+              }}
             />
           </div>
         </div>
@@ -123,15 +146,86 @@ export default function AuditLogsPage() {
                       </div>
                     </TableCell>
                     <TableCell className='px-6 py-4'>
-                      <div className='flex items-center gap-2 px-2 py-1 rounded bg-muted/50 w-fit border border-muted-foreground/10'>
-                        <Shield className='h-3.5 w-3.5 text-muted-foreground' />
-                        <span className='font-mono text-xs font-semibold'>{log.entity}</span>
+                      <div className='flex flex-col gap-1.5'>
+                        <div className='flex items-center gap-1.5 px-2 py-0.5 rounded bg-muted/50 w-fit border border-muted-foreground/10'>
+                          <Shield className='h-3 w-3 text-muted-foreground' />
+                          <span className='font-mono text-[10px] font-semibold'>{log.entity}</span>
+                          {log.entityId && (
+                            <>
+                              <span className='text-muted-foreground/40'>|</span>
+                              <span className='font-mono text-[10px] text-muted-foreground'>#{log.entityId}</span>
+                            </>
+                          )}
+                        </div>
+                        <span
+                          className='text-sm font-medium text-foreground line-clamp-2 max-w-[250px] whitespace-normal'
+                          title={
+                            log.newData?.title ||
+                            log.newData?.name ||
+                            log.newData?.email ||
+                            log.newData?.key ||
+                            log.oldData?.title ||
+                            log.oldData?.name ||
+                            log.oldData?.email ||
+                            log.oldData?.key ||
+                            ''
+                          }
+                        >
+                          {log.newData?.title ||
+                            log.newData?.name ||
+                            log.newData?.email ||
+                            log.newData?.key ||
+                            log.oldData?.title ||
+                            log.oldData?.name ||
+                            log.oldData?.email ||
+                            log.oldData?.key ||
+                            (log.entityId ? `Bản ghi #${log.entityId}` : '---')}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell className='px-6 py-4 max-w-[200px]'>
-                      <div className='text-xs text-muted-foreground/90 font-mono line-clamp-2 bg-muted/30 p-2 rounded border border-muted/20'>
-                        {log.newData ? JSON.stringify(log.newData) : '---'}
-                      </div>
+                      {log.newData || log.oldData ? (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant='outline'
+                              size='sm'
+                              className='h-7 text-xs bg-muted/30 border-muted/50 hover:bg-muted/50 gap-1.5'
+                            >
+                              <Eye className='w-3.5 h-3.5' />
+                              Xem payload
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className='sm:max-w-4xl max-h-[80vh] flex flex-col'>
+                            <DialogHeader>
+                              <DialogTitle>Chi tiết dữ liệu (Payload)</DialogTitle>
+                              <DialogDescription>
+                                Dữ liệu chi tiết của bản ghi {log.entity} {log.entityId ? `#${log.entityId}` : ''}
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className='flex-1 overflow-auto mt-2 space-y-4'>
+                              {log.newData && (
+                                <div className='space-y-2'>
+                                  <h4 className='text-sm font-semibold text-foreground'>Dữ liệu mới (New Data)</h4>
+                                  <pre className='bg-muted/50 p-4 rounded-lg text-xs font-mono overflow-auto border border-muted'>
+                                    {JSON.stringify(log.newData, null, 2)}
+                                  </pre>
+                                </div>
+                              )}
+                              {log.oldData && (
+                                <div className='space-y-2'>
+                                  <h4 className='text-sm font-semibold text-foreground'>Dữ liệu cũ (Old Data)</h4>
+                                  <pre className='bg-muted/50 p-4 rounded-lg text-xs font-mono overflow-auto border border-muted'>
+                                    {JSON.stringify(log.oldData, null, 2)}
+                                  </pre>
+                                </div>
+                              )}
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      ) : (
+                        <span className='text-xs text-muted-foreground italic'>Không có dữ liệu</span>
+                      )}
                     </TableCell>
                     <TableCell className='px-6 py-4'>
                       <div className='flex flex-col gap-1'>
@@ -161,6 +255,7 @@ export default function AuditLogsPage() {
             </TableBody>
           </Table>
         </div>
+        {meta && <SharedPagination meta={meta} />}
       </div>
     </div>
   )

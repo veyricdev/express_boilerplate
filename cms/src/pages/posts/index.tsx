@@ -2,20 +2,11 @@ import { useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { User as AuthorIcon, Calendar, Clock, Edit, Eye, Filter, Plus, Search, Trash2 } from 'lucide-react'
-import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useNavigate, useSearchParams } from 'react-router'
+import { SharedPagination } from '@/components/shared/shared-pagination'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { postService } from '@/services/post.service'
@@ -23,13 +14,15 @@ import { Post } from '@/types'
 import { cn } from '@/utils/cn'
 
 export default function PostsPage() {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [page, setPage] = useState(1)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const searchTerm = searchParams.get('search') || ''
+  const page = parseInt(searchParams.get('page') || '1', 10)
+  const limit = parseInt(searchParams.get('limit') || '10', 10)
   const navigate = useNavigate()
 
   const { data: response, isLoading } = useQuery({
-    queryKey: ['posts', searchTerm, page],
-    queryFn: () => postService.findAll({ search: searchTerm, page, limit: 10 }),
+    queryKey: ['posts', searchTerm, page, limit],
+    queryFn: () => postService.findAll({ search: searchTerm, page, limit }),
   })
 
   const posts = response?.data || []
@@ -70,104 +63,6 @@ export default function PostsPage() {
     }
   }
 
-  const renderPagination = () => {
-    if (!meta || meta.lastPage <= 1) return null
-
-    const pages = []
-    const maxVisiblePages = 5
-    let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2))
-    const endPage = Math.min(meta.lastPage, startPage + maxVisiblePages - 1)
-
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1)
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i)
-    }
-
-    return (
-      <div className='p-4 border-t bg-muted/20'>
-        <Pagination className='justify-end'>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                href='#'
-                text='Trước'
-                onClick={(e) => {
-                  e.preventDefault()
-                  if (page > 1) setPage(page - 1)
-                }}
-                className={cn(page === 1 && 'pointer-events-none opacity-50')}
-              />
-            </PaginationItem>
-
-            {startPage > 1 && (
-              <>
-                <PaginationItem>
-                  <PaginationLink
-                    href='#'
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setPage(1)
-                    }}
-                  >
-                    1
-                  </PaginationLink>
-                </PaginationItem>
-                {startPage > 2 && <PaginationEllipsis />}
-              </>
-            )}
-
-            {pages.map((p) => (
-              <PaginationItem key={p}>
-                <PaginationLink
-                  href='#'
-                  isActive={p === page}
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setPage(p)
-                  }}
-                >
-                  {p}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-
-            {endPage < meta.lastPage && (
-              <>
-                {endPage < meta.lastPage - 1 && <PaginationEllipsis />}
-                <PaginationItem>
-                  <PaginationLink
-                    href='#'
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setPage(meta.lastPage)
-                    }}
-                  >
-                    {meta.lastPage}
-                  </PaginationLink>
-                </PaginationItem>
-              </>
-            )}
-
-            <PaginationItem>
-              <PaginationNext
-                href='#'
-                text='Sau'
-                onClick={(e) => {
-                  e.preventDefault()
-                  if (page < meta.lastPage) setPage(page + 1)
-                }}
-                className={cn(page === meta.lastPage && 'pointer-events-none opacity-50')}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      </div>
-    )
-  }
-
   return (
     <div className='p-8 space-y-6'>
       <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
@@ -191,8 +86,14 @@ export default function PostsPage() {
               className='pl-10 h-10 bg-background focus-visible:ring-primary/20 transition-all'
               value={searchTerm}
               onChange={(e) => {
-                setSearchTerm(e.target.value)
-                setPage(1) // Reset to first page on search
+                const newParams = new URLSearchParams(searchParams)
+                if (e.target.value) {
+                  newParams.set('search', e.target.value)
+                } else {
+                  newParams.delete('search')
+                }
+                newParams.set('page', '1')
+                setSearchParams(newParams, { replace: true })
               }}
             />
           </div>
@@ -332,7 +233,7 @@ export default function PostsPage() {
             </TableBody>
           </Table>
         </div>
-        {renderPagination()}
+        {meta && <SharedPagination meta={meta} />}
       </div>
     </div>
   )

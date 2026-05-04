@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { CheckCircle2, Plus, Search, ShieldCheck, Trash2, XCircle } from 'lucide-react'
 import { useState } from 'react'
+import { useSearchParams } from 'react-router'
+import { SharedPagination } from '@/components/shared/shared-pagination'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -14,15 +16,6 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { userService } from '@/services/user.service'
@@ -53,14 +46,16 @@ const PERMISSIONS = [
 ]
 
 export default function UsersPage() {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [page, setPage] = useState(1)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const searchTerm = searchParams.get('search') || ''
+  const page = parseInt(searchParams.get('page') || '1', 10)
+  const limit = parseInt(searchParams.get('limit') || '10', 10)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
   const { data: response, isLoading } = useQuery({
-    queryKey: ['users', searchTerm, page],
-    queryFn: () => userService.findAll({ search: searchTerm, page, limit: 10 }),
+    queryKey: ['users', searchTerm, page, limit],
+    queryFn: () => userService.findAll({ search: searchTerm, page, limit }),
   })
 
   const users = response?.data || []
@@ -74,104 +69,6 @@ export default function UsersPage() {
     } catch {
       return false
     }
-  }
-
-  const renderPagination = () => {
-    if (!meta || meta.lastPage <= 1) return null
-
-    const pages = []
-    const maxVisiblePages = 5
-    let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2))
-    const endPage = Math.min(meta.lastPage, startPage + maxVisiblePages - 1)
-
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1)
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i)
-    }
-
-    return (
-      <div className='p-4 border-t bg-muted/20'>
-        <Pagination className='justify-end'>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                href='#'
-                text='Trước'
-                onClick={(e) => {
-                  e.preventDefault()
-                  if (page > 1) setPage(page - 1)
-                }}
-                className={cn(page === 1 && 'pointer-events-none opacity-50')}
-              />
-            </PaginationItem>
-
-            {startPage > 1 && (
-              <>
-                <PaginationItem>
-                  <PaginationLink
-                    href='#'
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setPage(1)
-                    }}
-                  >
-                    1
-                  </PaginationLink>
-                </PaginationItem>
-                {startPage > 2 && <PaginationEllipsis />}
-              </>
-            )}
-
-            {pages.map((p) => (
-              <PaginationItem key={p}>
-                <PaginationLink
-                  href='#'
-                  isActive={p === page}
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setPage(p)
-                  }}
-                >
-                  {p}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-
-            {endPage < meta.lastPage && (
-              <>
-                {endPage < meta.lastPage - 1 && <PaginationEllipsis />}
-                <PaginationItem>
-                  <PaginationLink
-                    href='#'
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setPage(meta.lastPage)
-                    }}
-                  >
-                    {meta.lastPage}
-                  </PaginationLink>
-                </PaginationItem>
-              </>
-            )}
-
-            <PaginationItem>
-              <PaginationNext
-                href='#'
-                text='Sau'
-                onClick={(e) => {
-                  e.preventDefault()
-                  if (page < meta.lastPage) setPage(page + 1)
-                }}
-                className={cn(page === meta.lastPage && 'pointer-events-none opacity-50')}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      </div>
-    )
   }
 
   return (
@@ -197,8 +94,14 @@ export default function UsersPage() {
               className='pl-10 bg-background border-muted-foreground/10 focus-visible:ring-primary/20 h-10 w-full rounded-xl'
               value={searchTerm}
               onChange={(e) => {
-                setSearchTerm(e.target.value)
-                setPage(1)
+                const newParams = new URLSearchParams(searchParams)
+                if (e.target.value) {
+                  newParams.set('search', e.target.value)
+                } else {
+                  newParams.delete('search')
+                }
+                newParams.set('page', '1')
+                setSearchParams(newParams, { replace: true })
               }}
             />
           </div>
@@ -330,7 +233,7 @@ export default function UsersPage() {
             </TableBody>
           </Table>
         </div>
-        {renderPagination()}
+        {meta && <SharedPagination meta={meta} />}
       </div>
 
       {/* Edit Permissions Dialog */}

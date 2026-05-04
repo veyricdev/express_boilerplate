@@ -90,12 +90,12 @@ export class TagsService {
 
   /** Soft delete */
   async remove(id: number) {
-    await this.findOneAdmin(id)
+    const oldTag = await this.findOneAdmin(id)
     const deleted = await this.prisma.db.tag.update({
       where: { id, deletedAt: undefined } as any,
       data: { deletedAt: new Date() },
     })
-    await this.prisma.logAudit('SOFT_DELETE', 'TAG', id)
+    await this.prisma.logAudit('SOFT_DELETE', 'TAG', id, oldTag, deleted)
     return deleted
   }
 
@@ -108,15 +108,15 @@ export class TagsService {
       where: { id, deletedAt: undefined } as any,
       data: { deletedAt: null },
     })
-    await this.prisma.logAudit('RESTORE', 'TAG', id)
+    await this.prisma.logAudit('RESTORE', 'TAG', id, tag, restored)
     return restored
   }
 
   /** Hard delete — permanently removes */
   async hardDelete(id: number) {
-    await this.findOneAdmin(id)
+    const oldTag = await this.findOneAdmin(id)
 
-    await this.prisma.logAudit('HARD_DELETE', 'TAG', id)
+    await this.prisma.logAudit('HARD_DELETE', 'TAG', id, oldTag)
     return this.prisma.db.tag.delete({
       where: { id, deletedAt: undefined } as any,
     })

@@ -77,7 +77,7 @@ export class UsersService {
       data: { deletedAt: new Date() },
     })
 
-    await this.prisma.logAudit('SOFT_DELETE', 'USER', id)
+    await this.prisma.logAudit('SOFT_DELETE', 'USER', id, user, deleted)
     return deleted
   }
 
@@ -92,7 +92,7 @@ export class UsersService {
       data: { deletedAt: null },
     })
 
-    await this.prisma.logAudit('RESTORE', 'USER', id)
+    await this.prisma.logAudit('RESTORE', 'USER', id, user, restored)
     return restored
   }
 
@@ -101,7 +101,7 @@ export class UsersService {
     const user = await this.prisma.unfiltered.user.findUnique({ where: { id } })
     if (!user) throw new NotFoundException('User not found')
 
-    await this.prisma.logAudit('HARD_DELETE', 'USER', id)
+    await this.prisma.logAudit('HARD_DELETE', 'USER', id, user)
     return this.prisma.unfiltered.user.delete({ where: { id } })
   }
 

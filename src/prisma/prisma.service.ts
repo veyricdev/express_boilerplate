@@ -216,10 +216,22 @@ export class PrismaService {
     this.db = createFilteredClient(base)
   }
 
-  async logAudit(action: string, entity: string, entityId: number) {
+  async logAudit(
+    action: string,
+    entity: string,
+    entityId: number,
+    oldData?: any,
+    newData?: any
+  ) {
     try {
       await this.db.auditLog.create({
-        data: { action, entity, entityId },
+        data: {
+          action,
+          entity,
+          entityId,
+          oldData: oldData ? JSON.parse(JSON.stringify(oldData)) : undefined,
+          newData: newData ? JSON.parse(JSON.stringify(newData)) : undefined,
+        },
       })
     } catch {
       // Audit log failure should not break the main operation

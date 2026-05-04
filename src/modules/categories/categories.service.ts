@@ -69,7 +69,7 @@ export class CategoriesService {
 
   /** Soft delete — also nullifies categoryId on all linked posts (cascade Option B) */
   async remove(id: number) {
-    await this.findOneAdmin(id)
+    const oldCat = await this.findOneAdmin(id)
 
     // Cascade: detach posts from this category before soft-deleting
     await this.prisma.db.post.updateMany({
@@ -82,7 +82,7 @@ export class CategoriesService {
       data: { deletedAt: new Date() },
     })
 
-    await this.prisma.logAudit('SOFT_DELETE', 'CATEGORY', id)
+    await this.prisma.logAudit('SOFT_DELETE', 'CATEGORY', id, oldCat, deleted)
     return deleted
   }
 
@@ -96,13 +96,14 @@ export class CategoriesService {
       data: { deletedAt: null },
     })
 
-    await this.prisma.logAudit('RESTORE', 'CATEGORY', id)
+    await this.prisma.logAudit('RESTORE', 'CATEGORY', id, cat, restored)
     return restored
   }
 
   /** Hard delete — permanently removes from DB */
   async hardDelete(id: number) {
-    await this.prisma.logAudit('HARD_DELETE', 'CATEGORY', id)
+    const oldCat = await this.findOneAdmin(id)
+    await this.prisma.logAudit('HARD_DELETE', 'CATEGORY', id, oldCat)
     return this.prisma.db.category.delete({
       where: { id, deletedAt: undefined } as any,
     })
