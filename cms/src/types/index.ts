@@ -1,6 +1,12 @@
 export enum PostStatus {
-  DRAFT = 'DRAFT',
   PUBLISHED = 'PUBLISHED',
+  DRAFT = 'DRAFT',
+}
+
+export enum TrashMode {
+  ACTIVE = 'active',
+  TRASH = 'trash',
+  ALL = 'all',
 }
 
 export interface User {
@@ -84,6 +90,12 @@ export interface PaginationParams {
   page?: number
   limit?: number
   search?: string
+  status?: string
+  trashMode?: TrashMode
+  categoryId?: number
+  author?: string
+  fromDate?: string
+  toDate?: string
 }
 
 export interface BaseResponse<T> {

@@ -1,10 +1,17 @@
-import { BadRequestException, ForbiddenException, Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common'
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import type { SettingGroup, SettingType } from '~/prisma/generated/prisma'
 import { PrismaService } from '~/prisma/prisma.service'
-import type { BulkUpdateSettingDto } from './dto/update-settings.dto'
 import type { CreateSettingDto } from './dto/create-setting.dto'
 import type { UpdateSettingMetadataDto } from './dto/update-setting-metadata.dto'
+import type { BulkUpdateSettingDto } from './dto/update-settings.dto'
 
 const CACHE_KEY = 'settings:all'
 const CACHE_TTL_SECONDS = 60 * 60 // 1 hour
@@ -36,7 +43,7 @@ export class SettingsService implements OnModuleInit {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly config: ConfigService,
+    private readonly config: ConfigService
   ) {}
 
   async onModuleInit() {
@@ -129,7 +136,7 @@ export class SettingsService implements OnModuleInit {
         isSystem: false, // Custom settings are always false
       },
     })
-    
+
     await this.cacheInvalidate()
     return setting
   }
@@ -185,11 +192,10 @@ export class SettingsService implements OnModuleInit {
         this.prisma.db.setting.update({
           where: { key },
           data: { value: value ?? null },
-        }),
-      ),
+        })
+      )
     )
     await this.cacheInvalidate()
     this.logger.log(`Settings cache invalidated after bulk update (${updates.length} keys)`)
   }
-
 }

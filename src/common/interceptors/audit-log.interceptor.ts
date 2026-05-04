@@ -25,14 +25,21 @@ export class AuditLogInterceptor implements NestInterceptor {
     const entity = this.extractEntity(url)
     const action = this.mapAction(method)
     const urlEntityId = this.extractEntityId(url)
-    
+
     return next.handle().pipe(
       tap(async (data) => {
         try {
-          const resolvedEntityId = data?.id || data?.key || body?.id || body?.key || urlEntityId || (typeof data === 'number' ? data : undefined)
+          const resolvedEntityId =
+            data?.id ||
+            data?.key ||
+            body?.id ||
+            body?.key ||
+            urlEntityId ||
+            (typeof data === 'number' ? data : undefined)
           // entityId in Prisma is Int?, so we must ensure it's a number. If it's a string key like 'site_name', it becomes null.
-          const numericEntityId = (resolvedEntityId && !Number.isNaN(Number(resolvedEntityId))) ? Number(resolvedEntityId) : null
-          
+          const numericEntityId =
+            resolvedEntityId && !Number.isNaN(Number(resolvedEntityId)) ? Number(resolvedEntityId) : null
+
           await this.prisma.unfiltered.auditLog.create({
             data: {
               userId: user?.id,
@@ -69,8 +76,6 @@ export class AuditLogInterceptor implements NestInterceptor {
     }
     return undefined
   }
-
-
 
   private mapAction(method: string): string {
     switch (method) {

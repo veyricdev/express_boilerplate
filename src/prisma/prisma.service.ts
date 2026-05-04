@@ -216,13 +216,7 @@ export class PrismaService {
     this.db = createFilteredClient(base)
   }
 
-  async logAudit(
-    action: string,
-    entity: string,
-    entityId: number,
-    oldData?: any,
-    newData?: any
-  ) {
+  async logAudit(action: string, entity: string, entityId: number, oldData?: any, newData?: any) {
     try {
       await this.db.auditLog.create({
         data: {

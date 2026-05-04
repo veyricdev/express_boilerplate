@@ -17,4 +17,3 @@ export default () => ({
   corsOrigins: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : '*',
   redisUrl: process.env.REDIS_URL, // optional — undefined means use in-memory cache
 })
-

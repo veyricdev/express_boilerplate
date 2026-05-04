@@ -15,10 +15,10 @@ import { AuthModule } from './modules/auth/auth.module'
 import { CategoriesModule } from './modules/categories/categories.module'
 import { CmsModule } from './modules/cms/cms.module'
 import { PostsModule } from './modules/posts/posts.module'
+import { SettingsModule } from './modules/settings/settings.module'
 import { TagsModule } from './modules/tags/tags.module'
 import { UsersModule } from './modules/users/users.module'
 import { PrismaModule } from './prisma/prisma.module'
-import { SettingsModule } from './modules/settings/settings.module'
 
 @Module({
   imports: [

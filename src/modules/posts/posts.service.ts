@@ -22,6 +22,9 @@ export class PostsService {
       status?: PostStatus
       search?: string
       trashMode?: TrashMode
+      author?: string
+      fromDate?: Date
+      toDate?: Date
     }
   ) {
     const trashMode = query?.trashMode || TrashMode.ACTIVE
@@ -32,12 +35,22 @@ export class PostsService {
         where: {
           ...(trashMode === TrashMode.TRASH ? { deletedAt: { not: null } } : {}),
           ...(trashMode === TrashMode.ALL ? { deletedAt: { not: undefined } } : {}),
-          // Note: If trashMode is ACTIVE (default), we don't pass deletedAt here,
-          // and the Prisma extension auto-injects { deletedAt: null }.
-          // Passing { not: undefined } is a trick to bypass the extension's 'in' check.
           categoryId: query?.categoryId,
           status: query?.status,
           postTags: query?.tagId ? { some: { tagId: query.tagId } } : undefined,
+          author: query?.author
+            ? {
+                OR: [{ fullName: { contains: query.author } }, { email: { contains: query.author } }],
+              }
+            : undefined,
+          publishedAt:
+            (query?.fromDate && !Number.isNaN(query.fromDate.getTime())) ||
+            (query?.toDate && !Number.isNaN(query.toDate.getTime()))
+              ? {
+                  gte: query.fromDate && !Number.isNaN(query.fromDate.getTime()) ? query.fromDate : undefined,
+                  lte: query.toDate && !Number.isNaN(query.toDate.getTime()) ? query.toDate : undefined,
+                }
+              : undefined,
           OR: query?.search
             ? [{ title: { contains: query.search } }, { content: { contains: query.search } }]
             : undefined,

@@ -22,12 +22,23 @@ export class FindPostsAdminDto extends PaginationDto {
   @IsString()
   search?: string
 
-  @ApiPropertyOptional({
-    enum: TrashMode,
-    default: TrashMode.ACTIVE,
-    description: 'Filter by deletion status: active (not deleted), trash (deleted only), all (both)',
-  })
+  @ApiPropertyOptional({ enum: TrashMode, default: TrashMode.ACTIVE })
   @IsOptional()
   @IsEnum(TrashMode)
   trashMode?: TrashMode = TrashMode.ACTIVE
+
+  @ApiPropertyOptional({ example: 'John Doe' })
+  @IsOptional()
+  @IsString()
+  author?: string
+
+  @ApiPropertyOptional({ example: '2024-01-01' })
+  @IsOptional()
+  @Type(() => Date)
+  fromDate?: Date
+
+  @ApiPropertyOptional({ example: '2024-12-31' })
+  @IsOptional()
+  @Type(() => Date)
+  toDate?: Date
 }

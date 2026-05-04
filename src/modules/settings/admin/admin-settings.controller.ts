@@ -4,10 +4,10 @@ import { PERM_SETTINGS_READ, PERM_SETTINGS_WRITE } from '~/common/constants/perm
 import { RequirePermissions } from '~/common/decorators/require-permissions.decorator'
 import { JwtAuthGuard } from '~/common/guards/jwt-auth.guard'
 import { PermissionsGuard } from '~/common/guards/permissions.guard'
-import { SettingsService } from '../settings.service'
-import { BulkUpdateSettingsDto } from '../dto/update-settings.dto'
 import { CreateSettingDto } from '../dto/create-setting.dto'
 import { UpdateSettingMetadataDto } from '../dto/update-setting-metadata.dto'
+import { BulkUpdateSettingsDto } from '../dto/update-settings.dto'
+import { SettingsService } from '../settings.service'
 
 @ApiTags('Admin Settings')
 @ApiBearerAuth()

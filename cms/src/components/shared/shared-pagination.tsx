@@ -67,6 +67,7 @@ export function SharedPagination({ meta }: SharedPaginationProps) {
               <SelectValue placeholder={limit} />
             </SelectTrigger>
             <SelectContent align='start' className='min-w-[65px]'>
+              <SelectItem value='10'>10</SelectItem>
               <SelectItem value='20'>20</SelectItem>
               <SelectItem value='50'>50</SelectItem>
               <SelectItem value='100'>100</SelectItem>

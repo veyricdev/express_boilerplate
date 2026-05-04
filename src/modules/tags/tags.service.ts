@@ -44,7 +44,7 @@ export class TagsService {
         where: {
           ...(trashMode === TrashMode.TRASH ? { deletedAt: { not: null } } : {}),
           ...(trashMode === TrashMode.ALL ? { deletedAt: { not: undefined } } : {}),
-          name: query?.search ? { contains: query.search, mode: 'insensitive' } : undefined,
+          name: query?.search ? { contains: query.search } : undefined,
         },
         include: { _count: { select: { postTags: true } } },
         orderBy: { name: 'asc' },

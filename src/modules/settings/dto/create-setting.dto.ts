@@ -1,5 +1,5 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator'
 import { SettingGroup, SettingType } from '~/prisma/generated/prisma'
 
 export class CreateSettingDto {
