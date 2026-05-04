@@ -30,4 +30,14 @@ export class FindAuditLogsDto extends PaginationDto {
   @Type(() => Number)
   @IsInt()
   entityId?: number
+
+  @ApiPropertyOptional({ description: 'Filter by start date' })
+  @IsOptional()
+  @IsString()
+  fromDate?: string
+
+  @ApiPropertyOptional({ description: 'Filter by end date' })
+  @IsOptional()
+  @IsString()
+  toDate?: string
 }

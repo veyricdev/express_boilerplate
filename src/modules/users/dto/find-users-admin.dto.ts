@@ -17,4 +17,18 @@ export class FindUsersAdminDto extends PaginationDto {
   @IsOptional()
   @IsString()
   search?: string
+
+  @ApiPropertyOptional({ description: 'Filter by active status' })
+  @IsOptional()
+  isActive?: boolean
+
+  @ApiPropertyOptional({ description: 'Filter by start date' })
+  @IsOptional()
+  @IsString()
+  fromDate?: string
+
+  @ApiPropertyOptional({ description: 'Filter by end date' })
+  @IsOptional()
+  @IsString()
+  toDate?: string
 }

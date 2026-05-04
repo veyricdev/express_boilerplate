@@ -222,6 +222,9 @@ importers:
       shadcn:
         specifier: ^4.6.0
         version: 4.6.0(@types/node@24.12.2)(typescript@5.9.3)
+      slugify:
+        specifier: ^1.6.9
+        version: 1.6.9
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.2.5(react@19.2.5))(react@19.2.5)

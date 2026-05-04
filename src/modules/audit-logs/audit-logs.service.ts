@@ -8,7 +8,7 @@ export class AuditLogsService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(query: FindAuditLogsDto) {
-    const { page, limit, entity, action, userId, entityId, search } = query
+    const { page, limit, entity, action, userId, entityId, search, fromDate, toDate } = query
 
     return paginate(
       this.prisma.db.auditLog,
@@ -26,6 +26,13 @@ export class AuditLogsService {
                 { user: { email: { contains: search } } },
               ]
             : undefined,
+          createdAt:
+            fromDate || toDate
+              ? {
+                  ...(fromDate ? { gte: new Date(fromDate) } : {}),
+                  ...(toDate ? { lte: new Date(new Date(toDate).setHours(23, 59, 59, 999)) } : {}),
+                }
+              : undefined,
         },
         orderBy: { createdAt: 'desc' },
         include: {

@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
-import { BarChart, Globe, Info, Mail, Palette, Plus, Save, Search, Share2, Trash2 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { BarChart, Globe, Mail, Palette, Search, Share2 } from 'lucide-react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import {
   AlertDialog,
@@ -12,210 +12,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Textarea } from '@/components/ui/textarea'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import type { Setting, SettingGroup, SettingType } from '@/services/setting.service'
+import type { SettingGroup } from '@/services/setting.service'
 import { bulkUpdateSettings, createSetting, deleteSetting } from '@/services/setting.service'
 import { useSettings } from '@/store/settings'
+import { AddSettingDialog } from './components/add-setting-dialog'
+import { SettingsTabPanel } from './components/settings-tab-panel'
 
-// ─── Form Value Helpers ──────────────────────────────────────────────────────
-
-function useSettingsForm(settings: Setting[], group: SettingGroup) {
-  const grouped = settings.filter((s) => s.group === group)
-  const [values, setValues] = useState<Record<string, string>>({})
-  const initialized = useRef(false)
-
-  useEffect(() => {
-    if (grouped.length && !initialized.current) {
-      const initial: Record<string, string> = {}
-      for (const s of grouped) initial[s.key] = s.value ?? ''
-      setValues(initial)
-      initialized.current = true
-    }
-  }, [grouped])
-
-  const setValue = (key: string, val: string) => setValues((prev) => ({ ...prev, [key]: val }))
-
-  return { grouped, values, setValue }
-}
-
-// ─── Single Setting Control ──────────────────────────────────────────────────
-
-function SettingControl({
-  setting,
-  value,
-  onChange,
-  onDelete,
-}: {
-  setting: Setting
-  value: string
-  onChange: (val: string) => void
-  onDelete: (key: string) => void
-}) {
-  const LabelSection = () => (
-    <div className='flex items-center justify-between mb-2'>
-      <div className='flex items-center gap-2'>
-        <Label htmlFor={setting.key} className='text-sm font-medium'>
-          {setting.label}
-        </Label>
-        {setting.description && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Info className='size-4 text-muted-foreground' />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className='max-w-xs text-sm'>{setting.description}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-      </div>
-      {!setting.isSystem && (
-        <Button
-          variant='ghost'
-          size='icon'
-          className='size-6 text-destructive hover:text-destructive hover:bg-destructive/10'
-          onClick={() => onDelete(setting.key)}
-        >
-          <Trash2 className='size-4' />
-        </Button>
-      )}
-    </div>
-  )
-
-  if (setting.type === 'BOOLEAN') {
-    return (
-      <div className='space-y-2'>
-        <LabelSection />
-        <div className='flex items-center'>
-          <Switch
-            id={setting.key}
-            checked={value === 'true'}
-            onCheckedChange={(v: boolean) => onChange(v ? 'true' : 'false')}
-          />
-          <span className='ml-3 text-sm text-muted-foreground'>{value === 'true' ? 'Bật' : 'Tắt'}</span>
-        </div>
-      </div>
-    )
-  }
-
-  if (setting.type === 'IMAGE') {
-    return (
-      <div className='space-y-2'>
-        <LabelSection />
-        <Input
-          id={setting.key}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder='https://example.com/image.png'
-          className='font-mono text-xs'
-        />
-        {value && (
-          <img
-            src={value}
-            alt={setting.label}
-            className='h-16 w-auto rounded-md border object-contain bg-muted/30 p-1'
-            onError={(e) => ((e.target as HTMLImageElement).style.display = 'none')}
-          />
-        )}
-      </div>
-    )
-  }
-
-  if (setting.type === 'JSON') {
-    return (
-      <div className='space-y-2'>
-        <LabelSection />
-        <Textarea
-          id={setting.key}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          rows={4}
-          className='font-mono text-xs'
-        />
-      </div>
-    )
-  }
-
-  // Default: TEXT
-  return (
-    <div className='space-y-2'>
-      <LabelSection />
-      <Input id={setting.key} value={value} onChange={(e) => onChange(e.target.value)} />
-    </div>
-  )
-}
-
-// ─── Tab Panel ───────────────────────────────────────────────────────────────
-
-function SettingsTabPanel({
-  settings,
-  group,
-  onSave,
-  onDelete,
-  isPending,
-}: {
-  settings: Setting[]
-  group: SettingGroup
-  onSave: (updates: { key: string; value: string | null }[]) => void
-  onDelete: (key: string) => void
-  isPending: boolean
-}) {
-  const { grouped, values, setValue } = useSettingsForm(settings, group)
-
-  const handleSave = () => {
-    const updates = grouped.map((s) => ({
-      key: s.key,
-      value: values[s.key] !== undefined ? (values[s.key] === '' ? null : values[s.key]) : s.value,
-    }))
-    onSave(updates)
-  }
-
-  if (!grouped.length) {
-    return <div className='text-center py-8 text-muted-foreground'>Chưa có cấu hình nào trong nhóm này.</div>
-  }
-
-  return (
-    <div className='space-y-6'>
-      <div className='space-y-6'>
-        {grouped.map((setting) => (
-          <div key={setting.key} className='border-b border-border/50 pb-6 last:border-0 last:pb-0'>
-            <SettingControl
-              setting={setting}
-              value={values[setting.key] ?? ''}
-              onChange={(val) => setValue(setting.key, val)}
-              onDelete={onDelete}
-            />
-          </div>
-        ))}
-      </div>
-      <Button onClick={handleSave} disabled={isPending} className='gap-2'>
-        <Save className='size-4' />
-        {isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
-      </Button>
-    </div>
-  )
-}
-
-// ─── Main Page ───────────────────────────────────────────────────────────────
+// ─── Constants ───────────────────────────────────────────────────────────────
 
 const TABS = [
   { key: 'GENERAL' as SettingGroup, label: 'Chung', icon: Globe, description: 'Thông tin cơ bản của website' },
@@ -232,17 +38,7 @@ const TABS = [
 ]
 
 export default function SettingsPage() {
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [deleteKey, setDeleteKey] = useState<string | null>(null)
-
-  const [newSetting, setNewSetting] = useState({
-    key: '',
-    label: '',
-    type: 'TEXT' as SettingType,
-    group: 'GENERAL' as SettingGroup,
-    description: '',
-    value: '',
-  })
 
   const settings = useSettings((s) => s.settings)
   const isStoreLoading = useSettings((s) => s.isLoading)
@@ -264,8 +60,6 @@ export default function SettingsPage() {
     onSuccess: async () => {
       toast.success('Đã thêm cấu hình thành công')
       await useSettings.getState().forceReload()
-      setIsAddDialogOpen(false)
-      setNewSetting({ key: '', label: '', type: 'TEXT', group: 'GENERAL', description: '', value: '' })
     },
     onError: (err: any) => {
       toast.error(err?.response?.data?.message || 'Thêm cấu hình thất bại')
@@ -289,138 +83,25 @@ export default function SettingsPage() {
     saveSettings({ settings: updates })
   }
 
-  const handleCreate = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newSetting.key || !newSetting.label) {
-      toast.error('Vui lòng nhập Key và Nhãn hiển thị')
-      return
-    }
+  const handleCreate = (data: any) => {
     createNewSetting({
-      ...newSetting,
-      description: newSetting.description || null,
-      value: newSetting.value || null,
+      ...data,
+      description: data.description || null,
+      value: data.value || null,
     })
   }
 
   return (
-    <div className='space-y-6 py-4'>
-      <div className='flex items-center justify-between'>
+    <div className='p-8 space-y-8 max-w-(--breakpoint-2xl) w-full mx-auto animate-in fade-in duration-500'>
+      <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
         <div>
-          <h1 className='text-2xl font-bold tracking-tight'>Cấu hình hệ thống</h1>
-          <p className='text-muted-foreground text-sm mt-1'>Quản lý các thông số chung của website</p>
+          <h1 className='text-3xl font-bold tracking-tight bg-linear-to-r from-foreground to-foreground/70 bg-clip-text text-transparent'>
+            Cấu hình hệ thống
+          </h1>
+          <p className='text-muted-foreground mt-1'>Quản lý các thông số chung của website</p>
         </div>
 
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className='gap-2'>
-              <Plus className='size-4' />
-              Thêm cấu hình
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Thêm cấu hình mới</DialogTitle>
-              <DialogDescription>Tạo một cấu hình tùy chỉnh mới cho hệ thống.</DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleCreate} className='space-y-4 py-4'>
-              <div className='space-y-2'>
-                <Label htmlFor='key'>Key (Unique)</Label>
-                <Input
-                  id='key'
-                  placeholder='ví dụ: site_announcement'
-                  value={newSetting.key}
-                  onChange={(e) =>
-                    setNewSetting({ ...newSetting, key: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '_') })
-                  }
-                  required
-                />
-              </div>
-              <div className='space-y-2'>
-                <Label htmlFor='label'>Nhãn hiển thị</Label>
-                <Input
-                  id='label'
-                  placeholder='ví dụ: Thông báo hệ thống'
-                  value={newSetting.label}
-                  onChange={(e) => setNewSetting({ ...newSetting, label: e.target.value })}
-                  required
-                />
-              </div>
-              <div className='grid grid-cols-2 gap-4'>
-                <div className='space-y-2'>
-                  <Label>Loại dữ liệu</Label>
-                  <Select
-                    value={newSetting.type}
-                    onValueChange={(val: SettingType) => setNewSetting({ ...newSetting, type: val })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value='TEXT'>Văn bản (TEXT)</SelectItem>
-                      <SelectItem value='BOOLEAN'>Bật/Tắt (BOOLEAN)</SelectItem>
-                      <SelectItem value='IMAGE'>Hình ảnh (IMAGE)</SelectItem>
-                      <SelectItem value='JSON'>JSON (JSON)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className='space-y-2'>
-                  <Label>Nhóm cấu hình</Label>
-                  <Select
-                    value={newSetting.group}
-                    onValueChange={(val: SettingGroup) => setNewSetting({ ...newSetting, group: val })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {TABS.map((t) => (
-                        <SelectItem key={t.key} value={t.key}>
-                          {t.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className='space-y-2'>
-                <Label htmlFor='description'>Mô tả (Không bắt buộc)</Label>
-                <Input
-                  id='description'
-                  placeholder='Giải thích ý nghĩa của cấu hình này'
-                  value={newSetting.description}
-                  onChange={(e) => setNewSetting({ ...newSetting, description: e.target.value })}
-                />
-              </div>
-              <div className='space-y-2'>
-                <Label htmlFor='value'>Giá trị mặc định</Label>
-                {newSetting.type === 'BOOLEAN' ? (
-                  <div className='flex items-center gap-2 pt-2'>
-                    <Switch
-                      checked={newSetting.value === 'true'}
-                      onCheckedChange={(c) => setNewSetting({ ...newSetting, value: c ? 'true' : 'false' })}
-                    />
-                    <span className='text-sm text-muted-foreground'>{newSetting.value === 'true' ? 'Bật' : 'Tắt'}</span>
-                  </div>
-                ) : (
-                  <Input
-                    id='value'
-                    placeholder={newSetting.type === 'IMAGE' ? 'https://...' : 'Nhập giá trị'}
-                    value={newSetting.value}
-                    onChange={(e) => setNewSetting({ ...newSetting, value: e.target.value })}
-                  />
-                )}
-              </div>
-              <DialogFooter className='pt-4'>
-                <Button type='button' variant='outline' onClick={() => setIsAddDialogOpen(false)}>
-                  Hủy
-                </Button>
-                <Button type='submit' disabled={isCreating}>
-                  {isCreating ? 'Đang thêm...' : 'Thêm cấu hình'}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+        <AddSettingDialog onSave={handleCreate} isPending={isCreating} tabs={TABS} />
       </div>
 
       {isLoading ? (
@@ -430,13 +111,13 @@ export default function SettingsPage() {
           ))}
         </div>
       ) : (
-        <Tabs defaultValue='GENERAL'>
-          <TabsList className='mb-6 h-auto p-1 flex flex-wrap max-w-full overflow-x-auto justify-start gap-1'>
+        <Tabs defaultValue='GENERAL' className='space-y-6'>
+          <TabsList className='bg-muted/50 border h-10! p-1 gap-1 rounded-xl shrink-0 w-fit flex-wrap md:flex-nowrap'>
             {TABS.map((tab) => (
               <TabsTrigger
                 key={tab.key}
                 value={tab.key}
-                className='gap-2 data-[state=active]:font-semibold flex-1 min-w-[120px]'
+                className='px-4 rounded-lg transition-all data-[state=active]:shadow-sm gap-2 h-full text-sm font-medium'
               >
                 <tab.icon className='size-4' />
                 {tab.label}
@@ -446,15 +127,19 @@ export default function SettingsPage() {
 
           {TABS.map((tab) => (
             <TabsContent key={tab.key} value={tab.key}>
-              <Card>
-                <CardHeader>
-                  <CardTitle className='flex items-center gap-2 text-lg'>
-                    <tab.icon className='size-5 text-primary' />
-                    {tab.label}
-                  </CardTitle>
-                  <CardDescription>{tab.description}</CardDescription>
+              <Card className='border shadow-sm rounded-2xl overflow-hidden'>
+                <CardHeader className='bg-muted/10 border-b py-5'>
+                  <div className='flex items-center gap-3'>
+                    <div className='p-2 bg-primary/10 rounded-xl'>
+                      <tab.icon className='size-5 text-primary' />
+                    </div>
+                    <div>
+                      <CardTitle className='text-lg font-bold'>{tab.label}</CardTitle>
+                      <CardDescription className='text-xs mt-0.5'>{tab.description}</CardDescription>
+                    </div>
+                  </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className='pt-6'>
                   <SettingsTabPanel
                     settings={settings}
                     group={tab.key}
@@ -470,7 +155,7 @@ export default function SettingsPage() {
       )}
 
       <AlertDialog open={!!deleteKey} onOpenChange={(open) => !open && setDeleteKey(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className='rounded-2xl'>
           <AlertDialogHeader>
             <AlertDialogTitle>Xóa cấu hình?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -478,14 +163,16 @@ export default function SettingsPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Hủy</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting} className='rounded-xl'>
+              Hủy
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault()
                 if (deleteKey) deleteCustomSetting(deleteKey)
               }}
               disabled={isDeleting}
-              className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+              className='bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl'
             >
               {isDeleting ? 'Đang xóa...' : 'Xóa cấu hình'}
             </AlertDialogAction>

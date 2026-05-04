@@ -46,7 +46,7 @@ export function SharedPagination({ meta }: SharedPaginationProps) {
   }
 
   const pages = []
-  const maxVisiblePages = 5
+  const maxVisiblePages = 3
   let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2))
   const endPage = Math.min(meta.lastPage, startPage + maxVisiblePages - 1)
 
@@ -59,11 +59,11 @@ export function SharedPagination({ meta }: SharedPaginationProps) {
   }
 
   return (
-    <div className='p-4 border-t bg-muted/20 flex flex-col sm:flex-row items-center justify-between gap-4'>
+    <div className='p-3 md:p-4 border-t bg-muted/20 flex flex-col sm:flex-row items-center justify-between gap-3 md:gap-4'>
       <div className='flex items-center gap-3'>
         <div className='flex items-center gap-2'>
           <Select value={limit.toString()} onValueChange={handleLimitChange}>
-            <SelectTrigger className='w-[65px] h-8 bg-background'>
+            <SelectTrigger className='w-[70px] bg-background rounded-xl'>
               <SelectValue placeholder={limit} />
             </SelectTrigger>
             <SelectContent align='start' className='min-w-[65px]'>

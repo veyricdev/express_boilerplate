@@ -17,4 +17,14 @@ export class FindCategoriesAdminDto extends PaginationDto {
   @IsOptional()
   @IsString()
   search?: string
+
+  @ApiPropertyOptional({ description: 'Filter by start date' })
+  @IsOptional()
+  @IsString()
+  fromDate?: string
+
+  @ApiPropertyOptional({ description: 'Filter by end date' })
+  @IsOptional()
+  @IsString()
+  toDate?: string
 }

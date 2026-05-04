@@ -96,6 +96,11 @@ export interface PaginationParams {
   author?: string
   fromDate?: string
   toDate?: string
+  isActive?: boolean
+  userId?: number
+  entity?: string
+  action?: string
+  entityId?: number
 }
 
 export interface BaseResponse<T> {

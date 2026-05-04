@@ -11,7 +11,7 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(query: FindUsersAdminDto) {
-    const { page, limit, search, trashMode } = query
+    const { page, limit, search, trashMode, isActive, fromDate, toDate } = query
 
     return paginate(
       this.prisma.db.user,
@@ -20,6 +20,14 @@ export class UsersService {
           ...(trashMode === TrashMode.TRASH ? { deletedAt: { not: null } } : {}),
           ...(trashMode === TrashMode.ALL ? { deletedAt: { not: undefined } } : {}),
           OR: search ? [{ fullName: { contains: search } }, { email: { contains: search } }] : undefined,
+          isActive: isActive !== undefined ? (typeof isActive === 'string' ? isActive === 'true' : isActive) : undefined,
+          createdAt:
+            fromDate || toDate
+              ? {
+                  ...(fromDate ? { gte: new Date(fromDate) } : {}),
+                  ...(toDate ? { lte: new Date(new Date(toDate).setHours(23, 59, 59, 999)) } : {}),
+                }
+              : undefined,
         },
         orderBy: { createdAt: 'desc' },
       },

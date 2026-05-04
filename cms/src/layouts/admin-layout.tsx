@@ -55,7 +55,7 @@ export default function AdminLayout() {
             <Separator orientation='vertical' className='mx-2 h-4 self-center!' />
             <Breadcrumb>
               <BreadcrumbList className='text-base flex items-center'>
-                <BreadcrumbItem className='hidden md:block'>
+                <BreadcrumbItem className='hidden lg:block'>
                   <BreadcrumbLink asChild>
                     <Link
                       to='/'
@@ -67,7 +67,7 @@ export default function AdminLayout() {
                 </BreadcrumbItem>
                 {currentNav && (
                   <>
-                    <BreadcrumbSeparator className='hidden md:block' />
+                    <BreadcrumbSeparator className='hidden lg:block' />
                     <BreadcrumbItem>
                       <BreadcrumbPage className='font-bold text-foreground'>{currentNav.name}</BreadcrumbPage>
                     </BreadcrumbItem>

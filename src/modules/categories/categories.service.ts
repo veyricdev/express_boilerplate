@@ -13,7 +13,10 @@ export class CategoriesService {
 
   // ─── Admin ───────────────────────────────────────────────────────────────
 
-  async findAllAdmin(pagination: PaginationDto, query?: { search?: string; trashMode?: TrashMode }) {
+  async findAllAdmin(
+    pagination: PaginationDto,
+    query?: { search?: string; trashMode?: TrashMode; fromDate?: string; toDate?: string }
+  ) {
     const trashMode = query?.trashMode || TrashMode.ACTIVE
 
     return paginate(
@@ -23,6 +26,13 @@ export class CategoriesService {
           ...(trashMode === TrashMode.TRASH ? { deletedAt: { not: null } } : {}),
           ...(trashMode === TrashMode.ALL ? { deletedAt: { not: undefined } } : {}),
           name: query?.search ? { contains: query.search } : undefined,
+          createdAt:
+            query?.fromDate || query?.toDate
+              ? {
+                  ...(query.fromDate ? { gte: new Date(query.fromDate) } : {}),
+                  ...(query.toDate ? { lte: new Date(new Date(query.toDate).setHours(23, 59, 59, 999)) } : {}),
+                }
+              : undefined,
         },
         include: { _count: { select: { posts: true } } },
         orderBy: { name: 'asc' },

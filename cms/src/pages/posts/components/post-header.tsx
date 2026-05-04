@@ -13,7 +13,7 @@ export function PostHeader() {
         </h1>
         <p className='text-muted-foreground'>Quản lý nội dung bài viết và xuất bản.</p>
       </div>
-      <Button className='h-10 shadow-lg shadow-primary/20 rounded-xl px-5' onClick={() => navigate('/posts/create')}>
+      <Button className='shadow-lg shadow-primary/20 rounded-xl px-5' onClick={() => navigate('/posts/create')}>
         <Plus className='mr-2 h-4 w-4' /> Viết bài mới
       </Button>
     </div>
