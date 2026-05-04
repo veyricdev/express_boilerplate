@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { hasAnyPermission, hasPermission, PERM_SUPER_ADMIN } from '@/lib/permissions'
+import { hasAnyPermission, hasPermission, PERM_SUPER_ADMIN } from '@shared/constants/permissions'
 import { useAuth } from '@/store/auth'
 
 export function usePermission() {

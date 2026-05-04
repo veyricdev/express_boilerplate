@@ -2,7 +2,7 @@ import { Plus } from 'lucide-react'
 import { useNavigate } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { usePermission } from '@/hooks/use-permission'
-import { PERM_POSTS_WRITE } from '@/lib/permissions'
+import { PERM_POSTS_WRITE } from '@shared/constants/permissions'
 
 export function PostHeader() {
   const navigate = useNavigate()

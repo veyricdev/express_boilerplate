@@ -2,7 +2,7 @@ import { ArrowLeft, Save, Send } from 'lucide-react'
 import { useNavigate } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { usePermission } from '@/hooks/use-permission'
-import { PERM_POSTS_UPDATE, PERM_POSTS_WRITE } from '@/lib/permissions'
+import { PERM_POSTS_UPDATE, PERM_POSTS_WRITE } from '@shared/constants/permissions'
 
 interface EditorHeaderProps {
   isEdit: boolean

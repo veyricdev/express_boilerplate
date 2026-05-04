@@ -6,7 +6,7 @@ import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { usePermission } from '@/hooks/use-permission'
-import { PERM_SETTINGS_WRITE } from '@/lib/permissions'
+import { PERM_SETTINGS_WRITE } from '@shared/constants/permissions'
 import type { Setting } from '@/services/setting.service'
 
 interface SettingControlProps {

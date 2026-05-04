@@ -1,7 +1,7 @@
 import { Plus, Tag as TagIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { usePermission } from '@/hooks/use-permission'
-import { PERM_TAGS_WRITE } from '@/lib/permissions'
+import { PERM_TAGS_WRITE } from '@shared/constants/permissions'
 
 interface TagHeaderProps {
   onAdd: () => void

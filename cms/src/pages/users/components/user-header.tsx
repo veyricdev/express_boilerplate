@@ -1,7 +1,7 @@
 import { Plus, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { usePermission } from '@/hooks/use-permission'
-import { PERM_USERS_WRITE } from '@/lib/permissions'
+import { PERM_USERS_WRITE } from '@shared/constants/permissions'
 
 interface UserHeaderProps {
   onAdd: () => void

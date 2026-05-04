@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { usePermission } from '@/hooks/use-permission'
-import { PERM_CATS_DELETE, PERM_CATS_UPDATE } from '@/lib/permissions'
+import { PERM_CATS_DELETE, PERM_CATS_UPDATE, PERM_POSTS_READ } from '@shared/constants/permissions'
 import { categoryService } from '@/services/category.service'
 import { Category } from '@/types'
 import { cn } from '@/utils/cn'
@@ -142,15 +142,24 @@ export function CategoryTable({ categories, isLoading, onEdit }: CategoryTablePr
                   </div>
                 </TableCell>
                 <TableCell className='px-6 py-5'>
-                  <span className='text-xs text-muted-foreground line-clamp-2 max-w-[200px] italic'>
+                  <span className='text-xs text-muted-foreground line-clamp-2 text-wrap max-w-[200px] italic'>
                     {category.description || 'Chưa có mô tả'}
                   </span>
                 </TableCell>
                 <TableCell className='px-6 py-5'>
                   <Badge
                     variant='outline'
-                    className='font-bold bg-muted/50 border-muted-foreground/10 text-[11px] rounded-lg px-2 py-1 cursor-pointer hover:bg-primary/10 hover:text-primary transition-colors'
-                    onClick={() => navigate(`/posts?categoryId=${category.id}`)}
+                    className={cn(
+                      'font-bold bg-muted/50 border-muted-foreground/10 text-[11px] rounded-lg px-2 py-1',
+                      permission.has(PERM_POSTS_READ)
+                        ? 'cursor-pointer hover:bg-primary/10 hover:text-primary transition-colors'
+                        : 'opacity-70 cursor-not-allowed'
+                    )}
+                    onClick={() => {
+                      if (permission.has(PERM_POSTS_READ)) {
+                        navigate(`/posts?categoryId=${category.id}`)
+                      }
+                    }}
                   >
                     {category.postCount} BÀI VIẾT
                   </Badge>

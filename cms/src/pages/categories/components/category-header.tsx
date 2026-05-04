@@ -1,7 +1,7 @@
 import { FolderTree, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { usePermission } from '@/hooks/use-permission'
-import { PERM_CATS_WRITE } from '@/lib/permissions'
+import { PERM_CATS_WRITE } from '@shared/constants/permissions'
 
 interface CategoryHeaderProps {
   onAdd: () => void

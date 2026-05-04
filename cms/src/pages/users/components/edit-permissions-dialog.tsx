@@ -16,55 +16,77 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { userService } from '@/services/user.service'
 import { User } from '@/types'
 import { cn } from '@/utils/cn'
+import {
+  PERM_POSTS_READ,
+  PERM_POSTS_WRITE,
+  PERM_POSTS_UPDATE,
+  PERM_POSTS_DELETE,
+  PERM_CATS_READ,
+  PERM_CATS_WRITE,
+  PERM_CATS_UPDATE,
+  PERM_CATS_DELETE,
+  PERM_TAGS_READ,
+  PERM_TAGS_WRITE,
+  PERM_TAGS_UPDATE,
+  PERM_TAGS_DELETE,
+  PERM_USERS_READ,
+  PERM_USERS_WRITE,
+  PERM_USERS_UPDATE,
+  PERM_USERS_DELETE,
+  PERM_SETTINGS_READ,
+  PERM_SETTINGS_WRITE,
+  PERM_AUDIT_READ,
+  hasPermission as checkPerm,
+} from '@shared/constants/permissions'
 
 // Permission structure mapping
 const PERMISSION_GROUPS = [
   {
     entity: 'Bài viết',
     actions: [
-      { bit: 0, type: 'READ', label: 'Xem' },
-      { bit: 1, type: 'CREATE', label: 'Thêm' },
-      { bit: 2, type: 'UPDATE', label: 'Sửa' },
-      { bit: 3, type: 'DELETE', label: 'Xóa' },
+      { perm: PERM_POSTS_READ, type: 'READ', label: 'Xem' },
+      { perm: PERM_POSTS_WRITE, type: 'CREATE', label: 'Thêm' },
+      { perm: PERM_POSTS_UPDATE, type: 'UPDATE', label: 'Sửa' },
+      { perm: PERM_POSTS_DELETE, type: 'DELETE', label: 'Xóa' },
     ],
   },
   {
     entity: 'Danh mục',
     actions: [
-      { bit: 4, type: 'READ', label: 'Xem' },
-      { bit: 5, type: 'CREATE', label: 'Thêm' },
-      { bit: 6, type: 'UPDATE', label: 'Sửa' },
-      { bit: 7, type: 'DELETE', label: 'Xóa' },
+      { perm: PERM_CATS_READ, type: 'READ', label: 'Xem' },
+      { perm: PERM_CATS_WRITE, type: 'CREATE', label: 'Thêm' },
+      { perm: PERM_CATS_UPDATE, type: 'UPDATE', label: 'Sửa' },
+      { perm: PERM_CATS_DELETE, type: 'DELETE', label: 'Xóa' },
     ],
   },
   {
     entity: 'Thẻ (Tags)',
     actions: [
-      { bit: 8, type: 'READ', label: 'Xem' },
-      { bit: 9, type: 'CREATE', label: 'Thêm' },
-      { bit: 10, type: 'UPDATE', label: 'Sửa' },
-      { bit: 11, type: 'DELETE', label: 'Xóa' },
+      { perm: PERM_TAGS_READ, type: 'READ', label: 'Xem' },
+      { perm: PERM_TAGS_WRITE, type: 'CREATE', label: 'Thêm' },
+      { perm: PERM_TAGS_UPDATE, type: 'UPDATE', label: 'Sửa' },
+      { perm: PERM_TAGS_DELETE, type: 'DELETE', label: 'Xóa' },
     ],
   },
   {
     entity: 'Người dùng',
     actions: [
-      { bit: 12, type: 'READ', label: 'Xem' },
-      { bit: 13, type: 'CREATE', label: 'Thêm' },
-      { bit: 14, type: 'UPDATE', label: 'Sửa' },
-      { bit: 15, type: 'DELETE', label: 'Xóa' },
+      { perm: PERM_USERS_READ, type: 'READ', label: 'Xem' },
+      { perm: PERM_USERS_WRITE, type: 'CREATE', label: 'Thêm' },
+      { perm: PERM_USERS_UPDATE, type: 'UPDATE', label: 'Sửa' },
+      { perm: PERM_USERS_DELETE, type: 'DELETE', label: 'Xóa' },
     ],
   },
   {
     entity: 'Cài đặt',
     actions: [
-      { bit: 17, type: 'READ', label: 'Xem' },
-      { bit: 18, type: 'UPDATE', label: 'Sửa' },
+      { perm: PERM_SETTINGS_READ, type: 'READ', label: 'Xem' },
+      { perm: PERM_SETTINGS_WRITE, type: 'UPDATE', label: 'Sửa' },
     ],
   },
   {
     entity: 'Nhật ký',
-    actions: [{ bit: 16, type: 'READ', label: 'Xem' }],
+    actions: [{ perm: PERM_AUDIT_READ, type: 'READ', label: 'Xem' }],
   },
 ]
 
@@ -106,21 +128,19 @@ export function EditPermissionsDialog({ user, isOpen, onClose }: EditPermissions
     },
   })
 
-  const hasPermission = (permissions: string, bit: number) => {
+  const hasPermission = (permissions: string, permVal: bigint) => {
     if (!permissions) return false
     try {
-      const p = BigInt(permissions)
-      return (p & (1n << BigInt(bit))) !== 0n
+      return checkPerm(permissions, permVal)
     } catch {
       return false
     }
   }
 
-  const togglePermission = (bit: number) => {
+  const togglePermission = (permVal: bigint) => {
     try {
       const p = BigInt(localPermissions)
-      const bitVal = 1n << BigInt(bit)
-      const newP = (p & bitVal) !== 0n ? p ^ bitVal : p | bitVal
+      const newP = checkPerm(localPermissions, permVal) ? p ^ permVal : p | permVal
       setLocalPermissions(newP.toString())
     } catch {
       // Ignore invalid bigint strings
@@ -193,12 +213,12 @@ export function EditPermissionsDialog({ user, isOpen, onClose }: EditPermissions
                         <TableCell
                           key={actionType.type}
                           className='px-4 py-4 text-center'
-                          onClick={() => togglePermission(permission.bit)}
+                          onClick={() => togglePermission(permission.perm)}
                         >
                           <div className='flex justify-center'>
                             <Checkbox
-                              checked={hasPermission(localPermissions, permission.bit)}
-                              onCheckedChange={() => togglePermission(permission.bit)}
+                              checked={hasPermission(localPermissions, permission.perm)}
+                              onCheckedChange={() => togglePermission(permission.perm)}
                               className='rounded-md border-primary/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary transition-all duration-200 hover:scale-110'
                             />
                           </div>

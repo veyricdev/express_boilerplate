@@ -44,7 +44,7 @@ import {
   PERM_SETTINGS_READ,
   PERM_TAGS_READ,
   PERM_USERS_READ,
-} from '@/lib/permissions'
+} from '@shared/constants/permissions'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/store/auth'
 

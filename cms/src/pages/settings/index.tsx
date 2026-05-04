@@ -16,7 +16,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { usePermission } from '@/hooks/use-permission'
-import { PERM_SETTINGS_WRITE } from '@/lib/permissions'
+import { PERM_SETTINGS_WRITE } from '@shared/constants/permissions'
 import type { SettingGroup } from '@/services/setting.service'
 import { bulkUpdateSettings, createSetting, deleteSetting } from '@/services/setting.service'
 import { useSettings } from '@/store/settings'
