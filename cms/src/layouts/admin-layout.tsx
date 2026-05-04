@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Link, Outlet, useLocation } from 'react-router'
 import { AppSidebar } from '@/components/app-sidebar'
 import { ModeToggle } from '@/components/mode-toggle'
+import { useSettings } from '@/store/settings'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -20,14 +21,21 @@ const navigation = [
   { name: 'Tags', href: '/tags' },
   { name: 'Audit Logs', href: '/audit-logs' },
   { name: 'Người dùng', href: '/users' },
+  { name: 'Cấu hình', href: '/settings' },
 ]
 
 export default function AdminLayout() {
   const location = useLocation()
+  const loadSettings = useSettings((s) => s.loadSettings)
 
   const currentNav = navigation.find(
     (n) => location.pathname === n.href || (n.href !== '/' && location.pathname.startsWith(n.href))
   )
+
+  useEffect(() => {
+    // Load global settings once when entering admin area
+    loadSettings()
+  }, [loadSettings])
 
   useEffect(() => {
     if (currentNav) {

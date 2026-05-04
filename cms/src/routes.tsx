@@ -14,6 +14,7 @@ const CategoriesPage = lazy(() => import('@/pages/categories'))
 const TagsPage = lazy(() => import('@/pages/tags'))
 const UsersPage = lazy(() => import('@/pages/users'))
 const AuditLogsPage = lazy(() => import('@/pages/audit-logs'))
+const SettingsPage = lazy(() => import('@/pages/settings'))
 
 const ProtectedRoute = () => {
   const isAuthenticated = useAuth((state) => state.isAuthenticated)
@@ -95,6 +96,14 @@ export const router = createBrowserRouter(
               element: (
                 <Suspense fallback={null}>
                   <AuditLogsPage />
+                </Suspense>
+              ),
+            },
+            {
+              path: 'settings',
+              element: (
+                <Suspense fallback={null}>
+                  <SettingsPage />
                 </Suspense>
               ),
             },

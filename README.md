@@ -20,6 +20,7 @@ Một boilerplate chuyên nghiệp sử dụng **NestJS (Fastify)** làm backend
 - **📝 CMS & User Management**: 
   - Quản lý bài viết với trạng thái **Scheduled Publishing** (hẹn giờ đăng bài).
   - Quản lý người dùng nâng cao (Tạo mới, phân quyền, trạng thái hoạt động).
+  - **Hybrid Global Settings**: Quản lý cấu hình chung linh hoạt, chia thành Core Settings (cố định) và Custom Settings (tùy chỉnh), hỗ trợ đa dạng kiểu dữ liệu. Tối ưu caching với Redis hoặc In-memory.
 - **🕵️ Audit Logging System**: 
   - Tự động ghi lại mọi thao tác thay đổi dữ liệu (`POST`, `PATCH`, `DELETE`) của Admin.
   - Xem lịch sử hoạt động, chi tiết dữ liệu cũ và mới, IP người thực hiện.

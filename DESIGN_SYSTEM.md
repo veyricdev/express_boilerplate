@@ -70,6 +70,13 @@ Sử dụng **Prisma Client Extensions** để can thiệp vào vòng đời c�
 Mọi thay đổi dữ liệu từ phía Admin đều được ghi lại thông qua `AuditLogInterceptor`:
 - Lưu trữ: Người thực hiện, Hành động, Thực thể, ID thực thể, Dữ liệu cũ, Dữ liệu mới, IP, User Agent.
 
+### 3.4. Global Settings (Hybrid)
+Hệ thống cấu hình được chia thành hai luồng để đảm bảo an toàn và linh hoạt:
+- **Core Settings (`isSystem: true`)**: Được seed từ mã nguồn, không thể xóa, chỉ có thể cập nhật giá trị.
+- **Custom Settings (`isSystem: false`)**: Admin có thể tạo, chỉnh sửa và xóa qua giao diện CMS.
+- **Caching**: Dữ liệu Settings ưu tiên lưu qua `ioredis` (Redis) giúp các Request cực kỳ nhanh, có cơ chế tự động xoay vòng (invalidate) khi có cập nhật.
+- **Frontend Sync**: Sử dụng `Zustand` kết hợp Server Side Cache để khởi tạo initial data, tránh tình trạng Double-Fetching trên React Query.
+
 ---
 
 ## 🎨 4. Ngôn ngữ Thiết kế UI/UX (Frontend Design)

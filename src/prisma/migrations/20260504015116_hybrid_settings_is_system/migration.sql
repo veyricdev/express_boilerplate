@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE `settings` ADD COLUMN `description` TEXT NULL,
+    ADD COLUMN `is_system` BOOLEAN NOT NULL DEFAULT false,
+    MODIFY `group` ENUM('GENERAL', 'SEO', 'SOCIAL', 'MAIL', 'ANALYTICS', 'THEME') NOT NULL DEFAULT 'GENERAL';

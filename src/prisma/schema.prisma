@@ -157,3 +157,39 @@ model AuditLog {
   @@index([entity, entityId])
   @@map("audit_logs")
 }
+
+// =============================================================================
+// SETTINGS
+// =============================================================================
+
+enum SettingType {
+  TEXT
+  BOOLEAN
+  IMAGE
+  JSON
+}
+
+enum SettingGroup {
+  GENERAL
+  SEO
+  SOCIAL
+  MAIL
+  ANALYTICS
+  THEME
+}
+
+model Setting {
+  id          Int          @id @default(autoincrement()) @db.UnsignedInt
+  key         String       @unique @db.VarChar(100)
+  value       String?      @db.Text
+  type        SettingType  @default(TEXT)
+  group       SettingGroup @default(GENERAL)
+  label       String       @db.VarChar(150)
+  description String?      @db.Text
+  isSystem    Boolean      @default(false) @map("is_system")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  @@index([group])
+  @@map("settings")
+}

@@ -97,6 +97,53 @@ async function main() {
     })
   }
   console.log('✅ 100 posts created')
+
+  // 5. Global Settings
+  const defaultSettings = [
+    // GENERAL
+    { key: 'site_name', label: 'Tên Website', description: 'Tên chính của website, hiển thị ở tiêu đề và các vị trí nổi bật', type: 'TEXT' as const, group: 'GENERAL' as const, value: 'NEST CMS', isSystem: true },
+    { key: 'site_description', label: 'Mô tả ngắn', description: 'Mô tả chung về website (hiển thị footer, giới thiệu)', type: 'TEXT' as const, group: 'GENERAL' as const, value: 'A powerful CMS built with NestJS & React', isSystem: true },
+    { key: 'site_logo', label: 'Logo Website', description: 'Logo chính (nên dùng nền trong suốt PNG/SVG)', type: 'IMAGE' as const, group: 'GENERAL' as const, value: null, isSystem: true },
+    { key: 'site_favicon', label: 'Favicon', description: 'Biểu tượng nhỏ hiển thị trên tab trình duyệt (kích thước chuẩn 32x32 hoặc 64x64)', type: 'IMAGE' as const, group: 'GENERAL' as const, value: null, isSystem: true },
+    { key: 'maintenance_mode', label: 'Chế độ bảo trì', description: 'Bật chế độ bảo trì. Người dùng bình thường sẽ thấy trang thông báo bảo trì', type: 'BOOLEAN' as const, group: 'GENERAL' as const, value: 'false', isSystem: true },
+
+    // SEO
+    { key: 'seo_default_title', label: 'SEO Title mặc định', description: 'Tiêu đề mặc định nếu trang không được thiết lập tiêu đề riêng', type: 'TEXT' as const, group: 'SEO' as const, value: 'NEST CMS - Content Management System', isSystem: true },
+    { key: 'seo_default_description', label: 'SEO Description mặc định', description: 'Mô tả ngắn gọn dành cho các công cụ tìm kiếm', type: 'TEXT' as const, group: 'SEO' as const, value: 'Nền tảng quản trị nội dung mạnh mẽ, tối ưu hóa cho tốc độ và khả năng mở rộng.', isSystem: true },
+    { key: 'seo_default_keywords', label: 'SEO Keywords', description: 'Các từ khóa chính của website (cách nhau bằng dấu phẩy)', type: 'TEXT' as const, group: 'SEO' as const, value: 'cms, nestjs, react, admin', isSystem: true },
+    { key: 'seo_default_og_image', label: 'OG Image mặc định', description: 'Hình ảnh hiển thị khi chia sẻ link lên mạng xã hội (Facebook, Zalo...)', type: 'IMAGE' as const, group: 'SEO' as const, value: null, isSystem: true },
+
+    // SOCIAL
+    { key: 'social_facebook', label: 'URL Facebook', description: 'Đường dẫn đến trang Fanpage hoặc trang cá nhân Facebook', type: 'TEXT' as const, group: 'SOCIAL' as const, value: '', isSystem: true },
+    { key: 'social_twitter', label: 'URL X (Twitter)', description: 'Đường dẫn đến hồ sơ X (Twitter)', type: 'TEXT' as const, group: 'SOCIAL' as const, value: '', isSystem: true },
+    { key: 'social_instagram', label: 'URL Instagram', description: 'Đường dẫn đến hồ sơ Instagram', type: 'TEXT' as const, group: 'SOCIAL' as const, value: '', isSystem: true },
+    { key: 'social_linkedin', label: 'URL LinkedIn', description: 'Đường dẫn đến hồ sơ công ty trên LinkedIn', type: 'TEXT' as const, group: 'SOCIAL' as const, value: '', isSystem: true },
+    { key: 'social_youtube', label: 'URL Youtube', description: 'Đường dẫn đến kênh Youtube', type: 'TEXT' as const, group: 'SOCIAL' as const, value: '', isSystem: true },
+
+    // MAIL (SMTP)
+    { key: 'smtp_host', label: 'SMTP Host', description: 'Địa chỉ máy chủ gửi email (VD: smtp.gmail.com)', type: 'TEXT' as const, group: 'MAIL' as const, value: '', isSystem: true },
+    { key: 'smtp_port', label: 'SMTP Port', description: 'Cổng kết nối SMTP (thường là 465, 587)', type: 'TEXT' as const, group: 'MAIL' as const, value: '587', isSystem: true },
+    { key: 'smtp_user', label: 'SMTP User', description: 'Tên đăng nhập hoặc địa chỉ email gửi đi', type: 'TEXT' as const, group: 'MAIL' as const, value: '', isSystem: true },
+    { key: 'smtp_from_address', label: 'From Address', description: 'Địa chỉ người gửi mặc định (VD: noreply@domain.com)', type: 'TEXT' as const, group: 'MAIL' as const, value: '', isSystem: true },
+
+    // ANALYTICS
+    { key: 'analytics_ga_id', label: 'Google Analytics ID', description: 'Mã theo dõi Google Analytics (Định dạng: G-XXXXXXXXXX)', type: 'TEXT' as const, group: 'ANALYTICS' as const, value: '', isSystem: true },
+    { key: 'analytics_fb_pixel', label: 'Facebook Pixel ID', description: 'Mã Facebook Pixel dùng để theo dõi chuyển đổi', type: 'TEXT' as const, group: 'ANALYTICS' as const, value: '', isSystem: true },
+
+    // THEME
+    { key: 'theme_primary_color', label: 'Màu chủ đạo (Primary Color)', description: 'Mã màu Hex cho các thành phần chính (VD: #3b82f6)', type: 'TEXT' as const, group: 'THEME' as const, value: '#0f172a', isSystem: true },
+    { key: 'theme_font_family', label: 'Font Family', description: 'Tên font chữ chính sử dụng trên website (VD: Inter, Roboto)', type: 'TEXT' as const, group: 'THEME' as const, value: 'Inter', isSystem: true },
+    { key: 'theme_default_dark_mode', label: 'Dark Mode mặc định', description: 'Website hiển thị giao diện tối mặc định khi truy cập lần đầu', type: 'BOOLEAN' as const, group: 'THEME' as const, value: 'false', isSystem: true },
+  ]
+  for (const setting of defaultSettings) {
+    await prisma.setting.upsert({
+      where: { key: setting.key },
+      create: setting,
+      update: {},
+    })
+  }
+  console.log('✅ Default settings seeded')
+
   console.log('🏁 Seed completed successfully')
 }
 

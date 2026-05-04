@@ -15,4 +15,6 @@ export default () => ({
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
   },
   corsOrigins: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : '*',
+  redisUrl: process.env.REDIS_URL, // optional — undefined means use in-memory cache
 })
+

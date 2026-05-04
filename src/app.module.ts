@@ -18,6 +18,7 @@ import { PostsModule } from './modules/posts/posts.module'
 import { TagsModule } from './modules/tags/tags.module'
 import { UsersModule } from './modules/users/users.module'
 import { PrismaModule } from './prisma/prisma.module'
+import { SettingsModule } from './modules/settings/settings.module'
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { PrismaModule } from './prisma/prisma.module'
     TagsModule,
     CmsModule,
     AuditLogsModule,
+    SettingsModule,
     LoggerModule,
   ],
   providers: [

@@ -7,6 +7,7 @@ import {
   History,
   LayoutDashboard,
   LogOut,
+  Settings,
   Tag,
   Users,
 } from 'lucide-react'
@@ -45,6 +46,7 @@ const navigation = [
   { name: 'Tags', href: '/tags', icon: Tag },
   { name: 'Audit Logs', href: '/audit-logs', icon: History },
   { name: 'Người dùng', href: '/users', icon: Users },
+  { name: 'Cấu hình', href: '/settings', icon: Settings },
 ]
 
 export function AppSidebar() {

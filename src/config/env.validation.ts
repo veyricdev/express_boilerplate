@@ -20,6 +20,9 @@ export const envSchema = z.object({
 
   // Security
   CORS_ORIGINS: z.string().optional().default('*'),
+
+  // Cache (optional Redis — falls back to in-memory)
+  REDIS_URL: z.string().url().optional(),
 })
 
 export type Env = z.infer<typeof envSchema>
