@@ -111,7 +111,7 @@ export function AppSidebar() {
                       isActive={isActive}
                       tooltip={item.name}
                       className={cn(
-                        'transition-all duration-200 text-base h-11 px-3 rounded-xl w-full',
+                        'transition-all duration-200 h-11 px-3 rounded-xl w-full',
                         isActive
                           ? 'bg-sidebar-accent text-sidebar-accent-foreground font-bold shadow-sm'
                           : 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50',

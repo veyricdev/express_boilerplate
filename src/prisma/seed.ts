@@ -5,13 +5,7 @@ import * as bcrypt from 'bcrypt'
 import { PERM_ADMIN } from '../common/constants/permissions'
 import { PostStatus, PrismaClient } from './generated/prisma'
 
-const adapter = new PrismaMariaDb({
-  host: process.env.DATABASE_HOST || 'localhost',
-  port: parseInt(process.env.DATABASE_PORT || '3306', 10),
-  user: process.env.DATABASE_USER || 'root',
-  password: process.env.DATABASE_PASSWORD || '',
-  database: process.env.DATABASE_NAME || 'nest_boilerplate',
-})
+const adapter = new PrismaMariaDb(process.env.DATABASE_URL || '')
 
 const prisma = new PrismaClient({ adapter })
 

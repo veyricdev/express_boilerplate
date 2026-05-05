@@ -54,12 +54,12 @@ export default function AdminLayout() {
             <SidebarTrigger className='-ml-1' />
             <Separator orientation='vertical' className='mx-2 h-4 self-center!' />
             <Breadcrumb>
-              <BreadcrumbList className='text-base flex items-center'>
+              <BreadcrumbList className='flex items-center'>
                 <BreadcrumbItem className='hidden lg:block'>
                   <BreadcrumbLink asChild>
                     <Link
                       to='/'
-                      className='font-bold text-lg tracking-tight bg-linear-to-r from-foreground to-foreground/60 bg-clip-text text-transparent'
+                      className='font-bold tracking-tight bg-linear-to-r from-foreground to-foreground/60 bg-clip-text text-transparent'
                     >
                       NEST CMS
                     </Link>

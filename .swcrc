@@ -15,7 +15,8 @@
     "keepClassNames": true
   },
   "exclude": [
-    ".*\\.map$"
+    ".*\\.map$",
+    ".*prisma/generated.*"
   ],
   "minify": true
 }

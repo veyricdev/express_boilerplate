@@ -12,7 +12,8 @@
       }
     },
     "assets": [
-      "views/**/*"
+      "views/**/*",
+      "prisma/generated/**/*"
     ]
   }
 }

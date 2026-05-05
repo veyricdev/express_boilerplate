@@ -38,6 +38,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const userAgent = headers['user-agent']
     const ip = request.ip
 
+    // Ignore noisy Chrome DevTools 404s
+    if (status === 404 && url === '/.well-known/appspecific/com.chrome.devtools.json') {
+      return
+    }
+
     const logMessage = `[${method}] ${url} - Status: ${status} - IP: ${ip} - UA: ${userAgent}`
     const stack = exception instanceof Error ? exception.stack : JSON.stringify(exception)
 
@@ -47,6 +52,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
       exception: exception instanceof Error ? exception.message : exception,
     }
 
-    this.logger.error(`${logMessage} - Details: ${JSON.stringify(details)}`, stack || 'No stack trace')
+    if (status >= 500) {
+      this.logger.error(`${logMessage} - Details: ${JSON.stringify(details)}`, stack || 'No stack trace')
+    } else {
+      this.logger.warn(`${logMessage} - Details: ${JSON.stringify(details)}`)
+    }
   }
 }

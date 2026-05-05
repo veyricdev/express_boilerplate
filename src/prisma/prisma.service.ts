@@ -203,13 +203,7 @@ export class PrismaService {
 
   constructor(configService: ConfigService) {
     const dbConfig = configService.get('database')
-    const adapter = new PrismaMariaDb({
-      host: dbConfig.host,
-      port: dbConfig.port,
-      user: dbConfig.user,
-      password: dbConfig.password,
-      database: dbConfig.name,
-    })
+    const adapter = new PrismaMariaDb(dbConfig.url)
 
     const base = new PrismaClient({ adapter })
     this.unfiltered = base
