@@ -12,8 +12,12 @@ export enum TrashMode {
 export interface User {
   id: number
   email: string
+  username: string
   fullName: string
+  phone?: string | null
+  address?: string | null
   permissions: string
+  isOwner: boolean
   isActive: boolean
   lastLoginAt?: string
   deletedAt?: string | null

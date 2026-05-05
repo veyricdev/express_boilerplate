@@ -1,10 +1,18 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
 import { TrashMode } from '~/common/enums/trash-mode.enum'
 import { paginate } from '~/common/helpers/pagination.helper'
 import { PrismaService } from '~/prisma/prisma.service'
+import { ChangePasswordDto } from './dto/change-password.dto'
 import { CreateUserDto } from './dto/create-user.dto'
 import { FindUsersAdminDto } from './dto/find-users-admin.dto'
+import { UpdateProfileDto } from './dto/update-profile.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 
 @Injectable()
@@ -14,9 +22,13 @@ export class UsersService {
   private readonly userSelect = {
     id: true,
     email: true,
+    username: true,
     fullName: true,
     avatarUrl: true,
+    phone: true,
+    address: true,
     permissions: true,
+    isOwner: true,
     isActive: true,
     lastLoginAt: true,
     deletedAt: true,
@@ -33,7 +45,9 @@ export class UsersService {
         where: {
           ...(trashMode === TrashMode.TRASH ? { deletedAt: { not: null } } : {}),
           ...(trashMode === TrashMode.ALL ? { deletedAt: { not: undefined } } : {}),
-          OR: search ? [{ fullName: { contains: search } }, { email: { contains: search } }] : undefined,
+          OR: search
+            ? [{ fullName: { contains: search } }, { email: { contains: search } }, { username: { contains: search } }]
+            : undefined,
           isActive:
             isActive !== undefined ? (typeof isActive === 'string' ? isActive === 'true' : isActive) : undefined,
           createdAt:
@@ -58,9 +72,13 @@ export class UsersService {
     })
   }
 
-  /** Special method for Auth system to include passwordHash */
-  async findForAuth(email: string) {
-    return this.prisma.db.user.findFirst({ where: { email } })
+  /** Special method for Auth system — looks up by email OR username */
+  async findForAuth(identifier: string) {
+    return this.prisma.db.user.findFirst({
+      where: {
+        OR: [{ email: identifier }, { username: identifier }],
+      },
+    })
   }
 
   async findByEmail(email: string) {
@@ -73,8 +91,16 @@ export class UsersService {
   async create(dto: CreateUserDto) {
     const { password, permissions, ...rest } = dto
 
-    const existing = await this.findByEmail(rest.email)
-    if (existing) throw new ConflictException('Email already registered')
+    const existingUser = await this.prisma.db.user.findFirst({
+      where: {
+        OR: [{ email: rest.email }, { username: rest.username }],
+      },
+    })
+
+    if (existingUser) {
+      if (existingUser.email === rest.email) throw new ConflictException('Email already registered')
+      if (existingUser.username === rest.username) throw new ConflictException('Username already taken')
+    }
 
     const passwordHash = await bcrypt.hash(password, 10)
 
@@ -98,6 +124,9 @@ export class UsersService {
   }
 
   async update(id: number, dto: UpdateUserDto) {
+    const user = await this.prisma.db.user.findUnique({ where: { id } })
+    if (!user) throw new NotFoundException('User not found')
+
     const { password, permissions, ...rest } = dto
 
     const data: any = {
@@ -126,6 +155,7 @@ export class UsersService {
       where: { id, deletedAt: undefined } as any,
     })
     if (!user) throw new NotFoundException('User not found')
+    if (user.isOwner) throw new ForbiddenException('Owner account cannot be deleted')
 
     // Step 1: Revoke all active refresh tokens
     await this.prisma.db.refreshToken.updateMany({
@@ -150,6 +180,7 @@ export class UsersService {
       where: { id, deletedAt: undefined } as any,
     })
     if (!user) throw new NotFoundException('User not found')
+    if (user.isOwner) throw new ForbiddenException('Owner account cannot be modified')
     if (user.deletedAt === null) throw new ConflictException('User is not deleted')
 
     const restored = await this.prisma.db.user.update({
@@ -168,6 +199,7 @@ export class UsersService {
       where: { id, deletedAt: undefined } as any,
     })
     if (!user) throw new NotFoundException('User not found')
+    if (user.isOwner) throw new ForbiddenException('Owner account cannot be deleted')
 
     await this.prisma.logAudit('HARD_DELETE', 'USER', id, user)
     return this.prisma.unfiltered.user.delete({ where: { id } })
@@ -175,6 +207,10 @@ export class UsersService {
 
   /** Update user permissions using BigInt bit flags */
   async updatePermissions(id: number, permissions: bigint) {
+    const user = await this.prisma.db.user.findUnique({ where: { id } })
+    if (!user) throw new NotFoundException('User not found')
+    if (user.isOwner) throw new ForbiddenException('Owner account permissions cannot be modified')
+
     return this.prisma.db.user.update({
       where: { id },
       data: { permissions },
@@ -184,10 +220,55 @@ export class UsersService {
 
   /** Set user active/inactive */
   async setStatus(id: number, isActive: boolean) {
+    const user = await this.prisma.db.user.findUnique({ where: { id } })
+    if (!user) throw new NotFoundException('User not found')
+    if (user.isOwner) throw new ForbiddenException('Owner account status cannot be modified')
+
     return this.prisma.db.user.update({
       where: { id },
       data: { isActive },
       select: this.userSelect,
     })
+  }
+
+  async updateProfile(id: number, dto: UpdateProfileDto) {
+    const user = await this.prisma.db.user.findUnique({ where: { id } })
+    if (!user) throw new NotFoundException('User not found')
+
+    // Check unique email/username if changed
+    if (dto.email || dto.username) {
+      const existing = await this.prisma.db.user.findFirst({
+        where: {
+          id: { not: id },
+          OR: [...(dto.email ? [{ email: dto.email }] : []), ...(dto.username ? [{ username: dto.username }] : [])],
+        },
+      })
+      if (existing) {
+        if (existing.email === dto.email) throw new ConflictException('Email already registered')
+        if (existing.username === dto.username) throw new ConflictException('Username already taken')
+      }
+    }
+
+    return this.prisma.db.user.update({
+      where: { id },
+      data: dto,
+      select: this.userSelect,
+    })
+  }
+
+  async changePassword(id: number, dto: ChangePasswordDto) {
+    const user = await this.prisma.db.user.findUnique({ where: { id } })
+    if (!user) throw new NotFoundException('User not found')
+
+    const isMatch = await bcrypt.compare(dto.oldPassword, user.passwordHash)
+    if (!isMatch) throw new BadRequestException('Old password is incorrect')
+
+    const passwordHash = await bcrypt.hash(dto.newPassword, 10)
+    await this.prisma.db.user.update({
+      where: { id },
+      data: { passwordHash },
+    })
+
+    return { message: 'Password updated successfully' }
   }
 }

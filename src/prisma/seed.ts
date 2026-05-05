@@ -12,8 +12,28 @@ const prisma = new PrismaClient({ adapter })
 async function main() {
   console.log('🌱 Starting seed...')
 
-  // 1. Admin User
+  // 1. Owner User (super admin, bypasses all permission checks)
   const passwordHash = await bcrypt.hash('Admin@123', 10)
+  const owner = await prisma.user.upsert({
+    where: { email: 'owner@cms.com' },
+    update: {
+      passwordHash,
+      isOwner: true,
+      isActive: true,
+    },
+    create: {
+      email: 'owner@cms.com',
+      username: 'owner',
+      passwordHash,
+      fullName: 'System Owner',
+      permissions: 0n,
+      isOwner: true,
+      isActive: true,
+    },
+  })
+  console.log('✅ Owner user created/updated')
+
+  // 2. Admin User (regular admin with bit-flag permissions)
   const admin = await prisma.user.upsert({
     where: { email: 'admin@cms.com' },
     update: {
@@ -23,6 +43,7 @@ async function main() {
     },
     create: {
       email: 'admin@cms.com',
+      username: 'admin',
       passwordHash,
       fullName: 'System Administrator',
       permissions: PERM_ADMIN,

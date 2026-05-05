@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion } from 'framer-motion'
-import { Eye, EyeOff, Loader2, Lock, Mail } from 'lucide-react'
+import { Eye, EyeOff, Loader2, Lock, User } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate, useSearchParams } from 'react-router'
@@ -14,7 +14,7 @@ import { authService } from '@/services/auth.service'
 import { useAuth } from '@/store/auth'
 
 const loginSchema = z.object({
-  email: z.string().email('Email không hợp lệ'),
+  identifier: z.string().min(1, 'Vui lòng nhập Email hoặc Username'),
   password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
   rememberMe: z.boolean().optional(),
 })
@@ -47,7 +47,7 @@ export default function LoginPage() {
     try {
       // 1. Login to get tokens
       const { accessToken, refreshToken } = await authService.login({
-        email: data.email,
+        identifier: data.identifier,
         password: data.password,
       })
 
@@ -58,7 +58,7 @@ export default function LoginPage() {
       const user = await authService.getProfile()
 
       // 4. Finalize auth state
-      setAuth(user as any, accessToken, refreshToken)
+      setAuth(accessToken, refreshToken, user)
 
       const redirect = searchParams.get('redirect')
       navigate(redirect || '/')
@@ -98,22 +98,22 @@ export default function LoginPage() {
 
           <div className='space-y-5'>
             <div className='space-y-2'>
-              <Label htmlFor='email' className='text-sm font-semibold text-foreground/80 ml-1'>
-                Email
+              <Label htmlFor='identifier' className='text-sm font-semibold text-foreground/80 ml-1'>
+                Email hoặc Username
               </Label>
               <div className='relative group'>
-                <Mail className='absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-muted-foreground transition-colors group-focus-within:text-primary' />
+                <User className='absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-muted-foreground transition-colors group-focus-within:text-primary' />
                 <Input
-                  id='email'
-                  placeholder='admin@example.com'
-                  type='email'
-                  autoComplete='email'
+                  id='identifier'
+                  placeholder='admin@example.com hoặc admin'
+                  type='text'
+                  autoComplete='username'
                   className='pl-11 h-12 bg-card border-muted-foreground/20 focus-visible:ring-primary/20 rounded-2xl transition-all shadow-sm'
-                  {...register('email')}
+                  {...register('identifier')}
                 />
               </div>
-              {errors.email && (
-                <p className='text-xs font-medium text-destructive ml-1 mt-1.5'>{errors.email.message}</p>
+              {errors.identifier && (
+                <p className='text-xs font-medium text-destructive ml-1 mt-1.5'>{errors.identifier.message}</p>
               )}
             </div>
 

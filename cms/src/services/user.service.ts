@@ -33,4 +33,12 @@ export const userService = {
   setStatus: async (id: number, isActive: boolean): Promise<User> => {
     return api.patch(`/admin/users/${id}/toggle-active`, { isActive })
   },
+
+  updateMe: async (data: any): Promise<User> => {
+    return api.patch('/users/me', data)
+  },
+
+  changePassword: async (data: any): Promise<void> => {
+    await api.post('/users/me/change-password', data)
+  },
 }

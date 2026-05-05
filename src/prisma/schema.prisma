@@ -15,10 +15,14 @@ datasource db {
 model User {
   id           Int       @id @default(autoincrement()) @db.UnsignedInt
   email        String    @unique @db.VarChar(255)
+  username     String    @unique @db.VarChar(50)
   passwordHash String    @map("password_hash") @db.VarChar(255)
   fullName     String    @map("full_name") @db.VarChar(150)
   avatarUrl    String?   @map("avatar_url") @db.VarChar(500)
+  phone        String?   @db.VarChar(20)
+  address      String?   @db.Text
   permissions  BigInt    @default(0) @db.UnsignedBigInt // Bit Flags
+  isOwner      Boolean   @default(false) @map("is_owner")
   isActive     Boolean   @default(true) @map("is_active")
   lastLoginAt  DateTime? @map("last_login_at")
   deletedAt    DateTime? @map("deleted_at")
@@ -30,6 +34,7 @@ model User {
   auditLogs     AuditLog[]
 
   @@index([email])
+  @@index([username])
   @@index([isActive])
   @@index([deletedAt])
   @@map("users")

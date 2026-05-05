@@ -3,13 +3,15 @@ import { useMemo } from 'react'
 import { useAuth } from '@/store/auth'
 
 export function usePermission() {
-  const permissions = useAuth((state) => state.user?.permissions || '0')
+  const user = useAuth((state) => state.user)
+  const permissions = user?.permissions || '0'
+  const isOwner = user?.isOwner || false
 
   return useMemo(() => {
     return {
-      has: (perm: bigint) => hasPermission(permissions, perm),
-      hasAny: (perms: bigint[]) => hasAnyPermission(permissions, perms),
-      isSuperAdmin: hasPermission(permissions, PERM_SUPER_ADMIN),
+      has: (perm: bigint) => isOwner || hasPermission(permissions, perm),
+      hasAny: (perms: bigint[]) => isOwner || hasAnyPermission(permissions, perms),
+      isSuperAdmin: isOwner || hasPermission(permissions, PERM_SUPER_ADMIN),
     }
-  }, [permissions])
+  }, [permissions, isOwner])
 }

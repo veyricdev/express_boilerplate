@@ -19,7 +19,9 @@ import {
   Tag,
   Users,
 } from 'lucide-react'
+import { useState } from 'react'
 import { Link, useLocation } from 'react-router'
+import { AccountDialog } from '@/components/account-dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -61,6 +63,7 @@ const navigation = [
 export function AppSidebar() {
   const location = useLocation()
   const { isMobile } = useSidebar()
+  const [accountDialogOpen, setAccountDialogOpen] = useState(false)
   const user = useAuth((state) => state.user)
   const logout = useAuth((state) => state.logout)
   const permission = usePermission()
@@ -179,7 +182,7 @@ export function AppSidebar() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setAccountDialogOpen(true)}>
                     <BadgeCheck className='size-4' />
                     Tài khoản
                   </DropdownMenuItem>
@@ -199,6 +202,7 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
+      <AccountDialog open={accountDialogOpen} onOpenChange={setAccountDialogOpen} />
     </Sidebar>
   )
 }

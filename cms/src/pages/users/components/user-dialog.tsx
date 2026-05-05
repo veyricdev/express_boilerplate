@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Check, Copy, Key, Mail, RefreshCw, UserCircle, User as UserIcon } from 'lucide-react'
+import { Check, Copy, Key, Mail, MapPin, Phone, RefreshCw, UserCircle, User as UserIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -22,16 +22,22 @@ import { User } from '@/types'
 
 const userSchema = z.object({
   email: z.string().email('Email không hợp lệ'),
+  username: z.string().min(3, 'Tên đăng nhập phải có ít nhất 3 ký tự'),
   fullName: z.string().min(2, 'Họ tên phải có ít nhất 2 ký tự'),
   password: z.string().optional().or(z.literal('')),
+  phone: z.string().optional().or(z.literal('')),
+  address: z.string().optional().or(z.literal('')),
   permissions: z.string(),
   isActive: z.boolean(),
 })
 
 type UserFormValues = {
   email: string
+  username: string
   fullName: string
   password?: string
+  phone?: string
+  address?: string
   permissions: string
   isActive: boolean
 }
@@ -58,8 +64,11 @@ export function UserDialog({ user, open, onOpenChange }: UserDialogProps) {
     resolver: zodResolver(userSchema),
     defaultValues: {
       email: '',
+      username: '',
       fullName: '',
       password: '',
+      phone: '',
+      address: '',
       permissions: '0',
       isActive: true,
     },
@@ -70,16 +79,22 @@ export function UserDialog({ user, open, onOpenChange }: UserDialogProps) {
       if (user) {
         reset({
           email: user.email,
+          username: user.username || '',
           fullName: user.fullName,
           password: '',
+          phone: user.phone || '',
+          address: user.address || '',
           permissions: user.permissions || '0',
           isActive: user.isActive,
         })
       } else {
         reset({
           email: '',
+          username: '',
           fullName: '',
           password: '',
+          phone: '',
+          address: '',
           permissions: '0',
           isActive: true,
         })
@@ -135,7 +150,7 @@ export function UserDialog({ user, open, onOpenChange }: UserDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-[500px] rounded-3xl border-white/10 shadow-2xl overflow-hidden p-0'>
+      <DialogContent className='sm:max-w-[600px] rounded-3xl border-white/10 shadow-2xl overflow-hidden p-0 max-h-[90vh] overflow-y-auto'>
         <div className='absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none' />
         <form onSubmit={handleSubmit(onSubmit)} className='p-8 space-y-6 relative' autoComplete='off'>
           {/* Dummy inputs to fool browser autofill */}
@@ -171,6 +186,24 @@ export function UserDialog({ user, open, onOpenChange }: UserDialogProps) {
                 )}
               </div>
               <div className='grid gap-2.5'>
+                <Label htmlFor='username' className='ml-1 font-bold text-sm text-foreground/80 flex items-center gap-2'>
+                  <UserIcon className='h-3.5 w-3.5 opacity-50' /> Tên đăng nhập
+                </Label>
+                <Input
+                  id='username'
+                  {...register('username')}
+                  placeholder='admin_van_a'
+                  className='bg-muted/20 border-muted-foreground/10 focus-visible:ring-primary/20 rounded-xl h-11 transition-all'
+                  autoComplete='none'
+                />
+                {errors.username && (
+                  <p className='text-xs text-destructive font-bold ml-1'>{errors.username.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className='grid grid-cols-2 gap-4'>
+              <div className='grid gap-2.5'>
                 <Label htmlFor='email' className='ml-1 font-bold text-sm text-foreground/80 flex items-center gap-2'>
                   <Mail className='h-3.5 w-3.5 opacity-50' /> Email
                 </Label>
@@ -184,6 +217,31 @@ export function UserDialog({ user, open, onOpenChange }: UserDialogProps) {
                 />
                 {errors.email && <p className='text-xs text-destructive font-bold ml-1'>{errors.email.message}</p>}
               </div>
+              <div className='grid gap-2.5'>
+                <Label htmlFor='phone' className='ml-1 font-bold text-sm text-foreground/80 flex items-center gap-2'>
+                  <Phone className='h-3.5 w-3.5 opacity-50' /> Số điện thoại
+                </Label>
+                <Input
+                  id='phone'
+                  {...register('phone')}
+                  placeholder='0123456789'
+                  className='bg-muted/20 border-muted-foreground/10 focus-visible:ring-primary/20 rounded-xl h-11 transition-all'
+                />
+                {errors.phone && <p className='text-xs text-destructive font-bold ml-1'>{errors.phone.message}</p>}
+              </div>
+            </div>
+
+            <div className='grid gap-2.5'>
+              <Label htmlFor='address' className='ml-1 font-bold text-sm text-foreground/80 flex items-center gap-2'>
+                <MapPin className='h-3.5 w-3.5 opacity-50' /> Địa chỉ
+              </Label>
+              <Input
+                id='address'
+                {...register('address')}
+                placeholder='Số 1, Đường ABC, Quận XYZ, TP. HCM'
+                className='bg-muted/20 border-muted-foreground/10 focus-visible:ring-primary/20 rounded-xl h-11 transition-all'
+              />
+              {errors.address && <p className='text-xs text-destructive font-bold ml-1'>{errors.address.message}</p>}
             </div>
 
             <div className='grid gap-2.5'>

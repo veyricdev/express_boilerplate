@@ -1,20 +1,14 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-interface User {
-  id: string
-  email: string
-  fullName: string
-  roles: string[]
-  permissions: string // BigInt stored as string
-}
+import { User } from '@/types'
 
 interface AuthState {
   user: User | null
   token: string | null
   refreshToken: string | null
   isAuthenticated: boolean
-  setAuth: (user: User, token: string, refreshToken: string) => void
+  setAuth: (token: string, refreshToken: string, user: User) => void
   updateToken: (token: string, refreshToken: string) => void
   logout: () => void
 }
@@ -26,7 +20,7 @@ export const useAuth = create<AuthState>()(
       token: null,
       refreshToken: null,
       isAuthenticated: false,
-      setAuth: (user, token, refreshToken) => set({ user, token, refreshToken, isAuthenticated: true }),
+      setAuth: (token, refreshToken, user) => set({ token, refreshToken, user, isAuthenticated: true }),
       updateToken: (token, refreshToken) => set({ token, refreshToken }),
       logout: () => set({ user: null, token: null, refreshToken: null, isAuthenticated: false }),
     }),

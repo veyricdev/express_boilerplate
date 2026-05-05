@@ -180,6 +180,14 @@ export function UserTable({ users, isLoading, onEdit, onEditPermissions }: UserT
                       <span className='font-bold text-foreground group-hover:text-primary transition-colors leading-tight'>
                         {user.fullName}
                       </span>
+                      {user.isOwner && (
+                        <Badge
+                          variant='secondary'
+                          className='ml-2 bg-amber-500/10 text-amber-600 border-amber-500/20 text-[9px] px-1.5 py-0 h-4 font-bold uppercase'
+                        >
+                          Owner
+                        </Badge>
+                      )}
                       <span className='text-[11px] text-muted-foreground font-mono flex items-center gap-1'>
                         <span className='opacity-50 font-sans'>@</span>
                         {user.email}
@@ -230,7 +238,7 @@ export function UserTable({ users, isLoading, onEdit, onEditPermissions }: UserT
                 </TableCell>
                 <TableCell className='px-6 py-5 text-right'>
                   <div className='flex justify-end gap-1.5 transition-opacity'>
-                    {permission.has(PERM_USERS_UPDATE) && (
+                    {permission.has(PERM_USERS_UPDATE) && !user.isOwner && (
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button
@@ -246,7 +254,7 @@ export function UserTable({ users, isLoading, onEdit, onEditPermissions }: UserT
                       </Tooltip>
                     )}
 
-                    {!user.deletedAt && permission.has(PERM_USERS_UPDATE) && (
+                    {!user.deletedAt && permission.has(PERM_USERS_UPDATE) && !user.isOwner && (
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button
@@ -269,7 +277,7 @@ export function UserTable({ users, isLoading, onEdit, onEditPermissions }: UserT
                       </Tooltip>
                     )}
 
-                    {permission.has(PERM_USERS_UPDATE) && (
+                    {permission.has(PERM_USERS_UPDATE) && !user.isOwner && (
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button
@@ -287,7 +295,7 @@ export function UserTable({ users, isLoading, onEdit, onEditPermissions }: UserT
 
                     {user.deletedAt ? (
                       <>
-                        {permission.has(PERM_USERS_UPDATE) && (
+                        {permission.has(PERM_USERS_UPDATE) && !user.isOwner && (
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
@@ -304,7 +312,7 @@ export function UserTable({ users, isLoading, onEdit, onEditPermissions }: UserT
                           </Tooltip>
                         )}
 
-                        {permission.has(PERM_USERS_DELETE) && (
+                        {permission.has(PERM_USERS_DELETE) && !user.isOwner && (
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
@@ -322,7 +330,7 @@ export function UserTable({ users, isLoading, onEdit, onEditPermissions }: UserT
                         )}
                       </>
                     ) : (
-                      permission.has(PERM_USERS_DELETE) && (
+                      permission.has(PERM_USERS_DELETE) && !user.isOwner && (
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button

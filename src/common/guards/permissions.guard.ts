@@ -18,7 +18,16 @@ export class PermissionsGuard implements CanActivate {
 
     const { user } = context.switchToHttp().getRequest()
 
-    if (!user || user.permissions === undefined || user.permissions === null) {
+    if (!user) {
+      return false
+    }
+
+    // Owner bypasses all permission checks
+    if (user.isOwner === true) {
+      return true
+    }
+
+    if (user.permissions === undefined || user.permissions === null) {
       return false
     }
 
@@ -26,7 +35,6 @@ export class PermissionsGuard implements CanActivate {
       const userPermissions = BigInt(user.permissions)
 
       // Check if user has ANY of the required permissions (OR logic)
-      // If you want AND logic, change .some to .every
       return requiredPermissions.some((perm) => (userPermissions & perm) === perm)
     } catch (error) {
       console.error('[PermissionsGuard] Error parsing permissions:', error)

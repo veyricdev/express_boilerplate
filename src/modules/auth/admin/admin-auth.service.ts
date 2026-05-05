@@ -15,18 +15,20 @@ export class AdminAuthService {
   // ─── Login ────────────────────────────────────
 
   async login(dto: LoginDto, ipAddress?: string, userAgent?: string) {
-    const user = await this.usersService.findForAuth(dto.email)
+    const user = await this.usersService.findForAuth(dto.identifier)
 
     // Check if user exists and is active
     if (!user?.isActive) {
       throw new UnauthorizedException('Invalid admin credentials')
     }
 
-    // Check if user has ANY permission (not necessarily ALL permissions in PERM_ADMIN)
-    // At minimum, they must have at least one bit set to enter the CMS.
-    const userPerms = BigInt(user.permissions ?? 0n)
-    if (userPerms === 0n) {
-      throw new UnauthorizedException('Access denied: No administrative permissions assigned')
+    // Owner bypasses permission check entirely
+    if (!user.isOwner) {
+      // Check if user has ANY permission (at minimum one bit set to enter the CMS)
+      const userPerms = BigInt(user.permissions ?? 0n)
+      if (userPerms === 0n) {
+        throw new UnauthorizedException('Access denied: No administrative permissions assigned')
+      }
     }
 
     // Verify password
@@ -39,6 +41,7 @@ export class AdminAuthService {
       sub: user.id,
       email: user.email,
       permissions: user.permissions.toString(),
+      isOwner: user.isOwner,
     })
 
     const hashedRefreshToken = await this.authCoreService.hashPassword(tokens.refreshToken)
@@ -107,6 +110,7 @@ export class AdminAuthService {
       sub: user.id,
       email: user.email,
       permissions: user.permissions.toString(),
+      isOwner: user.isOwner,
     })
 
     const hashedNewToken = await this.authCoreService.hashPassword(tokens.refreshToken)
