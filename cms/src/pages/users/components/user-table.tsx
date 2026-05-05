@@ -330,7 +330,8 @@ export function UserTable({ users, isLoading, onEdit, onEditPermissions }: UserT
                         )}
                       </>
                     ) : (
-                      permission.has(PERM_USERS_DELETE) && !user.isOwner && (
+                      permission.has(PERM_USERS_DELETE) &&
+                      !user.isOwner && (
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button

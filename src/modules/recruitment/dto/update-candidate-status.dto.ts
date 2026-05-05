@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { CandidateStatus } from '~/prisma/generated/prisma'
 import { IsEnum } from 'class-validator'
+import { CandidateStatus } from '~/prisma/generated/prisma'
 
 export class UpdateCandidateStatusDto {
   @ApiProperty({ enum: CandidateStatus })

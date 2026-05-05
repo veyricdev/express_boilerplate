@@ -1,20 +1,21 @@
+import { PERM_CONTACTS_READ } from '@shared/constants/permissions'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router'
+import { toast } from 'sonner'
 import { SharedPagination } from '@/components/shared/shared-pagination'
+import { usePermission } from '@/hooks/use-permission'
 import { contactService } from '@/services/contact.service'
 import { ContactSubmission } from '@/types'
-import { toast } from 'sonner'
-import { PERM_CONTACTS_READ } from '@shared/constants/permissions'
-import { usePermission } from '@/hooks/use-permission'
-import { ContactHeader } from './components/contact-header'
 import { ContactFilters } from './components/contact-filters'
+import { ContactHeader } from './components/contact-header'
 import { ContactTable } from './components/contact-table'
 
 export default function ContactsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const page = parseInt(searchParams.get('page') || '1', 10)
   const limit = parseInt(searchParams.get('limit') || '20', 10)
-  const isRead = searchParams.get('isRead') === 'true' ? true : searchParams.get('isRead') === 'false' ? false : undefined
+  const isRead =
+    searchParams.get('isRead') === 'true' ? true : searchParams.get('isRead') === 'false' ? false : undefined
   const queryClient = useQueryClient()
   const { has } = usePermission()
 
@@ -50,19 +51,16 @@ export default function ContactsPage() {
   const currentFilter = isRead === true ? 'true' : isRead === false ? 'false' : 'all'
 
   return (
-    <div className='p-8 space-y-8 max-w-(--breakpoint-2xl) w-full mx-auto animate-in fade-in duration-500'>
+    <div className='p-4 md:p-8 space-y-8 max-w-(--breakpoint-2xl) w-full mx-auto animate-in fade-in duration-500'>
       <ContactHeader unreadCount={unreadCount} />
 
       <div className='bg-card rounded-2xl border shadow-sm overflow-hidden transition-all hover:shadow-md border-muted/50'>
-        <ContactFilters 
-          currentFilter={currentFilter} 
-          onFilterChange={filterRead} 
-        />
+        <ContactFilters currentFilter={currentFilter} onFilterChange={filterRead} />
 
-        <ContactTable 
-          contacts={contacts as ContactSubmission[]} 
-          isLoading={isLoading} 
-          deleteMutation={deleteMutation} 
+        <ContactTable
+          contacts={contacts as ContactSubmission[]}
+          isLoading={isLoading}
+          deleteMutation={deleteMutation}
         />
 
         {totalPages > 1 && (

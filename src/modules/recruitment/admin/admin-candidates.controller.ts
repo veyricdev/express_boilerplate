@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, Patch, Query, Body, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Query, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { PERM_CANDIDATES_READ, PERM_CANDIDATES_UPDATE } from '~/common/constants/permissions'
 import { ApiWrappedResponse } from '~/common/decorators/api-response.decorator'

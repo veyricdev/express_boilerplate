@@ -49,6 +49,10 @@ export const router = createBrowserRouter(
           children: [
             {
               index: true,
+              element: <Navigate to='/dashboard' replace />,
+            },
+            {
+              path: 'dashboard',
               element: (
                 <Suspense fallback={null}>
                   <DashboardPage />
@@ -232,7 +236,7 @@ export const router = createBrowserRouter(
     },
     {
       path: '*',
-      element: <Navigate to='/' replace />,
+      element: <Navigate to='/dashboard' replace />,
     },
   ],
   {

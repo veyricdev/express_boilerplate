@@ -101,7 +101,7 @@ export function TagDialog({ tag, open, onOpenChange }: TagDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-[425px] rounded-3xl border-white/10 shadow-2xl overflow-hidden p-0'>
         <div className='absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none' />
-        <form onSubmit={handleSubmit(onSubmit)} className='p-8 space-y-6 relative'>
+        <form onSubmit={handleSubmit(onSubmit)} className='p-6 md:p-8 space-y-6 relative'>
           <DialogHeader>
             <DialogTitle className='text-2xl font-bold flex items-center gap-3'>
               <div className='h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary'>

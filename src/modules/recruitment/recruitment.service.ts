@@ -1,14 +1,14 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import slugify from 'slugify'
+import { JobStatus } from '~/prisma/generated/prisma'
 import { PrismaService } from '~/prisma/prisma.service'
 import type { CreateDepartmentDto } from './dto/create-department.dto'
-import type { UpdateDepartmentDto } from './dto/update-department.dto'
 import type { CreateJobDto } from './dto/create-job.dto'
-import type { UpdateJobDto } from './dto/update-job.dto'
-import type { FindJobsDto } from './dto/find-jobs.dto'
 import type { FindCandidatesDto } from './dto/find-candidates.dto'
+import type { FindJobsDto } from './dto/find-jobs.dto'
 import type { UpdateCandidateStatusDto } from './dto/update-candidate-status.dto'
-import { JobStatus } from '~/prisma/generated/prisma'
+import type { UpdateDepartmentDto } from './dto/update-department.dto'
+import type { UpdateJobDto } from './dto/update-job.dto'
 
 @Injectable()
 export class RecruitmentService {
@@ -54,14 +54,23 @@ export class RecruitmentService {
       ...(departmentId && { departmentId }),
     }
     const [data, total] = await Promise.all([
-      this.prisma.db.job.findMany({ where, skip, take: limit, include: { department: true }, orderBy: { createdAt: 'desc' } }),
+      this.prisma.db.job.findMany({
+        where,
+        skip,
+        take: limit,
+        include: { department: true },
+        orderBy: { createdAt: 'desc' },
+      }),
       this.prisma.db.job.count({ where }),
     ])
     return { data, total, page, limit, totalPages: Math.ceil(total / limit) }
   }
 
   async findJobBySlugPublic(slug: string) {
-    const job = await this.prisma.db.job.findFirst({ where: { slug, status: JobStatus.OPEN, deletedAt: null }, include: { department: true } })
+    const job = await this.prisma.db.job.findFirst({
+      where: { slug, status: JobStatus.OPEN, deletedAt: null },
+      include: { department: true },
+    })
     if (!job) throw new NotFoundException(`Job not found`)
     return job
   }
@@ -76,7 +85,13 @@ export class RecruitmentService {
       ...(departmentId && { departmentId }),
     }
     const [data, total] = await Promise.all([
-      this.prisma.db.job.findMany({ where, skip, take: limit, include: { department: true }, orderBy: { createdAt: 'desc' } }),
+      this.prisma.db.job.findMany({
+        where,
+        skip,
+        take: limit,
+        include: { department: true },
+        orderBy: { createdAt: 'desc' },
+      }),
       this.prisma.db.job.count({ where }),
     ])
     return { data, total, page, limit, totalPages: Math.ceil(total / limit) }
@@ -174,7 +189,11 @@ export class RecruitmentService {
     return candidate
   }
 
-  async createCandidate(jobId: number, cvUrl: string, data: { fullName: string; email: string; phone?: string; coverLetter?: string }) {
+  async createCandidate(
+    jobId: number,
+    cvUrl: string,
+    data: { fullName: string; email: string; phone?: string; coverLetter?: string }
+  ) {
     const job = await this.prisma.db.job.findFirst({ where: { id: jobId, status: JobStatus.OPEN, deletedAt: null } })
     if (!job) throw new NotFoundException(`Job #${jobId} not found or not open`)
     return this.prisma.db.candidate.create({ data: { jobId, cvUrl, ...data } })

@@ -15,7 +15,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/s
 import { useSettings } from '@/store/settings'
 
 const navigation = [
-  { name: 'Dashboard', href: '/' },
+  { name: 'Dashboard', href: '/dashboard' },
   { name: 'Bài viết', href: '/posts' },
   { name: 'Danh mục', href: '/categories' },
   { name: 'Tags', href: '/tags' },
@@ -58,7 +58,7 @@ export default function AdminLayout() {
                 <BreadcrumbItem className='hidden lg:block'>
                   <BreadcrumbLink asChild>
                     <Link
-                      to='/'
+                      to='/dashboard'
                       className='font-bold tracking-tight bg-linear-to-r from-foreground to-foreground/60 bg-clip-text text-transparent'
                     >
                       NEST CMS

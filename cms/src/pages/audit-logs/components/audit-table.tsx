@@ -196,7 +196,7 @@ export function AuditTable({ logs, isLoading }: AuditTableProps) {
                       </DialogTrigger>
                       <DialogContent className='sm:max-w-4xl max-h-[85vh] flex flex-col rounded-3xl border-white/10 shadow-2xl overflow-hidden p-0 animate-in zoom-in-95 duration-200'>
                         <div className='absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none' />
-                        <div className='p-8 space-y-6 relative flex flex-col h-full'>
+                        <div className='p-6 md:p-8 space-y-6 relative flex flex-col h-full'>
                           <DialogHeader>
                             <DialogTitle className='text-2xl font-bold flex items-center gap-3'>
                               <div className='h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary'>

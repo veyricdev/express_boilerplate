@@ -116,7 +116,7 @@ export function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-[550px] rounded-3xl border-white/10 shadow-2xl overflow-hidden p-0 max-h-[90vh] overflow-y-auto'>
         <div className='absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none' />
-        <div className='p-8 space-y-6 relative'>
+        <div className='p-6 md:p-8 space-y-6 relative'>
           <DialogHeader>
             <DialogTitle className='text-2xl font-bold flex items-center gap-3'>
               <div className='h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary'>

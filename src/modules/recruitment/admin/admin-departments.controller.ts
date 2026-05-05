@@ -1,6 +1,11 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
-import { PERM_DEPARTMENTS_DELETE, PERM_DEPARTMENTS_READ, PERM_DEPARTMENTS_UPDATE, PERM_DEPARTMENTS_WRITE } from '~/common/constants/permissions'
+import {
+  PERM_DEPARTMENTS_DELETE,
+  PERM_DEPARTMENTS_READ,
+  PERM_DEPARTMENTS_UPDATE,
+  PERM_DEPARTMENTS_WRITE,
+} from '~/common/constants/permissions'
 import { ApiWrappedResponse } from '~/common/decorators/api-response.decorator'
 import { RequirePermissions } from '~/common/decorators/require-permissions.decorator'
 import { JwtAuthGuard } from '~/common/guards/jwt-auth.guard'

@@ -1,13 +1,13 @@
+import { PERM_DEPARTMENTS_READ } from '@shared/constants/permissions'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import { toast } from 'sonner'
+import { usePermission } from '@/hooks/use-permission'
 import { departmentService } from '@/services/department.service'
 import { Department } from '@/types'
-import { PERM_DEPARTMENTS_READ } from '@shared/constants/permissions'
-import { usePermission } from '@/hooks/use-permission'
-import { toast } from 'sonner'
+import { DepartmentDialog, DeptFormState } from './components/department-dialog'
 import { DepartmentHeader } from './components/department-header'
 import { DepartmentTable } from './components/department-table'
-import { DepartmentDialog, DeptFormState } from './components/department-dialog'
 
 export default function DepartmentsPage() {
   const queryClient = useQueryClient()
@@ -24,7 +24,12 @@ export default function DepartmentsPage() {
   })
 
   const createMutation = useMutation({
-    mutationFn: () => departmentService.create({ name: formData.name, description: formData.description || undefined, isActive: formData.isActive }),
+    mutationFn: () =>
+      departmentService.create({
+        name: formData.name,
+        description: formData.description || undefined,
+        isActive: formData.isActive,
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['departments'] })
       setIsDialogOpen(false)
@@ -34,7 +39,12 @@ export default function DepartmentsPage() {
   })
 
   const updateMutation = useMutation({
-    mutationFn: () => departmentService.update(editingId!, { name: formData.name, description: formData.description || undefined, isActive: formData.isActive }),
+    mutationFn: () =>
+      departmentService.update(editingId!, {
+        name: formData.name,
+        description: formData.description || undefined,
+        isActive: formData.isActive,
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['departments'] })
       setIsDialogOpen(false)
@@ -73,26 +83,26 @@ export default function DepartmentsPage() {
   }
 
   return (
-    <div className='p-8 space-y-8 max-w-(--breakpoint-2xl) w-full mx-auto animate-in fade-in duration-500'>
+    <div className='p-4 md:p-8 space-y-8 max-w-(--breakpoint-2xl) w-full mx-auto animate-in fade-in duration-500'>
       <DepartmentHeader onAdd={handleOpenAdd} />
 
       <div className='bg-card rounded-2xl border shadow-sm overflow-hidden transition-all hover:shadow-md border-muted/50'>
-        <DepartmentTable 
-          departments={departments as Department[]} 
-          isLoading={isLoading} 
-          onEdit={handleOpenEdit} 
-          deleteMutation={deleteMutation} 
+        <DepartmentTable
+          departments={departments as Department[]}
+          isLoading={isLoading}
+          onEdit={handleOpenEdit}
+          deleteMutation={deleteMutation}
         />
       </div>
 
-      <DepartmentDialog 
-        open={isDialogOpen} 
-        onOpenChange={setIsDialogOpen} 
-        editingId={editingId} 
-        formData={formData} 
-        setFormData={setFormData} 
-        onSubmit={handleSubmit} 
-        isPending={createMutation.isPending || updateMutation.isPending} 
+      <DepartmentDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        editingId={editingId}
+        formData={formData}
+        setFormData={setFormData}
+        onSubmit={handleSubmit}
+        isPending={createMutation.isPending || updateMutation.isPending}
       />
     </div>
   )

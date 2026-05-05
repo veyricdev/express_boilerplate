@@ -10,7 +10,10 @@ export const departmentService = {
     return api.post('/admin/departments', data) as any
   },
 
-  update: async (id: number, data: Partial<{ name: string; description?: string; isActive?: boolean }>): Promise<Department> => {
+  update: async (
+    id: number,
+    data: Partial<{ name: string; description?: string; isActive?: boolean }>
+  ): Promise<Department> => {
     return api.patch(`/admin/departments/${id}`, data) as any
   },
 

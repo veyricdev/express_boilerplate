@@ -11,6 +11,7 @@ export default defineConfig(({ mode }) => ({
       '@': resolve(__dirname, './src'),
       '@shared': resolve(__dirname, '../src/common'),
     },
+    dedupe: ['react', 'react-dom'],
   },
   build: {
     outDir: '../public/build',

@@ -14,12 +14,13 @@ import { AuditLogsModule } from './modules/audit-logs/audit-logs.module'
 import { AuthModule } from './modules/auth/auth.module'
 import { CategoriesModule } from './modules/categories/categories.module'
 import { CmsModule } from './modules/cms/cms.module'
+import { ContactsModule } from './modules/contacts/contacts.module'
+import { DashboardModule } from './modules/dashboard/dashboard.module'
 import { PostsModule } from './modules/posts/posts.module'
+import { RecruitmentModule } from './modules/recruitment/recruitment.module'
 import { SettingsModule } from './modules/settings/settings.module'
 import { TagsModule } from './modules/tags/tags.module'
 import { UsersModule } from './modules/users/users.module'
-import { ContactsModule } from './modules/contacts/contacts.module'
-import { RecruitmentModule } from './modules/recruitment/recruitment.module'
 import { PrismaModule } from './prisma/prisma.module'
 
 @Module({
@@ -41,6 +42,7 @@ import { PrismaModule } from './prisma/prisma.module'
     LoggerModule,
     ContactsModule,
     RecruitmentModule,
+    DashboardModule,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: BigIntInterceptor },

@@ -17,7 +17,9 @@ export function CandidateFilters({ status, onStatusChange }: CandidateFiltersPro
         <SelectContent>
           <SelectItem value='ALL'>Tất cả</SelectItem>
           {Object.entries(STATUS_LABELS).map(([key, label]) => (
-            <SelectItem key={key} value={key}>{label as string}</SelectItem>
+            <SelectItem key={key} value={key}>
+              {label as string}
+            </SelectItem>
           ))}
         </SelectContent>
       </Select>

@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { JobLevel, JobStatus, JobType } from '~/prisma/generated/prisma'
-import { IsDateString, IsEnum, IsInt, IsOptional, IsString, MaxLength } from 'class-validator'
 import { Transform } from 'class-transformer'
+import { IsDateString, IsEnum, IsInt, IsOptional, IsString, MaxLength } from 'class-validator'
+import { JobLevel, JobStatus, JobType } from '~/prisma/generated/prisma'
 
 export class CreateJobDto {
   @ApiProperty({ example: 'Senior Backend Developer' })

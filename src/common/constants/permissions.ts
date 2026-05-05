@@ -54,6 +54,9 @@ export const PERM_DEPARTMENTS_WRITE = 1n << 28n // 268435456
 export const PERM_DEPARTMENTS_UPDATE = 1n << 29n // 536870912
 export const PERM_DEPARTMENTS_DELETE = 1n << 30n // 1073741824
 
+// ── Dashboard ──────────────────────────────────
+export const PERM_DASHBOARD_READ = 1n << 31n // 2147483648
+
 // ── Composites ─────────────────────────────────
 export const PERM_ADMIN =
   PERM_POSTS_READ |
@@ -86,7 +89,8 @@ export const PERM_ADMIN =
   PERM_DEPARTMENTS_READ |
   PERM_DEPARTMENTS_WRITE |
   PERM_DEPARTMENTS_UPDATE |
-  PERM_DEPARTMENTS_DELETE
+  PERM_DEPARTMENTS_DELETE |
+  PERM_DASHBOARD_READ
 
 // All bits set (super admin / future-proof)
 export const PERM_SUPER_ADMIN = 0xffffffffffffffffn

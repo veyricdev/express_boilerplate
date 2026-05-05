@@ -8,11 +8,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-react": "^11.1.2",
     "@fontsource-variable/geist": "^5.2.8",
     "@hookform/resolvers": "^5.2.2",
     "@tailwindcss/vite": "^4.2.4",
     "@tanstack/react-query": "^5.100.6",
     "axios": "^1.15.2",
+    "ckeditor5": "^48.0.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -25,6 +27,7 @@
     "react-hook-form": "^7.74.0",
     "react-intersection-observer": "^10.0.3",
     "react-router": "^7.14.2",
+    "recharts": "^3.8.1",
     "shadcn": "^4.6.0",
     "slugify": "^1.6.9",
     "sonner": "^2.0.7",

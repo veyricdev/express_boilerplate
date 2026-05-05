@@ -126,7 +126,7 @@ export default function PostEditorPage() {
   })
 
   if (isEdit && isLoadingPost) {
-    return <div className='p-8 flex items-center justify-center'>Đang tải bài viết...</div>
+    return <div className='p-4 md:p-8 flex items-center justify-center'>Đang tải bài viết...</div>
   }
 
   return (

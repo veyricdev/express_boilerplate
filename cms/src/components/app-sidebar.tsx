@@ -60,9 +60,7 @@ import { useAuth } from '@/store/auth'
 const navigationGroups = [
   {
     label: 'Tổng quan',
-    items: [
-      { name: 'Dashboard', href: '/', icon: LayoutDashboard, perm: undefined },
-    ],
+    items: [{ name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, perm: undefined }],
   },
   {
     label: 'Nội dung',
@@ -82,9 +80,7 @@ const navigationGroups = [
   },
   {
     label: 'Liên hệ',
-    items: [
-      { name: 'Hộp thư', href: '/contacts', icon: Mail, perm: PERM_CONTACTS_READ },
-    ],
+    items: [{ name: 'Hộp thư', href: '/contacts', icon: Mail, perm: PERM_CONTACTS_READ }],
   },
   {
     label: 'Hệ thống',

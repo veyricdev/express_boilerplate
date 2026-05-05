@@ -1,11 +1,15 @@
-import { Injectable, BadRequestException } from '@nestjs/common'
-import { join, extname } from 'node:path'
-import { createWriteStream } from 'node:fs'
 import { randomUUID } from 'node:crypto'
+import { createWriteStream } from 'node:fs'
+import { extname, join } from 'node:path'
 import { pipeline } from 'node:stream/promises'
 import type { MultipartFile } from '@fastify/multipart'
+import { BadRequestException, Injectable } from '@nestjs/common'
 
-const ALLOWED_MIME_TYPES = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+const ALLOWED_MIME_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+]
 const MAX_SIZE = 5 * 1024 * 1024 // 5MB
 
 @Injectable()

@@ -216,3 +216,38 @@ export interface Candidate {
   createdAt: string
   updatedAt: string
 }
+
+// ── Dashboard ────────────────────────────────────────────────────────────────
+
+export interface DashboardSummary {
+  posts: {
+    total: number
+    newThisMonth: number
+    totalViews: number
+  }
+  recruitment: {
+    activeJobs: number
+    totalCandidates: number
+    onboardedCandidates: number
+    successRate: number
+  }
+}
+
+export interface DashboardAnalytics {
+  viewTrend: {
+    date: string
+    views: number
+    posts: number
+  }[]
+  funnel: {
+    status: string
+    count: number
+  }[]
+}
+
+export type DashboardActivity = AuditLog & {
+  user: {
+    fullName: string
+    avatarUrl?: string | null
+  }
+}

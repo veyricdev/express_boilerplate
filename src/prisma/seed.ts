@@ -3,7 +3,7 @@ import { faker } from '@faker-js/faker'
 import { PrismaMariaDb } from '@prisma/adapter-mariadb'
 import * as bcrypt from 'bcrypt'
 import { PERM_ADMIN } from '../common/constants/permissions'
-import { PostStatus, JobType, JobStatus, JobLevel, CandidateStatus, PrismaClient } from './generated/prisma'
+import { CandidateStatus, JobLevel, JobStatus, JobType, PostStatus, PrismaClient } from './generated/prisma'
 
 const adapter = new PrismaMariaDb(process.env.DATABASE_URL || '')
 
@@ -141,8 +141,21 @@ async function main() {
         description: faker.lorem.paragraphs(2),
         requirements: faker.lorem.paragraphs(1),
         benefits: faker.lorem.paragraphs(1),
-        type: faker.helpers.arrayElement([JobType.FULL_TIME, JobType.PART_TIME, JobType.CONTRACT, JobType.INTERNSHIP, JobType.REMOTE]),
-        level: faker.helpers.arrayElement([JobLevel.INTERN, JobLevel.JUNIOR, JobLevel.MID, JobLevel.SENIOR, JobLevel.LEAD, JobLevel.MANAGER]),
+        type: faker.helpers.arrayElement([
+          JobType.FULL_TIME,
+          JobType.PART_TIME,
+          JobType.CONTRACT,
+          JobType.INTERNSHIP,
+          JobType.REMOTE,
+        ]),
+        level: faker.helpers.arrayElement([
+          JobLevel.INTERN,
+          JobLevel.JUNIOR,
+          JobLevel.MID,
+          JobLevel.SENIOR,
+          JobLevel.LEAD,
+          JobLevel.MANAGER,
+        ]),
         status: faker.helpers.arrayElement([JobStatus.DRAFT, JobStatus.OPEN, JobStatus.CLOSED]),
         location: faker.location.city(),
         salaryRange: '$1000 - $3000',
@@ -164,7 +177,12 @@ async function main() {
         phone: faker.phone.number({ style: 'national' }),
         cvUrl: 'https://example.com/dummy-cv.pdf',
         coverLetter: faker.lorem.paragraph(),
-        status: faker.helpers.arrayElement([CandidateStatus.RECEIVED, CandidateStatus.INTERVIEWING, CandidateStatus.HIRED, CandidateStatus.REJECTED]),
+        status: faker.helpers.arrayElement([
+          CandidateStatus.RECEIVED,
+          CandidateStatus.INTERVIEWING,
+          CandidateStatus.HIRED,
+          CandidateStatus.REJECTED,
+        ]),
         jobId: job.id,
       },
     })

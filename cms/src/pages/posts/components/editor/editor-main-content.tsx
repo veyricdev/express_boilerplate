@@ -1,4 +1,5 @@
-import { useFormContext } from 'react-hook-form'
+import { Controller, useFormContext } from 'react-hook-form'
+import CkEditor from '@/components/shared/ckeditor'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -7,7 +8,8 @@ import { Textarea } from '@/components/ui/textarea'
 export function EditorMainContent() {
   const {
     register,
-    formState: { errors },
+    control,
+    formState: { errors, isSubmitting },
   } = useFormContext()
 
   return (
@@ -55,11 +57,17 @@ export function EditorMainContent() {
             <Label htmlFor='content' className='text-sm font-semibold'>
               Nội dung <span className='text-destructive'>*</span>
             </Label>
-            <Textarea
-              id='content'
-              placeholder='Viết nội dung bài viết ở đây...'
-              className='w-full min-h-[500px] rounded-xl focus-visible:ring-primary/20 font-sans leading-relaxed p-4 border border-input'
-              {...register('content')}
+            <Controller
+              name='content'
+              control={control}
+              render={({ field }) => (
+                <CkEditor
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder='Viết nội dung bài viết ở đây...'
+                  pending={isSubmitting}
+                />
+              )}
             />
             {errors.content && <p className='text-xs text-destructive'>{errors.content?.message as string}</p>}
           </div>

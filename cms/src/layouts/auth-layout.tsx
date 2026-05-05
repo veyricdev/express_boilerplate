@@ -28,7 +28,7 @@ export default function AuthLayout() {
         </div>
 
         <div className='relative z-10'>
-          <div className='space-y-6 max-w-sm'>
+          <div className='p-6 md:p-8 space-y-6 relative'>
             <p className='text-primary-foreground/70 text-lg lg:text-xl font-medium leading-tight'>
               Hệ thống quản trị nội dung chuyên nghiệp, linh hoạt và tối ưu hiệu suất.
             </p>
@@ -43,7 +43,7 @@ export default function AuthLayout() {
       </div>
 
       {/* Right Panel: Form */}
-      <main className='flex-1 flex items-center justify-center p-8 lg:p-16 relative'>
+      <main className='flex-1 flex items-center justify-center p-6 lg:p-16 relative'>
         {/* Mobile Background Decoration */}
         <div className='md:hidden absolute inset-0 pointer-events-none'>
           <div className='absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[100px]' />

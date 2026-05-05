@@ -4,11 +4,11 @@ import { ArrowLeft, Save } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import { toast } from 'sonner'
+import CkEditor from '@/components/shared/ckeditor'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
 import { usePermission } from '@/hooks/use-permission'
 import { departmentService } from '@/services/department.service'
 import { CreateJobData, jobService } from '@/services/job.service'
@@ -130,7 +130,9 @@ export default function JobEditorPage() {
                 />
               </div>
               <div className='space-y-1.5'>
-                <Label className='text-muted-foreground uppercase text-[11px] font-bold tracking-wider'>Mức lương</Label>
+                <Label className='text-muted-foreground uppercase text-[11px] font-bold tracking-wider'>
+                  Mức lương
+                </Label>
                 <Input
                   value={form.salaryRange || ''}
                   onChange={(e) => update('salaryRange', e.target.value)}
@@ -149,35 +151,36 @@ export default function JobEditorPage() {
 
             {/* Description */}
             <div className='space-y-1.5'>
-              <Label className='text-muted-foreground uppercase text-[11px] font-bold tracking-wider'>Mô tả công việc *</Label>
-              <Textarea
-                rows={8}
+              <Label className='text-muted-foreground uppercase text-[11px] font-bold tracking-wider'>
+                Mô tả công việc *
+              </Label>
+              <CkEditor
                 value={form.description}
-                onChange={(e) => update('description', e.target.value)}
+                onChange={(val) => update('description', val)}
                 placeholder='Mô tả chi tiết công việc...'
-                className='resize-y'
+                pending={saveMutation.isPending}
               />
             </div>
 
             {/* Requirements */}
             <div className='space-y-1.5'>
               <Label className='text-muted-foreground uppercase text-[11px] font-bold tracking-wider'>Yêu cầu</Label>
-              <Textarea
-                rows={6}
+              <CkEditor
                 value={form.requirements || ''}
-                onChange={(e) => update('requirements', e.target.value)}
+                onChange={(val) => update('requirements', val)}
                 placeholder='Yêu cầu ứng viên...'
+                pending={saveMutation.isPending}
               />
             </div>
 
             {/* Benefits */}
             <div className='space-y-1.5'>
               <Label className='text-muted-foreground uppercase text-[11px] font-bold tracking-wider'>Quyền lợi</Label>
-              <Textarea
-                rows={6}
+              <CkEditor
                 value={form.benefits || ''}
-                onChange={(e) => update('benefits', e.target.value)}
+                onChange={(val) => update('benefits', val)}
                 placeholder='Quyền lợi được hưởng...'
+                pending={saveMutation.isPending}
               />
             </div>
           </div>
@@ -186,10 +189,8 @@ export default function JobEditorPage() {
         {/* Sidebar */}
         <div className='space-y-6'>
           <div className='bg-card rounded-2xl border shadow-sm p-5 space-y-6'>
-            <h3 className='font-bold uppercase tracking-wider text-sm border-b pb-3 mb-2'>
-              Phân loại & Trạng thái
-            </h3>
-            
+            <h3 className='font-bold uppercase tracking-wider text-sm border-b pb-3 mb-2'>Phân loại & Trạng thái</h3>
+
             <div className='space-y-1.5'>
               <Label className='text-muted-foreground uppercase text-[11px] font-bold tracking-wider'>Trạng thái</Label>
               <Select value={form.status} onValueChange={(v) => update('status', v as JobStatus)}>

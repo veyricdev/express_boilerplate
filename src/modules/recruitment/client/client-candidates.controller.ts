@@ -1,17 +1,17 @@
 import { BadRequestException, Controller, Param, ParseIntPipe, Post, Req } from '@nestjs/common'
 import { ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger'
+import type { FastifyRequest } from 'fastify'
 import { ApiWrappedResponse } from '~/common/decorators/api-response.decorator'
 import { CandidateResponseDto } from '../dto/candidate-response.dto'
 import { RecruitmentService } from '../recruitment.service'
 import { UploadService } from '../upload.service'
-import type { FastifyRequest } from 'fastify'
 
 @ApiTags('Jobs (Public)')
 @Controller('jobs')
 export class ClientCandidatesController {
   constructor(
     private readonly recruitmentService: RecruitmentService,
-    private readonly uploadService: UploadService,
+    private readonly uploadService: UploadService
   ) {}
 
   @Post(':id/apply')

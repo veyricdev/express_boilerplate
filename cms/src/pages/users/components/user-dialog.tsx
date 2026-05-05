@@ -152,7 +152,7 @@ export function UserDialog({ user, open, onOpenChange }: UserDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-[600px] rounded-3xl border-white/10 shadow-2xl overflow-hidden p-0 max-h-[90vh] overflow-y-auto'>
         <div className='absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none' />
-        <form onSubmit={handleSubmit(onSubmit)} className='p-8 space-y-6 relative' autoComplete='off'>
+        <form onSubmit={handleSubmit(onSubmit)} className='p-6 md:p-8 space-y-6 relative' autoComplete='off'>
           {/* Dummy inputs to fool browser autofill */}
           <input type='text' name='email' style={{ display: 'none' }} />
           <input type='password' name='password' style={{ display: 'none' }} />

@@ -31,13 +31,27 @@ export function CandidateTable({ candidates, isLoading }: CandidateTableProps) {
       <Table>
         <TableHeader className='bg-muted/50'>
           <TableRow className='hover:bg-transparent border-b'>
-            <TableHead className='px-6 py-4 font-bold text-foreground h-12 uppercase text-[11px] tracking-wider w-[80px]'>#ID</TableHead>
-            <TableHead className='w-[25%] px-6 py-4 font-bold text-foreground h-12 uppercase text-[11px] tracking-wider'>Ứng viên</TableHead>
-            <TableHead className='px-6 py-4 font-bold text-foreground h-12 uppercase text-[11px] tracking-wider'>Liên hệ</TableHead>
-            <TableHead className='px-6 py-4 font-bold text-foreground h-12 uppercase text-[11px] tracking-wider'>Vị trí ứng tuyển</TableHead>
-            <TableHead className='px-6 py-4 font-bold text-foreground h-12 uppercase text-[11px] tracking-wider'>Trạng thái</TableHead>
-            <TableHead className='px-6 py-4 font-bold text-foreground h-12 uppercase text-[11px] tracking-wider'>Ngày nộp</TableHead>
-            <TableHead className='px-6 py-4 font-bold text-foreground h-12 uppercase text-[11px] tracking-wider text-right'>Hành động</TableHead>
+            <TableHead className='px-6 py-4 font-bold text-foreground h-12 uppercase text-[11px] tracking-wider w-[80px]'>
+              #ID
+            </TableHead>
+            <TableHead className='w-[25%] px-6 py-4 font-bold text-foreground h-12 uppercase text-[11px] tracking-wider'>
+              Ứng viên
+            </TableHead>
+            <TableHead className='px-6 py-4 font-bold text-foreground h-12 uppercase text-[11px] tracking-wider'>
+              Liên hệ
+            </TableHead>
+            <TableHead className='px-6 py-4 font-bold text-foreground h-12 uppercase text-[11px] tracking-wider'>
+              Vị trí ứng tuyển
+            </TableHead>
+            <TableHead className='px-6 py-4 font-bold text-foreground h-12 uppercase text-[11px] tracking-wider'>
+              Trạng thái
+            </TableHead>
+            <TableHead className='px-6 py-4 font-bold text-foreground h-12 uppercase text-[11px] tracking-wider'>
+              Ngày nộp
+            </TableHead>
+            <TableHead className='px-6 py-4 font-bold text-foreground h-12 uppercase text-[11px] tracking-wider text-right'>
+              Hành động
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -61,7 +75,10 @@ export function CandidateTable({ candidates, isLoading }: CandidateTableProps) {
               <TableRow key={c.id} className='hover:bg-muted/30 transition-all border-b last:border-0 group'>
                 <TableCell className='px-6 py-5 font-mono text-[11px] text-muted-foreground'>#{c.id}</TableCell>
                 <TableCell className='px-6 py-5'>
-                  <Link to={`/candidates/${c.id}`} className='font-bold text-foreground hover:text-primary transition-colors'>
+                  <Link
+                    to={`/candidates/${c.id}`}
+                    className='font-bold text-foreground hover:text-primary transition-colors'
+                  >
                     {c.fullName}
                   </Link>
                 </TableCell>
@@ -85,7 +102,9 @@ export function CandidateTable({ candidates, isLoading }: CandidateTableProps) {
                       <>
                         <span className='font-bold text-sm'>{c.job.title}</span>
                         {c.job.department && (
-                          <span className='text-[11px] text-muted-foreground font-medium'>🏢 {c.job.department.name}</span>
+                          <span className='text-[11px] text-muted-foreground font-medium'>
+                            🏢 {c.job.department.name}
+                          </span>
                         )}
                       </>
                     ) : (
@@ -94,7 +113,10 @@ export function CandidateTable({ candidates, isLoading }: CandidateTableProps) {
                   </div>
                 </TableCell>
                 <TableCell className='px-6 py-5'>
-                  <Badge variant={STATUS_VARIANTS[c.status]} className='text-[10px] uppercase tracking-tighter px-2 py-0.5 rounded-full font-bold shadow-xs'>
+                  <Badge
+                    variant={STATUS_VARIANTS[c.status]}
+                    className='text-[10px] uppercase tracking-tighter px-2 py-0.5 rounded-full font-bold shadow-xs'
+                  >
                     {STATUS_LABELS[c.status]}
                   </Badge>
                 </TableCell>

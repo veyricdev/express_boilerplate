@@ -1,10 +1,22 @@
 import {
   hasPermission as checkPerm,
   PERM_AUDIT_READ,
+  PERM_CANDIDATES_READ,
+  PERM_CANDIDATES_UPDATE,
   PERM_CATS_DELETE,
   PERM_CATS_READ,
   PERM_CATS_UPDATE,
   PERM_CATS_WRITE,
+  PERM_CONTACTS_DELETE,
+  PERM_CONTACTS_READ,
+  PERM_DEPARTMENTS_DELETE,
+  PERM_DEPARTMENTS_READ,
+  PERM_DEPARTMENTS_UPDATE,
+  PERM_DEPARTMENTS_WRITE,
+  PERM_JOBS_DELETE,
+  PERM_JOBS_READ,
+  PERM_JOBS_UPDATE,
+  PERM_JOBS_WRITE,
   PERM_POSTS_DELETE,
   PERM_POSTS_READ,
   PERM_POSTS_UPDATE,
@@ -19,18 +31,6 @@ import {
   PERM_USERS_READ,
   PERM_USERS_UPDATE,
   PERM_USERS_WRITE,
-  PERM_CONTACTS_READ,
-  PERM_CONTACTS_DELETE,
-  PERM_JOBS_READ,
-  PERM_JOBS_WRITE,
-  PERM_JOBS_UPDATE,
-  PERM_JOBS_DELETE,
-  PERM_CANDIDATES_READ,
-  PERM_CANDIDATES_UPDATE,
-  PERM_DEPARTMENTS_READ,
-  PERM_DEPARTMENTS_WRITE,
-  PERM_DEPARTMENTS_UPDATE,
-  PERM_DEPARTMENTS_DELETE,
 } from '@shared/constants/permissions'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ShieldCheck } from 'lucide-react'
@@ -199,7 +199,7 @@ export function EditPermissionsDialog({ user, isOpen, onClose }: EditPermissions
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className='sm:max-w-2xl rounded-3xl border-white/10 shadow-2xl overflow-hidden p-0 animate-in zoom-in-95 duration-200'>
         <div className='absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none' />
-        <div className='p-8 space-y-6 relative'>
+        <div className='p-6 md:p-8 space-y-6 relative'>
           <DialogHeader>
             <DialogTitle className='text-2xl font-bold flex items-center gap-3'>
               <div className='h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary'>

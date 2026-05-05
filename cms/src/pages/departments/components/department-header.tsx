@@ -1,6 +1,6 @@
+import { PERM_DEPARTMENTS_WRITE } from '@shared/constants/permissions'
 import { Building2, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { PERM_DEPARTMENTS_WRITE } from '@shared/constants/permissions'
 import { usePermission } from '@/hooks/use-permission'
 
 interface DepartmentHeaderProps {
@@ -19,7 +19,7 @@ export function DepartmentHeader({ onAdd }: DepartmentHeaderProps) {
         <p className='text-muted-foreground text-sm'>Quản lý các phòng ban / bộ phận</p>
       </div>
       {has(PERM_DEPARTMENTS_WRITE) && (
-        <Button 
+        <Button
           onClick={onAdd}
           className='shadow-lg shadow-primary/20 h-10 rounded-xl px-5 font-bold transition-all hover:scale-[1.02] active:scale-95'
         >

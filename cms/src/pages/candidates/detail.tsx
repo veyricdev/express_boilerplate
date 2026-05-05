@@ -47,7 +47,7 @@ export default function CandidateDetailPage() {
   const c = candidate as any as Candidate | undefined
 
   return (
-    <div className='p-8 space-y-8 animate-in fade-in duration-500 max-w-(--breakpoint-2xl) w-full mx-auto'>
+    <div className='p-4 md:p-8 space-y-8 animate-in fade-in duration-500 max-w-(--breakpoint-2xl) w-full mx-auto'>
       <div className='flex items-center gap-3'>
         <Button variant='ghost' size='sm' asChild>
           <Link to='/candidates'>
