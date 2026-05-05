@@ -100,7 +100,7 @@ export class SettingsService implements OnModuleInit {
 
   async getAll(): Promise<SettingRecord[]> {
     const cached = await this.cacheGet()
-    if (cached) return cached
+    if (cached && cached.length > 0) return cached
 
     const settings = await this.prisma.db.setting.findMany({
       orderBy: [{ group: 'asc' }, { key: 'asc' }],

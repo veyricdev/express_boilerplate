@@ -19,6 +19,18 @@ import {
   PERM_USERS_READ,
   PERM_USERS_UPDATE,
   PERM_USERS_WRITE,
+  PERM_CONTACTS_READ,
+  PERM_CONTACTS_DELETE,
+  PERM_JOBS_READ,
+  PERM_JOBS_WRITE,
+  PERM_JOBS_UPDATE,
+  PERM_JOBS_DELETE,
+  PERM_CANDIDATES_READ,
+  PERM_CANDIDATES_UPDATE,
+  PERM_DEPARTMENTS_READ,
+  PERM_DEPARTMENTS_WRITE,
+  PERM_DEPARTMENTS_UPDATE,
+  PERM_DEPARTMENTS_DELETE,
 } from '@shared/constants/permissions'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ShieldCheck } from 'lucide-react'
@@ -66,6 +78,38 @@ const PERMISSION_GROUPS = [
       { perm: PERM_TAGS_WRITE, type: 'CREATE', label: 'Thêm' },
       { perm: PERM_TAGS_UPDATE, type: 'UPDATE', label: 'Sửa' },
       { perm: PERM_TAGS_DELETE, type: 'DELETE', label: 'Xóa' },
+    ],
+  },
+  {
+    entity: 'Phòng ban',
+    actions: [
+      { perm: PERM_DEPARTMENTS_READ, type: 'READ', label: 'Xem' },
+      { perm: PERM_DEPARTMENTS_WRITE, type: 'CREATE', label: 'Thêm' },
+      { perm: PERM_DEPARTMENTS_UPDATE, type: 'UPDATE', label: 'Sửa' },
+      { perm: PERM_DEPARTMENTS_DELETE, type: 'DELETE', label: 'Xóa' },
+    ],
+  },
+  {
+    entity: 'Tin tuyển dụng',
+    actions: [
+      { perm: PERM_JOBS_READ, type: 'READ', label: 'Xem' },
+      { perm: PERM_JOBS_WRITE, type: 'CREATE', label: 'Thêm' },
+      { perm: PERM_JOBS_UPDATE, type: 'UPDATE', label: 'Sửa' },
+      { perm: PERM_JOBS_DELETE, type: 'DELETE', label: 'Xóa' },
+    ],
+  },
+  {
+    entity: 'Ứng viên',
+    actions: [
+      { perm: PERM_CANDIDATES_READ, type: 'READ', label: 'Xem' },
+      { perm: PERM_CANDIDATES_UPDATE, type: 'UPDATE', label: 'Sửa' },
+    ],
+  },
+  {
+    entity: 'Hộp thư',
+    actions: [
+      { perm: PERM_CONTACTS_READ, type: 'READ', label: 'Xem' },
+      { perm: PERM_CONTACTS_DELETE, type: 'DELETE', label: 'Xóa' },
     ],
   },
   {

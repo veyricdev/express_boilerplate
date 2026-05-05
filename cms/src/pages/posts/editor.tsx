@@ -131,7 +131,7 @@ export default function PostEditorPage() {
 
   return (
     <FormProvider {...methods}>
-      <div className='p-4 md:p-8 space-y-6 md:space-y-8'>
+      <div className='p-4 md:p-8 space-y-6 md:space-y-8 max-w-(--breakpoint-2xl) w-full mx-auto'>
         <EditorHeader
           isEdit={isEdit}
           isPending={mutation.isPending}

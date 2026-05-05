@@ -18,6 +18,8 @@ import { PostsModule } from './modules/posts/posts.module'
 import { SettingsModule } from './modules/settings/settings.module'
 import { TagsModule } from './modules/tags/tags.module'
 import { UsersModule } from './modules/users/users.module'
+import { ContactsModule } from './modules/contacts/contacts.module'
+import { RecruitmentModule } from './modules/recruitment/recruitment.module'
 import { PrismaModule } from './prisma/prisma.module'
 
 @Module({
@@ -37,6 +39,8 @@ import { PrismaModule } from './prisma/prisma.module'
     AuditLogsModule,
     SettingsModule,
     LoggerModule,
+    ContactsModule,
+    RecruitmentModule,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: BigIntInterceptor },

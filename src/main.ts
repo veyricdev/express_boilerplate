@@ -1,4 +1,6 @@
 import { join } from 'node:path'
+import { mkdirSync } from 'node:fs'
+import multipart from '@fastify/multipart'
 import helmet from '@fastify/helmet'
 import { ValidationPipe, VersioningType } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
@@ -11,6 +13,14 @@ import { ApiResponseDto } from './common/dtos/api-response.dto'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter({ logger: true }))
+
+  // Multipart (file upload)
+  await app.register(multipart, {
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  })
+
+  // Ensure upload directory exists
+  mkdirSync(join(__dirname, '..', 'public', 'uploads', 'cvs'), { recursive: true })
 
   // Security
   await app.register(helmet, {

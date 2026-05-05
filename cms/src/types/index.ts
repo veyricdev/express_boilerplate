@@ -127,3 +127,92 @@ export interface PaginatedResponse<T> {
     hasPreviousPage: boolean
   }
 }
+
+// ── Contacts ─────────────────────────────────────────────────────────────────
+
+export interface ContactSubmission {
+  id: number
+  fullName: string
+  email: string
+  phone?: string | null
+  subject: string
+  message: string
+  isRead: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+// ── Recruitment ───────────────────────────────────────────────────────────────
+
+export enum JobType {
+  FULL_TIME = 'FULL_TIME',
+  PART_TIME = 'PART_TIME',
+  CONTRACT = 'CONTRACT',
+  INTERNSHIP = 'INTERNSHIP',
+  REMOTE = 'REMOTE',
+}
+
+export enum JobStatus {
+  DRAFT = 'DRAFT',
+  OPEN = 'OPEN',
+  CLOSED = 'CLOSED',
+}
+
+export enum JobLevel {
+  INTERN = 'INTERN',
+  JUNIOR = 'JUNIOR',
+  MID = 'MID',
+  SENIOR = 'SENIOR',
+  LEAD = 'LEAD',
+  MANAGER = 'MANAGER',
+}
+
+export enum CandidateStatus {
+  RECEIVED = 'RECEIVED',
+  INTERVIEWING = 'INTERVIEWING',
+  REJECTED = 'REJECTED',
+  HIRED = 'HIRED',
+}
+
+export interface Department {
+  id: number
+  name: string
+  description?: string | null
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Job {
+  id: number
+  title: string
+  slug: string
+  departmentId?: number | null
+  department?: Department | null
+  description: string
+  requirements?: string | null
+  benefits?: string | null
+  salaryRange?: string | null
+  location?: string | null
+  type: JobType
+  level: JobLevel
+  status: JobStatus
+  deadline?: string | null
+  deletedAt?: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Candidate {
+  id: number
+  jobId: number
+  job?: Job | null
+  fullName: string
+  email: string
+  phone?: string | null
+  cvUrl: string
+  coverLetter?: string | null
+  status: CandidateStatus
+  createdAt: string
+  updatedAt: string
+}

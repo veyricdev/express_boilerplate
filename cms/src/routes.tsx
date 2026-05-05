@@ -16,6 +16,15 @@ const UsersPage = lazy(() => import('@/pages/users'))
 const AuditLogsPage = lazy(() => import('@/pages/audit-logs'))
 const SettingsPage = lazy(() => import('@/pages/settings'))
 const ForbiddenPage = lazy(() => import('@/pages/errors/403'))
+// Contacts
+const ContactsPage = lazy(() => import('@/pages/contacts/index'))
+const ContactDetailPage = lazy(() => import('@/pages/contacts/detail'))
+// Recruitment
+const DepartmentsPage = lazy(() => import('@/pages/departments/index'))
+const JobsPage = lazy(() => import('@/pages/jobs/index'))
+const JobEditorPage = lazy(() => import('@/pages/jobs/editor'))
+const CandidatesPage = lazy(() => import('@/pages/candidates/index'))
+const CandidateDetailPage = lazy(() => import('@/pages/candidates/detail'))
 
 const ProtectedRoute = () => {
   const isAuthenticated = useAuth((state) => state.isAuthenticated)
@@ -122,6 +131,87 @@ export const router = createBrowserRouter(
                   <ForbiddenPage />
                 </Suspense>
               ),
+            },
+            // ── Contacts ────────────────────────────────────────────────
+            {
+              path: 'contacts',
+              children: [
+                {
+                  index: true,
+                  element: (
+                    <Suspense fallback={null}>
+                      <ContactsPage />
+                    </Suspense>
+                  ),
+                },
+                {
+                  path: ':id',
+                  element: (
+                    <Suspense fallback={null}>
+                      <ContactDetailPage />
+                    </Suspense>
+                  ),
+                },
+              ],
+            },
+            // ── Recruitment ─────────────────────────────────────────────
+            {
+              path: 'departments',
+              element: (
+                <Suspense fallback={null}>
+                  <DepartmentsPage />
+                </Suspense>
+              ),
+            },
+            {
+              path: 'jobs',
+              children: [
+                {
+                  index: true,
+                  element: (
+                    <Suspense fallback={null}>
+                      <JobsPage />
+                    </Suspense>
+                  ),
+                },
+                {
+                  path: 'new',
+                  element: (
+                    <Suspense fallback={null}>
+                      <JobEditorPage />
+                    </Suspense>
+                  ),
+                },
+                {
+                  path: ':id/edit',
+                  element: (
+                    <Suspense fallback={null}>
+                      <JobEditorPage />
+                    </Suspense>
+                  ),
+                },
+              ],
+            },
+            {
+              path: 'candidates',
+              children: [
+                {
+                  index: true,
+                  element: (
+                    <Suspense fallback={null}>
+                      <CandidatesPage />
+                    </Suspense>
+                  ),
+                },
+                {
+                  path: ':id',
+                  element: (
+                    <Suspense fallback={null}>
+                      <CandidateDetailPage />
+                    </Suspense>
+                  ),
+                },
+              ],
             },
           ],
         },

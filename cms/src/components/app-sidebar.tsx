@@ -1,6 +1,10 @@
 import {
   PERM_AUDIT_READ,
+  PERM_CANDIDATES_READ,
   PERM_CATS_READ,
+  PERM_CONTACTS_READ,
+  PERM_DEPARTMENTS_READ,
+  PERM_JOBS_READ,
   PERM_POSTS_READ,
   PERM_SETTINGS_READ,
   PERM_TAGS_READ,
@@ -9,12 +13,15 @@ import {
 import {
   BadgeCheck,
   Bell,
+  Briefcase,
+  Building2,
   ChevronsUpDown,
   FileText,
   FolderTree,
   History,
   LayoutDashboard,
   LogOut,
+  Mail,
   Settings,
   Tag,
   Users,
@@ -50,14 +57,43 @@ import { usePermission } from '@/hooks/use-permission'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/store/auth'
 
-const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard }, // No specific permission
-  { name: 'Bài viết', href: '/posts', icon: FileText, perm: PERM_POSTS_READ },
-  { name: 'Danh mục', href: '/categories', icon: FolderTree, perm: PERM_CATS_READ },
-  { name: 'Tags', href: '/tags', icon: Tag, perm: PERM_TAGS_READ },
-  { name: 'Audit Logs', href: '/audit-logs', icon: History, perm: PERM_AUDIT_READ },
-  { name: 'Người dùng', href: '/users', icon: Users, perm: PERM_USERS_READ },
-  { name: 'Cấu hình', href: '/settings', icon: Settings, perm: PERM_SETTINGS_READ },
+const navigationGroups = [
+  {
+    label: 'Tổng quan',
+    items: [
+      { name: 'Dashboard', href: '/', icon: LayoutDashboard, perm: undefined },
+    ],
+  },
+  {
+    label: 'Nội dung',
+    items: [
+      { name: 'Bài viết', href: '/posts', icon: FileText, perm: PERM_POSTS_READ },
+      { name: 'Danh mục', href: '/categories', icon: FolderTree, perm: PERM_CATS_READ },
+      { name: 'Tags', href: '/tags', icon: Tag, perm: PERM_TAGS_READ },
+    ],
+  },
+  {
+    label: 'Tuyển dụng',
+    items: [
+      { name: 'Phòng ban', href: '/departments', icon: Building2, perm: PERM_DEPARTMENTS_READ },
+      { name: 'Tin tuyển dụng', href: '/jobs', icon: Briefcase, perm: PERM_JOBS_READ },
+      { name: 'Ứng viên', href: '/candidates', icon: Users, perm: PERM_CANDIDATES_READ },
+    ],
+  },
+  {
+    label: 'Liên hệ',
+    items: [
+      { name: 'Hộp thư', href: '/contacts', icon: Mail, perm: PERM_CONTACTS_READ },
+    ],
+  },
+  {
+    label: 'Hệ thống',
+    items: [
+      { name: 'Người dùng', href: '/users', icon: Users, perm: PERM_USERS_READ },
+      { name: 'Audit Logs', href: '/audit-logs', icon: History, perm: PERM_AUDIT_READ },
+      { name: 'Cấu hình', href: '/settings', icon: Settings, perm: PERM_SETTINGS_READ },
+    ],
+  },
 ]
 
 export function AppSidebar() {
@@ -89,54 +125,57 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel className='group-data-[collapsible=icon]:hidden px-4 transition-all duration-200'>
-            Hệ thống
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className='gap-1 px-2 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:items-center transition-all duration-200'>
-              {navigation.map((item) => {
-                if (item.perm && !permission.has(item.perm)) {
-                  return null
-                }
-                const isActive =
-                  location.pathname === item.href || (item.href !== '/' && location.pathname.startsWith(item.href))
-                return (
-                  <SidebarMenuItem
-                    key={item.name}
-                    className='relative w-full flex justify-center transition-all duration-200'
-                  >
-                    {isActive && (
-                      <div className='absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full z-10 group-data-[collapsible=icon]:h-4 transition-all duration-200' />
-                    )}
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isActive}
-                      tooltip={item.name}
-                      className={cn(
-                        'transition-all duration-200 h-11 px-3 rounded-xl w-full',
-                        isActive
-                          ? 'bg-sidebar-accent text-sidebar-accent-foreground font-bold shadow-sm'
-                          : 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50',
-                        'group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:rounded-lg group-data-[collapsible=icon]:w-auto'
-                      )}
-                    >
-                      <Link to={item.href} className='flex items-center gap-3 w-full'>
-                        <item.icon
+        {navigationGroups.map((group) => {
+          const visibleItems = group.items.filter((item) => !item.perm || permission.has(item.perm))
+          if (visibleItems.length === 0) return null
+          return (
+            <SidebarGroup key={group.label}>
+              <SidebarGroupLabel className='group-data-[collapsible=icon]:hidden px-4 transition-all duration-200'>
+                {group.label}
+              </SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu className='gap-1 px-2 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:items-center transition-all duration-200'>
+                  {visibleItems.map((item) => {
+                    const isActive =
+                      location.pathname === item.href || (item.href !== '/' && location.pathname.startsWith(item.href))
+                    return (
+                      <SidebarMenuItem
+                        key={item.name}
+                        className='relative w-full flex justify-center transition-all duration-200'
+                      >
+                        {isActive && (
+                          <div className='absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full z-10 group-data-[collapsible=icon]:h-4 transition-all duration-200' />
+                        )}
+                        <SidebarMenuButton
+                          asChild
+                          isActive={isActive}
+                          tooltip={item.name}
                           className={cn(
-                            'size-5 shrink-0 transition-colors duration-200',
-                            isActive ? 'text-primary' : 'text-muted-foreground'
+                            'transition-all duration-200 h-11 px-3 rounded-xl w-full',
+                            isActive
+                              ? 'bg-sidebar-accent text-sidebar-accent-foreground font-bold shadow-sm'
+                              : 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50',
+                            'group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:rounded-lg group-data-[collapsible=icon]:w-auto'
                           )}
-                        />
-                        <span className='truncate group-data-[collapsible=icon]:hidden'>{item.name}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+                        >
+                          <Link to={item.href} className='flex items-center gap-3 w-full'>
+                            <item.icon
+                              className={cn(
+                                'size-5 shrink-0 transition-colors duration-200',
+                                isActive ? 'text-primary' : 'text-muted-foreground'
+                              )}
+                            />
+                            <span className='truncate group-data-[collapsible=icon]:hidden'>{item.name}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    )
+                  })}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          )
+        })}
       </SidebarContent>
       <SidebarFooter className='p-2 group-data-[collapsible=icon]:p-2 border-t'>
         <SidebarMenu className='group-data-[collapsible=icon]:items-center'>
