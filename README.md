@@ -20,14 +20,16 @@ Một boilerplate chuyên nghiệp sử dụng **NestJS (Fastify)** làm backend
 - **📝 CMS & User Management**: 
   - Quản lý bài viết với trạng thái **Scheduled Publishing** (hẹn giờ đăng bài).
   - Quản lý người dùng nâng cao (Tạo mới, phân quyền, trạng thái hoạt động).
+  - **Recruitment Module**: Quản lý tuyển dụng chuyên nghiệp (Jobs, Candidates, Departments).
+  - **Contacts Module**: Tiếp nhận và quản lý thông tin liên hệ từ khách hàng.
   - **Hybrid Global Settings**: Quản lý cấu hình chung linh hoạt, chia thành Core Settings (cố định) và Custom Settings (tùy chỉnh), hỗ trợ đa dạng kiểu dữ liệu. Tối ưu caching với Redis hoặc In-memory.
 - **🕵️ Audit Logging System**: 
   - Tự động ghi lại mọi thao tác thay đổi dữ liệu (`POST`, `PATCH`, `DELETE`) của Admin.
   - Xem lịch sử hoạt động, chi tiết dữ liệu cũ và mới, IP người thực hiện.
 - **📚 API Documentation**: Tích hợp **Scalar API Reference / Swagger** tại `/docs`.
 - **🛠️ Developer Experience**:
-  - **Bitwise Permissions**: Hệ thống phân quyền nâng cao sử dụng Bit Flags (BigInt) cho hiệu năng tối ưu.
-  - **Unified Pagination**: Engine phân trang đồng nhất cho toàn bộ hệ thống Admin.
+  - **Bitwise Permissions**: Hệ thống phân quyền nâng cao sử dụng Bit Flags (BigInt). Đặc biệt hỗ trợ cờ `isOwner` giúp bypass mọi kiểm tra quyền cho tài khoản quản trị tối cao.
+  - **Unified Pagination**: Engine phân trang đồng nhất cho toàn bộ hệ thống Admin, hỗ trợ thay đổi số bản ghi mỗi trang.
 
 ---
 
@@ -39,7 +41,7 @@ Một boilerplate chuyên nghiệp sử dụng **NestJS (Fastify)** làm backend
 ├── src/                # NestJS Backend API
 │   ├── common/         # Decorators, Guards, Filters, Interceptors, Helpers
 │   ├── config/         # Cấu hình hệ thống & Validation môi trường
-│   ├── modules/        # Các tính năng chính (Auth, Users, Posts, AuditLogs,...)
+│   ├── modules/        # Các tính năng (Auth, Users, Posts, Recruitment, Contacts,...)
 │   ├── prisma/         # Prisma Module, Service, Schema, và Seed logic
 │   └── shared/         # Logic dùng chung & Vite Integration
 ├── pnpm-workspace.yaml # Cấu hình pnpm workspaces
@@ -99,7 +101,7 @@ Tạo file `.env` (nếu chưa có). **Lưu ý quan trọng khi dùng Docker:**
 
 ### 3. Chạy Container
 ```bash
-docker run -d -p 3000:3000 --env-file .env --name nest-react-app nest-react-app
+docker run -d -p 3000:3000 --env-file .env --restart unless-stopped --name nest-react-app nest-react-app
 ```
 
 ---
