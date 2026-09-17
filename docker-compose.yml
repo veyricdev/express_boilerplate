@@ -21,7 +21,7 @@ services:
   # Redis cache
   app_cache:
     container_name: express_boilerplate_redis
-    image: redis:8.4.0-alpine
+    image: redis:8.10.1-alpine
     ports:
       - "6679:6379"
     restart: unless-stopped
