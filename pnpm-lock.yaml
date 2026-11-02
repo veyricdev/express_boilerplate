@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@asteasolutions/zod-to-openapi':
         specifier: 8.2.0
-        version: 8.2.0(zod@4.3.2)
+        version: 8.2.0(zod@4.6.6)
       '@prisma/adapter-pg':
         specifier: ^7.2.0
         version: 7.2.0
@@ -114,8 +114,8 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0
       zod:
-        specifier: 4.3.2
-        version: 4.3.2
+        specifier: 4.6.6
+        version: 4.6.6
     devDependencies:
       '@biomejs/biome':
         specifier: 2.2.4
@@ -2599,15 +2599,15 @@ packages:
   zeptomatch@2.0.2:
     resolution: {integrity: sha512-H33jtSKf8Ijtb5BW6wua3G5DhnFjbFML36eFu+VdOoVY4HD9e7ggjqdM6639B+L87rjnR6Y+XeRzBXZdy52B/g==}
 
-  zod@4.3.2:
-    resolution: {integrity: sha512-b8L8yn4rIVfiXyHAmnr52/ZEpDumlT0bmxiq3Ws1ybrinhflGpt12Hvv54kYnEsGPRs6o/Ka3/ppA2OWY21IVg==}
+  zod@4.6.6:
+    resolution: {integrity: sha512-4UmzQUF5fxvfcYHlbjBmejU+w+hbDnWFx4aS8kBx7nPBHcO2SqPbpAG8snbdg+Xse4pRefR98hgjFgIMCI/UhA==}
 
 snapshots:
 
-  '@asteasolutions/zod-to-openapi@8.2.0(zod@4.3.2)':
+  '@asteasolutions/zod-to-openapi@8.2.0(zod@4.6.6)':
     dependencies:
       openapi3-ts: 4.5.0
-      zod: 4.3.2
+      zod: 4.6.6
 
   '@biomejs/biome@2.2.4':
     optionalDependencies:
@@ -3014,7 +3014,7 @@ snapshots:
       '@scalar/helpers': 0.2.4
       nanoid: 5.1.5
       type-fest: 5.0.0
-      zod: 4.3.2
+      zod: 4.6.6
 
   '@sindresorhus/is@5.6.0': {}
 
@@ -4920,4 +4920,4 @@ snapshots:
     dependencies:
       grammex: 3.1.12
 
-  zod@4.3.2: {}
+  zod@4.6.6: {}
